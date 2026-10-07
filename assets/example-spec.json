@@ -1,0 +1,26 @@
+{
+ "spec_version": 1,
+ "name": "Order flow",
+ "pages": [
+  {
+   "name": "Overview",
+   "grid": {"column_pitch": 240, "row_pitch": 170},
+   "nodes": [
+    {"key": "customer", "shape": "biz/WomanCustomer", "label": "Customer", "col": 0, "row": 1, "scale": 1.6, "label_position": "below"},
+    {"key": "shop", "shape": "basic/Square", "label": "Web shop", "col": 1, "row": 1, "width": 140, "height": 70},
+    {"key": "orders", "shape": "basic/Square", "label": "Order service", "col": 2, "row": 1, "width": 140, "height": 70},
+    {"key": "payments", "shape": "basic/Square", "label": "Payments", "col": 3, "row": 0, "width": 140, "height": 70},
+    {"key": "warehouse", "shape": "basic/Square", "label": "Warehouse", "col": 3, "row": 2, "width": 140, "height": 70},
+    {"key": "database", "shape": "basic/Cylinder", "label": "Orders", "col": 2, "row": 2.2, "scale": 1.6, "label_position": "below"},
+    {"key": "note", "shape": "note", "label": "Stock is reserved\nbefore payment", "col": 4.1, "row": 2, "width": 170, "height": 80}
+   ],
+   "edges": [
+    {"source": "customer", "target": "shop", "label": "browses"},
+    {"source": "shop", "target": "orders", "label": "places order"},
+    {"source": "orders", "target": "payments"},
+    {"source": "orders", "target": "warehouse"},
+    {"source": "orders", "target": "database", "end_ending": "none", "pattern": "dashed"}
+   ]
+  }
+ ]
+}

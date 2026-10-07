@@ -1,0 +1,512 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://simplediagrams.com/schemas/diagram-spec-1.schema.json",
+ "$defs": {
+  "EdgeSpec": {
+   "additionalProperties": false,
+   "description": "A connector between two nodes.",
+   "properties": {
+    "source": {
+     "description": "Key of the node the connector leaves.",
+     "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
+     "title": "Source",
+     "type": "string"
+    },
+    "target": {
+     "description": "Key of the node the connector arrives at.",
+     "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
+     "title": "Target",
+     "type": "string"
+    },
+    "label": {
+     "default": "",
+     "maxLength": 2000,
+     "title": "Label",
+     "type": "string"
+    },
+    "route": {
+     "default": "orthogonal",
+     "description": "orthogonal: horizontal and vertical runs only. straight: one direct line. curved: one direct line with a gentle bow.",
+     "enum": [
+      "orthogonal",
+      "straight",
+      "curved"
+     ],
+     "title": "Route",
+     "type": "string"
+    },
+    "source_side": {
+     "anyOf": [
+      {
+       "enum": [
+        "left",
+        "right",
+        "top",
+        "bottom"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Chosen automatically if omitted.",
+     "title": "Source Side"
+    },
+    "target_side": {
+     "anyOf": [
+      {
+       "enum": [
+        "left",
+        "right",
+        "top",
+        "bottom"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Chosen automatically if omitted.",
+     "title": "Target Side"
+    },
+    "start_ending": {
+     "default": "none",
+     "enum": [
+      "none",
+      "stop",
+      "arrow",
+      "solidArrow",
+      "circle",
+      "solidCircle",
+      "openDiamond",
+      "diamond",
+      "halfCircle",
+      "crowFoot",
+      "one",
+      "oneAndOnlyOne",
+      "zeroOrOne",
+      "oneOrMany",
+      "zeroOrMany",
+      "filledArrow",
+      "slash"
+     ],
+     "title": "Start Ending",
+     "type": "string"
+    },
+    "end_ending": {
+     "default": "arrow",
+     "enum": [
+      "none",
+      "stop",
+      "arrow",
+      "solidArrow",
+      "circle",
+      "solidCircle",
+      "openDiamond",
+      "diamond",
+      "halfCircle",
+      "crowFoot",
+      "one",
+      "oneAndOnlyOne",
+      "zeroOrOne",
+      "oneOrMany",
+      "zeroOrMany",
+      "filledArrow",
+      "slash"
+     ],
+     "title": "End Ending",
+     "type": "string"
+    },
+    "pattern": {
+     "default": "solid",
+     "enum": [
+      "solid",
+      "dashed",
+      "dotted"
+     ],
+     "title": "Pattern",
+     "type": "string"
+    },
+    "stroke": {
+     "default": "#495057",
+     "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+     "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+     "title": "Stroke",
+     "type": "string"
+    },
+    "line_width": {
+     "default": 2,
+     "maximum": 10000,
+     "minimum": 0,
+     "title": "Line Width",
+     "type": "number"
+    }
+   },
+   "required": [
+    "source",
+    "target"
+   ],
+   "title": "EdgeSpec",
+   "type": "object"
+  },
+  "GridLayout": {
+   "additionalProperties": false,
+   "description": "Turns `col` and `row` into page coordinates.\n\nA node's centre sits at `origin + (col * column_pitch, row * row_pitch)`.\nFractional columns and rows are allowed for staggered layouts.",
+   "properties": {
+    "origin_x": {
+     "default": 200,
+     "description": "Page x of column 0's centre line.",
+     "maximum": 1000000,
+     "minimum": -1000000,
+     "title": "Origin X",
+     "type": "number"
+    },
+    "origin_y": {
+     "default": 160,
+     "description": "Page y of row 0's centre line.",
+     "maximum": 1000000,
+     "minimum": -1000000,
+     "title": "Origin Y",
+     "type": "number"
+    },
+    "column_pitch": {
+     "default": 240,
+     "description": "Distance between column centres.",
+     "maximum": 10000,
+     "minimum": 10,
+     "title": "Column Pitch",
+     "type": "number"
+    },
+    "row_pitch": {
+     "default": 160,
+     "description": "Distance between row centres.",
+     "maximum": 10000,
+     "minimum": 10,
+     "title": "Row Pitch",
+     "type": "number"
+    }
+   },
+   "title": "GridLayout",
+   "type": "object"
+  },
+  "NodeSpec": {
+   "additionalProperties": false,
+   "description": "One shape on the page.\n\nGive either `col` and `row`, or `x` and `y`. Both name the node's centre,\nso nodes of different sizes still line up along shared centre lines.",
+   "properties": {
+    "key": {
+     "description": "Your own name for this node, unique on the page.",
+     "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
+     "title": "Key",
+     "type": "string"
+    },
+    "shape": {
+     "description": "rectangle, ellipse, note or text for a plain drawn shape, or '<library>/<item>' for a library shape, for example 'basic/Cylinder'. Library and item names come from assets/built-in-shapes.json.",
+     "title": "Shape",
+     "type": "string"
+    },
+    "label": {
+     "default": "",
+     "maxLength": 2000,
+     "title": "Label",
+     "type": "string"
+    },
+    "col": {
+     "anyOf": [
+      {
+       "maximum": 10000,
+       "minimum": -10000,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Col"
+    },
+    "row": {
+     "anyOf": [
+      {
+       "maximum": 10000,
+       "minimum": -10000,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Row"
+    },
+    "x": {
+     "anyOf": [
+      {
+       "maximum": 1000000,
+       "minimum": -1000000,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "X"
+    },
+    "y": {
+     "anyOf": [
+      {
+       "maximum": 1000000,
+       "minimum": -1000000,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Y"
+    },
+    "width": {
+     "anyOf": [
+      {
+       "maximum": 100000,
+       "minimum": 1,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Width"
+    },
+    "height": {
+     "anyOf": [
+      {
+       "maximum": 100000,
+       "minimum": 1,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Height"
+    },
+    "scale": {
+     "default": 1,
+     "description": "Multiplies a library shape's natural size, keeping its proportions.",
+     "maximum": 100,
+     "minimum": 0.1,
+     "title": "Scale",
+     "type": "number"
+    },
+    "label_position": {
+     "default": "middle",
+     "description": "Use 'below' or 'above' for icons whose artwork would hide a label. A label wider than its shape is then written as a separate caption grouped with the shape.",
+     "enum": [
+      "above",
+      "top",
+      "middle",
+      "bottom",
+      "below"
+     ],
+     "title": "Label Position",
+     "type": "string"
+    },
+    "fill": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Fill"
+    },
+    "stroke": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Stroke"
+    },
+    "line_width": {
+     "anyOf": [
+      {
+       "maximum": 10000,
+       "minimum": 0,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Line Width"
+    },
+    "text_color": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Text Color"
+    },
+    "font_size": {
+     "default": 15,
+     "maximum": 720,
+     "minimum": 1,
+     "title": "Font Size",
+     "type": "number"
+    },
+    "bold": {
+     "default": false,
+     "title": "Bold",
+     "type": "boolean"
+    },
+    "rotation": {
+     "default": 0,
+     "maximum": 360,
+     "minimum": -360,
+     "title": "Rotation",
+     "type": "number"
+    }
+   },
+   "required": [
+    "key",
+    "shape"
+   ],
+   "title": "NodeSpec",
+   "type": "object"
+  },
+  "PageSpec": {
+   "additionalProperties": false,
+   "description": "One page of the diagram.",
+   "properties": {
+    "name": {
+     "default": "Page 1",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Name",
+     "type": "string"
+    },
+    "grid": {
+     "$ref": "#/$defs/GridLayout",
+     "default": {
+      "origin_x": 200.0,
+      "origin_y": 160.0,
+      "column_pitch": 240.0,
+      "row_pitch": 160.0
+     }
+    },
+    "background": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Background"
+    },
+    "nodes": {
+     "items": {
+      "$ref": "#/$defs/NodeSpec"
+     },
+     "maxItems": 300,
+     "minItems": 1,
+     "title": "Nodes",
+     "type": "array"
+    },
+    "edges": {
+     "default": [],
+     "items": {
+      "$ref": "#/$defs/EdgeSpec"
+     },
+     "maxItems": 400,
+     "title": "Edges",
+     "type": "array"
+    }
+   },
+   "required": [
+    "nodes"
+   ],
+   "title": "PageSpec",
+   "type": "object"
+  }
+ },
+ "additionalProperties": false,
+ "description": "A whole diagram, written by an agent and compiled to a document.",
+ "properties": {
+  "spec_version": {
+   "const": 1,
+   "default": 1,
+   "title": "Spec Version",
+   "type": "integer"
+  },
+  "name": {
+   "description": "The document's name.",
+   "maxLength": 200,
+   "minLength": 1,
+   "title": "Name",
+   "type": "string"
+  },
+  "id": {
+   "anyOf": [
+    {
+     "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+     "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+     "type": "string"
+    },
+    {
+     "type": "null"
+    }
+   ],
+   "default": null,
+   "description": "Document id. Omit for a new diagram; a fresh one is generated.",
+   "title": "Id"
+  },
+  "pages": {
+   "items": {
+    "$ref": "#/$defs/PageSpec"
+   },
+   "maxItems": 30,
+   "minItems": 1,
+   "title": "Pages",
+   "type": "array"
+  }
+ },
+ "required": [
+  "name",
+  "pages"
+ ],
+ "title": "SimpleDiagrams diagram spec",
+ "type": "object"
+}

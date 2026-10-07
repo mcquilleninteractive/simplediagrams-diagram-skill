@@ -1,0 +1,14 @@
+{
+  "name": "simplediagrams",
+  "description": "Agent skills for SimpleDiagrams",
+  "owner": {
+    "name": "McQuillen Interactive Pty. Ltd."
+  },
+  "plugins": [
+    {
+      "name": "simplediagrams-diagram-skill",
+      "source": "./",
+      "description": "Builds SimpleDiagrams documents from a description: library shapes, labels and cleanly routed connectors, checked against an exact model of the file format."
+    }
+  ]
+}

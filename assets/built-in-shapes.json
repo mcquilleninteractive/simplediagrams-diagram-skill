@@ -1,0 +1,1736 @@
+{
+ "catalog": "com.simplediagrams.skill.built-in-shapes",
+ "catalog_version": 1,
+ "source_app_version": "5.0.9",
+ "note": "Shapes that SimpleDiagrams resolves by reference. A symbol_reference uses library_id, item_id and the library's asset_version exactly as listed.",
+ "libraries": [
+  {
+   "library_id": "com.simplediagrams.shapeLibrary.basic",
+   "short_name": "basic",
+   "display_name": "Basic",
+   "asset_version": 1,
+   "shapes": [
+    {
+     "item_id": "Square",
+     "display_name": "Square",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "BoxWithDiagonalCross",
+     "display_name": "Box With Diagonal Cross",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "DashBox",
+     "display_name": "Dash Box",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Frame",
+     "display_name": "Frame",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "HatchBox",
+     "display_name": "Hatch Box",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CrossHatchBox",
+     "display_name": "Cross Hatch Box",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RectangleCurvedSides",
+     "display_name": "Rectangle With Curved Sides",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RectangleOneCurvedSide",
+     "display_name": "Rectangle With One Curved Side",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RectangleTwoAngledSides",
+     "display_name": "Rectangle With Two Angled Sides",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RectangleWithChipMissing",
+     "display_name": "Rectangle With Chip Missing",
+     "default_width": 50,
+     "default_height": 35
+    },
+    {
+     "item_id": "SquareWaveBottom",
+     "display_name": "Square Wave Bottom",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Triangle",
+     "display_name": "Triangle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RightTriangle",
+     "display_name": "Right Triangle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Circle",
+     "display_name": "Circle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "DashCircle",
+     "display_name": "Dash Circle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Donut",
+     "display_name": "Donut",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Diamond",
+     "display_name": "Diamond",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Trapezoid",
+     "display_name": "Trapezoid",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Octagon",
+     "display_name": "Octagon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Cube",
+     "display_name": "Cube",
+     "default_width": 40,
+     "default_height": 50
+    },
+    {
+     "item_id": "Pyramid",
+     "display_name": "Pyramid",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Cylinder",
+     "display_name": "Cylinder",
+     "default_width": 35,
+     "default_height": 50
+    },
+    {
+     "item_id": "OpenSquare",
+     "display_name": "Open Square",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "BracketLeft",
+     "display_name": "Bracket Left",
+     "default_width": 20,
+     "default_height": 50
+    },
+    {
+     "item_id": "BracketRight",
+     "display_name": "Bracket Right",
+     "default_width": 20,
+     "default_height": 50
+    },
+    {
+     "item_id": "Bracket2Left",
+     "display_name": "Bracket 2 Left",
+     "default_width": 14,
+     "default_height": 50
+    },
+    {
+     "item_id": "Bracket2Right",
+     "display_name": "Bracket 2 Right",
+     "default_width": 14,
+     "default_height": 50
+    },
+    {
+     "item_id": "ProcessStep",
+     "display_name": "Process Step",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Chevron",
+     "display_name": "Chevron",
+     "default_width": 40,
+     "default_height": 50
+    },
+    {
+     "item_id": "Cross",
+     "display_name": "Cross",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Grid",
+     "display_name": "Grid",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Burst",
+     "display_name": "Burst",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Arrow",
+     "display_name": "Arrow",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "DoubleArrow",
+     "display_name": "Double Arrow",
+     "default_width": 40,
+     "default_height": 50
+    },
+    {
+     "item_id": "TwoSidedArrow",
+     "display_name": "Two-Sided Arrow",
+     "default_width": 50,
+     "default_height": 30
+    },
+    {
+     "item_id": "CornerArrows",
+     "display_name": "Corner Arrows",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CornerArrowsRounded",
+     "display_name": "Corner Arrows Rounded",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ThreeArrowJuncture",
+     "display_name": "Three Arrow Juncture",
+     "default_width": 50,
+     "default_height": 35
+    },
+    {
+     "item_id": "ArrowCross",
+     "display_name": "Arrow Cross",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ReturnArrow",
+     "display_name": "Return Arrow",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CircleWithDiagonalBar",
+     "display_name": "Circle With Diagonal Bar",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CircleWithTwoDiagonalBars",
+     "display_name": "Circle With Two Diagonal Bars",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "HalfCircle",
+     "display_name": "Half Circle",
+     "default_width": 30,
+     "default_height": 50
+    },
+    {
+     "item_id": "MunchCircle",
+     "display_name": "Munch Circle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Hourglass",
+     "display_name": "Hourglass",
+     "default_width": 35,
+     "default_height": 50
+    },
+    {
+     "item_id": "Layers",
+     "display_name": "Layers",
+     "default_width": 50,
+     "default_height": 40
+    },
+    {
+     "item_id": "CircleWedge",
+     "display_name": "Circle Wedge",
+     "default_width": 30,
+     "default_height": 50
+    },
+    {
+     "item_id": "CircleGrid",
+     "display_name": "Circle Grid",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Sparkle",
+     "display_name": "Sparkle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Star",
+     "display_name": "Star",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Insignia",
+     "display_name": "Insignia",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Document",
+     "display_name": "Document",
+     "default_width": 40,
+     "default_height": 50
+    }
+   ]
+  },
+  {
+   "library_id": "com.simplediagrams.shapeLibrary.basicClean",
+   "short_name": "basicClean",
+   "display_name": "Basic (Clean)",
+   "asset_version": 1,
+   "shapes": [
+    {
+     "item_id": "Square",
+     "display_name": "Square",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "BoxWithDiagonalCross",
+     "display_name": "Box With Diagonal Cross",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "DashBox",
+     "display_name": "Dash Box",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Frame",
+     "display_name": "Frame",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "HatchBox",
+     "display_name": "Hatch Box",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CrossHatchBox",
+     "display_name": "Cross Hatch Box",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RectangleCurvedSides",
+     "display_name": "Rectangle With Curved Sides",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RectangleOneCurvedSide",
+     "display_name": "Rectangle With One Curved Side",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RectangleWithChipMissing",
+     "display_name": "Rectangle With Chip Missing",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "SquareWaveBottom",
+     "display_name": "Square Wave Bottom",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Triangle",
+     "display_name": "Triangle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RightTriangle",
+     "display_name": "Right Triangle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Circle",
+     "display_name": "Circle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "DashCircle",
+     "display_name": "Dash Circle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Donut",
+     "display_name": "Donut",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Diamond",
+     "display_name": "Diamond",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Trapezoid",
+     "display_name": "Trapezoid",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Octagon",
+     "display_name": "Octagon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Cube",
+     "display_name": "Cube",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Pyramid",
+     "display_name": "Pyramid",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Cylinder",
+     "display_name": "Cylinder",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "OpenSquare",
+     "display_name": "Open Square",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "BracketLeft",
+     "display_name": "Bracket Left",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "BracketRight",
+     "display_name": "Bracket Right",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ProcessStep",
+     "display_name": "Process Step",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Chevron",
+     "display_name": "Chevron",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Cross",
+     "display_name": "Cross",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Grid",
+     "display_name": "Grid",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Burst",
+     "display_name": "Burst",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Arrow",
+     "display_name": "Arrow",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "DoubleArrow",
+     "display_name": "Double Arrow",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CornerArrows",
+     "display_name": "Corner Arrows",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CornerArrowsRounded",
+     "display_name": "Corner Arrows Rounded",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ArrowCross",
+     "display_name": "Arrow Cross",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ReturnArrow",
+     "display_name": "Return Arrow",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CircleWithDiagonalBar",
+     "display_name": "Circle With Diagonal Bar",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CircleWithTwoDiagonalBars",
+     "display_name": "Circle With Two Diagonal Bars",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "HalfCircle",
+     "display_name": "Half Circle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "MunchCircle",
+     "display_name": "Munch Circle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Hourglass",
+     "display_name": "Hourglass",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Layers",
+     "display_name": "Layers",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CircleWedge",
+     "display_name": "Circle Wedge",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CircleGrid",
+     "display_name": "Circle Grid",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Sparkle",
+     "display_name": "Sparkle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Star",
+     "display_name": "Star",
+     "default_width": 50,
+     "default_height": 50
+    }
+   ]
+  },
+  {
+   "library_id": "com.simplediagrams.shapeLibrary.3DBasicHatch",
+   "short_name": "3DBasicHatch",
+   "display_name": "3D Basic (Hatch)",
+   "asset_version": 1,
+   "shapes": [
+    {
+     "item_id": "square",
+     "display_name": "square",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "BoxWithDiagonalCross",
+     "display_name": "Box With Diagonal Cross",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Frame",
+     "display_name": "Frame",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "HatchBox",
+     "display_name": "Hatch Box",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "rectangle",
+     "display_name": "rectangle",
+     "default_width": 50,
+     "default_height": 30
+    },
+    {
+     "item_id": "CrossHatchBox",
+     "display_name": "Cross Hatch Box",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RectangleCurvedSides",
+     "display_name": "Rectangle With Curved Sides",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RectangleOneCurvedSide",
+     "display_name": "Rectangle With One Curved Side",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RectangleTwoAngledSides",
+     "display_name": "Rectangle With Two Angled Sides",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RectangleWithChipMissing",
+     "display_name": "Rectangle With Chip Missing",
+     "default_width": 50,
+     "default_height": 35
+    },
+    {
+     "item_id": "rectangle_rounded",
+     "display_name": "rectangle rounded",
+     "default_width": 50,
+     "default_height": 30
+    },
+    {
+     "item_id": "rectangle_2",
+     "display_name": "rectangle 2",
+     "default_width": 25,
+     "default_height": 50
+    },
+    {
+     "item_id": "SquareWaveBottom",
+     "display_name": "Square Wave Bottom",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Triangle",
+     "display_name": "Triangle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RightTriangle",
+     "display_name": "Right Triangle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Circle",
+     "display_name": "circle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "circle2",
+     "display_name": "circle 2",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Donut",
+     "display_name": "Donut",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Diamond",
+     "display_name": "Diamond",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Trapezoid",
+     "display_name": "Trapezoid",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Octagon",
+     "display_name": "Octagon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "OpenSquare",
+     "display_name": "Open Square",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "BracketLeft",
+     "display_name": "Bracket Left",
+     "default_width": 20,
+     "default_height": 50
+    },
+    {
+     "item_id": "BracketRight",
+     "display_name": "Bracket Right",
+     "default_width": 20,
+     "default_height": 50
+    },
+    {
+     "item_id": "Bracket2Left",
+     "display_name": "Bracket 2 Left",
+     "default_width": 14,
+     "default_height": 50
+    },
+    {
+     "item_id": "Bracket2Right",
+     "display_name": "Bracket 2 Right",
+     "default_width": 14,
+     "default_height": 50
+    },
+    {
+     "item_id": "ProcessStep",
+     "display_name": "Process Step",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Chevron",
+     "display_name": "Chevron",
+     "default_width": 40,
+     "default_height": 50
+    },
+    {
+     "item_id": "Cross",
+     "display_name": "Cross",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Grid",
+     "display_name": "Grid",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Burst",
+     "display_name": "Burst",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Arrow",
+     "display_name": "Arrow",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "DoubleArrow",
+     "display_name": "Double Arrow",
+     "default_width": 40,
+     "default_height": 50
+    },
+    {
+     "item_id": "TwoSidedArrow",
+     "display_name": "Two-Sided Arrow",
+     "default_width": 50,
+     "default_height": 30
+    },
+    {
+     "item_id": "CornerArrows",
+     "display_name": "Corner Arrows",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CornerArrowsRounded",
+     "display_name": "Corner Arrows Rounded",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ThreeArrowJuncture",
+     "display_name": "Three Arrow Juncture",
+     "default_width": 50,
+     "default_height": 35
+    },
+    {
+     "item_id": "ArrowCross",
+     "display_name": "Arrow Cross",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ReturnArrow",
+     "display_name": "Return Arrow",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CircleWithDiagonalBar",
+     "display_name": "Circle With Diagonal Bar",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CircleWithTwoDiagonalBars",
+     "display_name": "Circle With Two Diagonal Bars",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "HalfCircle",
+     "display_name": "Half Circle",
+     "default_width": 30,
+     "default_height": 50
+    },
+    {
+     "item_id": "MunchCircle",
+     "display_name": "Munch Circle",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Hourglass",
+     "display_name": "Hourglass",
+     "default_width": 35,
+     "default_height": 50
+    },
+    {
+     "item_id": "CircleWedge",
+     "display_name": "Circle Wedge",
+     "default_width": 30,
+     "default_height": 50
+    },
+    {
+     "item_id": "CircleGrid",
+     "display_name": "Circle Grid",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Star",
+     "display_name": "Star",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Insignia",
+     "display_name": "Insignia",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Document",
+     "display_name": "Document",
+     "default_width": 40,
+     "default_height": 50
+    },
+    {
+     "item_id": "oval",
+     "display_name": "oval",
+     "default_width": 50,
+     "default_height": 30
+    },
+    {
+     "item_id": "heart",
+     "display_name": "heart",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "rectangle_wave_bottom",
+     "display_name": "rectangle wave bottom",
+     "default_width": 50,
+     "default_height": 40
+    },
+    {
+     "item_id": "process_1",
+     "display_name": "process 1",
+     "default_width": 50,
+     "default_height": 40
+    },
+    {
+     "item_id": "process_2",
+     "display_name": "process 2",
+     "default_width": 50,
+     "default_height": 40
+    },
+    {
+     "item_id": "burst",
+     "display_name": "burst",
+     "default_width": 50,
+     "default_height": 30
+    },
+    {
+     "item_id": "star",
+     "display_name": "star",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "star2",
+     "display_name": "star 2",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "cloud2",
+     "display_name": "cloud",
+     "default_width": 50,
+     "default_height": 30
+    },
+    {
+     "item_id": "arrow_down",
+     "display_name": "arrow down",
+     "default_width": 30,
+     "default_height": 50
+    },
+    {
+     "item_id": "arrow_up",
+     "display_name": "arrow up",
+     "default_width": 30,
+     "default_height": 50
+    },
+    {
+     "item_id": "arrow_left",
+     "display_name": "arrow left",
+     "default_width": 50,
+     "default_height": 30
+    },
+    {
+     "item_id": "arrow_right",
+     "display_name": "arrow right",
+     "default_width": 30,
+     "default_height": 50
+    },
+    {
+     "item_id": "arrow_down_2",
+     "display_name": "arrow down 2",
+     "default_width": 20,
+     "default_height": 50
+    },
+    {
+     "item_id": "arrow_up_2",
+     "display_name": "arrow up 2",
+     "default_width": 20,
+     "default_height": 50
+    },
+    {
+     "item_id": "arrow_left_2",
+     "display_name": "arrow left 2",
+     "default_width": 50,
+     "default_height": 20
+    },
+    {
+     "item_id": "arrow_right_2",
+     "display_name": "arrow right 2",
+     "default_width": 20,
+     "default_height": 50
+    },
+    {
+     "item_id": "arrow_down_3",
+     "display_name": "arrow down 3",
+     "default_width": 20,
+     "default_height": 50
+    },
+    {
+     "item_id": "arrow_up_3",
+     "display_name": "arrow up 3",
+     "default_width": 20,
+     "default_height": 50
+    },
+    {
+     "item_id": "arrow_left_3",
+     "display_name": "arrow left 3",
+     "default_width": 50,
+     "default_height": 20
+    },
+    {
+     "item_id": "arrow_right_3",
+     "display_name": "arrow right 3",
+     "default_width": 20,
+     "default_height": 50
+    },
+    {
+     "item_id": "triangle_down",
+     "display_name": "triangle down",
+     "default_width": 50,
+     "default_height": 45
+    },
+    {
+     "item_id": "triangle_up",
+     "display_name": "triangle up",
+     "default_width": 50,
+     "default_height": 45
+    },
+    {
+     "item_id": "triangle_left",
+     "display_name": "triangle left",
+     "default_width": 45,
+     "default_height": 50
+    },
+    {
+     "item_id": "triangle_right",
+     "display_name": "triangle right",
+     "default_width": 45,
+     "default_height": 50
+    }
+   ]
+  },
+  {
+   "library_id": "com.simplediagrams.shapeLibrary.wordBubbles",
+   "short_name": "wordBubbles",
+   "display_name": "Word Bubbles",
+   "asset_version": 1,
+   "shapes": [
+    {
+     "item_id": "wordBubble1",
+     "display_name": "wordBubble1",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble2",
+     "display_name": "wordBubble2",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble3",
+     "display_name": "wordBubble3",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble4",
+     "display_name": "wordBubble4",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble5",
+     "display_name": "wordBubble5",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble6",
+     "display_name": "wordBubble6",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble7",
+     "display_name": "wordBubble7",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble8",
+     "display_name": "wordBubble8",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble9",
+     "display_name": "wordBubble9",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble10",
+     "display_name": "wordBubble10",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble11",
+     "display_name": "wordBubble11",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble12",
+     "display_name": "wordBubble12",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble13",
+     "display_name": "wordBubble13",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble14",
+     "display_name": "wordBubble14",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble15",
+     "display_name": "wordBubble15",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble16",
+     "display_name": "wordBubble16",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble17",
+     "display_name": "wordBubble17",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble18",
+     "display_name": "wordBubble18",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble19",
+     "display_name": "wordBubble19",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble20",
+     "display_name": "wordBubble20",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble21",
+     "display_name": "wordBubble21",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble22",
+     "display_name": "wordBubble22",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble23",
+     "display_name": "wordBubble23",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble24",
+     "display_name": "wordBubble24",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble25",
+     "display_name": "wordBubble25",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble26",
+     "display_name": "wordBubble26",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble27",
+     "display_name": "wordBubble27",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble28",
+     "display_name": "wordBubble28",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble29",
+     "display_name": "wordBubble29",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble30",
+     "display_name": "wordBubble30",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble31",
+     "display_name": "wordBubble31",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble32",
+     "display_name": "wordBubble32",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble33",
+     "display_name": "wordBubble33",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble34",
+     "display_name": "wordBubble34",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble35",
+     "display_name": "wordBubble35",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble36",
+     "display_name": "wordBubble36",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble37",
+     "display_name": "wordBubble37",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble38",
+     "display_name": "wordBubble38",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble39",
+     "display_name": "wordBubble39",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble40",
+     "display_name": "wordBubble40",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble41",
+     "display_name": "wordBubble41",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble42",
+     "display_name": "wordBubble42",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble43",
+     "display_name": "wordBubble43",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble44",
+     "display_name": "wordBubble44",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble45",
+     "display_name": "wordBubble45",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble46",
+     "display_name": "wordBubble46",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble47",
+     "display_name": "wordBubble47",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble48",
+     "display_name": "wordBubble48",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble49",
+     "display_name": "wordBubble49",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "wordBubble50",
+     "display_name": "wordBubble50",
+     "default_width": 50,
+     "default_height": 50
+    }
+   ]
+  },
+  {
+   "library_id": "com.simplediagrams.shapeLibrary.biz",
+   "short_name": "biz",
+   "display_name": "Biz",
+   "asset_version": 1,
+   "shapes": [
+    {
+     "item_id": "Man",
+     "display_name": "Man",
+     "default_width": 25,
+     "default_height": 50
+    },
+    {
+     "item_id": "ManCustomer",
+     "display_name": "Man Customer",
+     "default_width": 20,
+     "default_height": 50
+    },
+    {
+     "item_id": "Woman",
+     "display_name": "Woman",
+     "default_width": 25,
+     "default_height": 50
+    },
+    {
+     "item_id": "WomanCustomer",
+     "display_name": "Woman Customer",
+     "default_width": 25,
+     "default_height": 50
+    },
+    {
+     "item_id": "Crown",
+     "display_name": "Crown",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Team",
+     "display_name": "Team",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "PeopleInvolved",
+     "display_name": "People Involved",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Interaction",
+     "display_name": "Interaction",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Building",
+     "display_name": "Building",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Building2",
+     "display_name": "Building2",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Cash",
+     "display_name": "Cash",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Check",
+     "display_name": "Check",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "X",
+     "display_name": "X",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Clock",
+     "display_name": "Clock",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Computer",
+     "display_name": "Computer",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Database",
+     "display_name": "Database",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Form",
+     "display_name": "Form",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Pain",
+     "display_name": "Pain",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Checklist",
+     "display_name": "Checklist",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Document",
+     "display_name": "Document",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "Binders",
+     "display_name": "Binders",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CoinEuro",
+     "display_name": "Coin Euro",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CoinDollar",
+     "display_name": "Coin Dollar",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CoinPound",
+     "display_name": "Coin Pound",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CoinBlank",
+     "display_name": "Coin Blank",
+     "default_width": 50,
+     "default_height": 50
+    }
+   ]
+  },
+  {
+   "library_id": "com.simplediagrams.shapeLibrary.uiFlow",
+   "short_name": "uiFlow",
+   "display_name": "UI Flow",
+   "asset_version": 1,
+   "shapes": [
+    {
+     "item_id": "BasicPage",
+     "display_name": "Basic Page",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "BasicWindow",
+     "display_name": "Basic Window",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ModalDialogPopup",
+     "display_name": "Modal Dialog",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "FrontPage",
+     "display_name": "Front Page",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ProductPage",
+     "display_name": "Product Page",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ItemListPage",
+     "display_name": "Item List",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ItemList2Page",
+     "display_name": "Item List 2",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ItemProfilePage",
+     "display_name": "Item Profile",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "TabsPage",
+     "display_name": "Tabs",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "GridPage",
+     "display_name": "Grid",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "TwoColumnsPage",
+     "display_name": "Two Columns",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ThreeColumnsPage",
+     "display_name": "Three Columns",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "MapPage",
+     "display_name": "Map",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ChartPage",
+     "display_name": "Chart",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "DashboardPage",
+     "display_name": "Dashboard",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "BasicForm",
+     "display_name": "Basic Form",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "LoginForm",
+     "display_name": "Login Form",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "LoginFormDialog",
+     "display_name": "Login Form Dialog",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "LoadingBar",
+     "display_name": "Loading Bar",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "CartIcon",
+     "display_name": "Cart Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "SecurityIcon",
+     "display_name": "Security Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "QuestionIcon",
+     "display_name": "Question Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ExclamationIcon",
+     "display_name": "Exclamation Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ItemIcon",
+     "display_name": "Item Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "StopIcon",
+     "display_name": "Stop Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "UserIcon",
+     "display_name": "User Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "HappyUserIcon",
+     "display_name": "Happy User Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "UnhappyUserIcon",
+     "display_name": "Unhappy User Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "BriefcaseIcon",
+     "display_name": "Briefcase Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "FireIcon",
+     "display_name": "Fire Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "BriefcaseOnFireIcon",
+     "display_name": "Briefcase On Fire Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "InteractionIcon",
+     "display_name": "Interaction Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "ClockIcon",
+     "display_name": "Clock Icon",
+     "default_width": 50,
+     "default_height": 50
+    },
+    {
+     "item_id": "RewardIcon",
+     "display_name": "Reward Icon",
+     "default_width": 50,
+     "default_height": 50
+    }
+   ]
+  }
+ ]
+}

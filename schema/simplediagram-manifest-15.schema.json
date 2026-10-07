@@ -1,0 +1,31 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://simplediagrams.com/schemas/simplediagram-manifest-15.schema.json",
+ "additionalProperties": false,
+ "description": "The whole of `manifest.json`. All three keys are required.",
+ "properties": {
+  "format": {
+   "const": "com.simplediagrams.document",
+   "title": "Format",
+   "type": "string"
+  },
+  "format_version": {
+   "const": 15,
+   "description": "Package format. document.json's schema_version is this minus one.",
+   "title": "Format Version",
+   "type": "integer"
+  },
+  "contains_legacy_source": {
+   "const": false,
+   "title": "Contains Legacy Source",
+   "type": "boolean"
+  }
+ },
+ "required": [
+  "format",
+  "format_version",
+  "contains_legacy_source"
+ ],
+ "title": "SimpleDiagrams manifest.json",
+ "type": "object"
+}

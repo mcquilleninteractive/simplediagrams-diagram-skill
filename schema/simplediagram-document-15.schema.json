@@ -1,0 +1,1765 @@
+{
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "$id": "https://simplediagrams.com/schemas/simplediagram-document-15.schema.json",
+ "$defs": {
+  "Attachment": {
+   "additionalProperties": false,
+   "description": "Binds a connector end to an anchor on an element of the same page.",
+   "properties": {
+    "element_id": {
+     "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+     "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+     "title": "Element Id",
+     "type": "string"
+    },
+    "connection_point_id": {
+     "maximum": 9223372036854775807,
+     "minimum": 0,
+     "title": "Connection Point Id",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "element_id",
+    "connection_point_id"
+   ],
+   "title": "Attachment",
+   "type": "object"
+  },
+  "Background": {
+   "additionalProperties": false,
+   "description": "The page background: none, or one solid color.",
+   "properties": {
+    "kind": {
+     "enum": [
+      "none",
+      "solid"
+     ],
+     "title": "Kind",
+     "type": "string"
+    },
+    "color_hex": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Color Hex"
+    }
+   },
+   "required": [
+    "kind"
+   ],
+   "title": "Background",
+   "type": "object"
+  },
+  "CharacterRun": {
+   "additionalProperties": false,
+   "description": "A style override for one span of the text.",
+   "properties": {
+    "range": {
+     "$ref": "#/$defs/TextRange"
+    },
+    "style": {
+     "$ref": "#/$defs/CharacterStyle"
+    }
+   },
+   "required": [
+    "range",
+    "style"
+   ],
+   "title": "CharacterRun",
+   "type": "object"
+  },
+  "CharacterStyle": {
+   "additionalProperties": false,
+   "description": "Font settings for a run of text.",
+   "properties": {
+    "font_family": {
+     "anyOf": [
+      {
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Omit to use the app's standard font.",
+     "title": "Font Family"
+    },
+    "font_size": {
+     "maximum": 720,
+     "minimum": 1,
+     "title": "Font Size",
+     "type": "number"
+    },
+    "weight": {
+     "enum": [
+      "regular",
+      "medium",
+      "bold"
+     ],
+     "title": "Weight",
+     "type": "string"
+    },
+    "is_italic": {
+     "title": "Is Italic",
+     "type": "boolean"
+    },
+    "is_underlined": {
+     "title": "Is Underlined",
+     "type": "boolean"
+    },
+    "color_hex": {
+     "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+     "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+     "title": "Color Hex",
+     "type": "string"
+    }
+   },
+   "required": [
+    "font_size",
+    "weight",
+    "is_italic",
+    "is_underlined",
+    "color_hex"
+   ],
+   "title": "CharacterStyle",
+   "type": "object"
+  },
+  "Connection": {
+   "additionalProperties": false,
+   "description": "One entry in a page's `connections` array.",
+   "properties": {
+    "content": {
+     "$ref": "#/$defs/ConnectionCore"
+    },
+    "is_locked": {
+     "title": "Is Locked",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "content",
+    "is_locked"
+   ],
+   "title": "Connection",
+   "type": "object"
+  },
+  "ConnectionCore": {
+   "additionalProperties": false,
+   "description": "A connector's route, attachments and paint.\n\n`points` is the whole route and is always required. When an end is\nattached, the app redraws that end at the anchor, but the stored point\nshould still be the anchor's position.",
+   "properties": {
+    "id": {
+     "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+     "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+     "title": "Id",
+     "type": "string"
+    },
+    "points": {
+     "items": {
+      "$ref": "#/$defs/ConnectorPoint"
+     },
+     "minItems": 2,
+     "title": "Points",
+     "type": "array"
+    },
+    "start_attachment": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Attachment"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "end_attachment": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Attachment"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "stroke_hex": {
+     "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+     "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+     "title": "Stroke Hex",
+     "type": "string"
+    },
+    "line_width": {
+     "maximum": 10000,
+     "minimum": 0,
+     "title": "Line Width",
+     "type": "number"
+    },
+    "stroke_pattern": {
+     "enum": [
+      "solid",
+      "dashed",
+      "dotted"
+     ],
+     "title": "Stroke Pattern",
+     "type": "string"
+    },
+    "start_ending": {
+     "enum": [
+      "none",
+      "stop",
+      "arrow",
+      "solidArrow",
+      "circle",
+      "solidCircle",
+      "openDiamond",
+      "diamond",
+      "halfCircle",
+      "crowFoot",
+      "one",
+      "oneAndOnlyOne",
+      "zeroOrOne",
+      "oneOrMany",
+      "zeroOrMany",
+      "filledArrow",
+      "slash"
+     ],
+     "title": "Start Ending",
+     "type": "string"
+    },
+    "end_ending": {
+     "enum": [
+      "none",
+      "stop",
+      "arrow",
+      "solidArrow",
+      "circle",
+      "solidCircle",
+      "openDiamond",
+      "diamond",
+      "halfCircle",
+      "crowFoot",
+      "one",
+      "oneAndOnlyOne",
+      "zeroOrOne",
+      "oneOrMany",
+      "zeroOrMany",
+      "filledArrow",
+      "slash"
+     ],
+     "title": "End Ending",
+     "type": "string"
+    },
+    "stroke_texture": {
+     "anyOf": [
+      {
+       "enum": [
+        "Horizontal",
+        "Vertical",
+        "Grid",
+        "SingleHatch",
+        "TripleHatch",
+        "PencilFill",
+        "PencilThinHoriztonalHatch",
+        "PencilThinSquareHatch",
+        "PencilThinCrossHatch",
+        "PencilThinDiagonalHatch",
+        "WatercolorFill",
+        "Grain",
+        "PencilVerticalHatch",
+        "PencilTriangleHatch"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Stroke Texture"
+    },
+    "label": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/ConnectorLabel"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    }
+   },
+   "required": [
+    "id",
+    "points",
+    "stroke_hex",
+    "line_width",
+    "stroke_pattern",
+    "start_ending",
+    "end_ending"
+   ],
+   "title": "ConnectionCore",
+   "type": "object"
+  },
+  "ConnectionPointAnchor": {
+   "additionalProperties": false,
+   "description": "A place on an element where a connector can attach.\n\n`x` and `y` are fractions of the element's frame. `id` is what a\nconnector's attachment names.",
+   "properties": {
+    "id": {
+     "maximum": 9223372036854775807,
+     "minimum": 0,
+     "title": "Id",
+     "type": "integer"
+    },
+    "x": {
+     "maximum": 1,
+     "minimum": 0,
+     "title": "X",
+     "type": "number"
+    },
+    "y": {
+     "maximum": 1,
+     "minimum": 0,
+     "title": "Y",
+     "type": "number"
+    }
+   },
+   "required": [
+    "id",
+    "x",
+    "y"
+   ],
+   "title": "ConnectionPointAnchor",
+   "type": "object"
+  },
+  "ConnectorLabel": {
+   "additionalProperties": false,
+   "description": "Text placed along a connector.",
+   "properties": {
+    "content": {
+     "$ref": "#/$defs/TextContent"
+    },
+    "position": {
+     "description": "0 is the start, 1 the end.",
+     "maximum": 1,
+     "minimum": 0,
+     "title": "Position",
+     "type": "number"
+    },
+    "normal_offset": {
+     "maximum": 1000000000.0,
+     "minimum": -1000000000.0,
+     "title": "Normal Offset",
+     "type": "number"
+    }
+   },
+   "required": [
+    "content",
+    "position",
+    "normal_offset"
+   ],
+   "title": "ConnectorLabel",
+   "type": "object"
+  },
+  "ConnectorPoint": {
+   "additionalProperties": false,
+   "description": "One point along a connector, in page coordinates.",
+   "properties": {
+    "x": {
+     "maximum": 1000000000.0,
+     "minimum": -1000000000.0,
+     "title": "X",
+     "type": "number"
+    },
+    "y": {
+     "maximum": 1000000000.0,
+     "minimum": -1000000000.0,
+     "title": "Y",
+     "type": "number"
+    },
+    "kind": {
+     "enum": [
+      "straight",
+      "curve"
+     ],
+     "title": "Kind",
+     "type": "string"
+    }
+   },
+   "required": [
+    "x",
+    "y",
+    "kind"
+   ],
+   "title": "ConnectorPoint",
+   "type": "object"
+  },
+  "DrawableReference": {
+   "additionalProperties": false,
+   "description": "One entry in an explicit drawing order, listed back to front.",
+   "properties": {
+    "kind": {
+     "enum": [
+      "element",
+      "connection"
+     ],
+     "title": "Kind",
+     "type": "string"
+    },
+    "id": {
+     "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+     "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+     "title": "Id",
+     "type": "string"
+    }
+   },
+   "required": [
+    "kind",
+    "id"
+   ],
+   "title": "DrawableReference",
+   "type": "object"
+  },
+  "Element": {
+   "additionalProperties": false,
+   "description": "One entry in a page's `elements` array.\n\nExactly three keys, and the app rejects any other. Both shape-data keys\nmust be present; in this profile they are always `null` and `[]`.",
+   "properties": {
+    "content": {
+     "$ref": "#/$defs/ElementPresentation"
+    },
+    "shape_data_definition_id": {
+     "title": "Shape Data Definition Id",
+     "type": "null"
+    },
+    "shape_data_values": {
+     "items": {},
+     "maxItems": 0,
+     "title": "Shape Data Values",
+     "type": "array"
+    }
+   },
+   "required": [
+    "content",
+    "shape_data_definition_id",
+    "shape_data_values"
+   ],
+   "title": "Element",
+   "type": "object"
+  },
+  "ElementCore": {
+   "additionalProperties": false,
+   "description": "The innermost element record: identity, kind, geometry, text and paint.",
+   "properties": {
+    "id": {
+     "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+     "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+     "title": "Id",
+     "type": "string"
+    },
+    "kind": {
+     "enum": [
+      "rectangle",
+      "ellipse",
+      "note",
+      "text",
+      "symbol",
+      "path"
+     ],
+     "title": "Kind",
+     "type": "string"
+    },
+    "frame": {
+     "$ref": "#/$defs/Rect"
+    },
+    "rotation_degrees": {
+     "maximum": 1000000000.0,
+     "minimum": -1000000000.0,
+     "title": "Rotation Degrees",
+     "type": "number"
+    },
+    "z_index": {
+     "maximum": 9223372036854775807,
+     "minimum": -9223372036854775808,
+     "title": "Z Index",
+     "type": "integer"
+    },
+    "text_content": {
+     "$ref": "#/$defs/TextContent"
+    },
+    "style": {
+     "$ref": "#/$defs/ElementStyle"
+    },
+    "connection_points": {
+     "items": {
+      "$ref": "#/$defs/ConnectionPointAnchor"
+     },
+     "maxItems": 128,
+     "title": "Connection Points",
+     "type": "array"
+    },
+    "symbol_reference": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/SymbolReference"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "path": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Path"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    }
+   },
+   "required": [
+    "id",
+    "kind",
+    "frame",
+    "rotation_degrees",
+    "z_index",
+    "text_content",
+    "style",
+    "connection_points"
+   ],
+   "title": "ElementCore",
+   "type": "object"
+  },
+  "ElementLock": {
+   "additionalProperties": false,
+   "description": "Wraps the element core with its lock flag.",
+   "properties": {
+    "content": {
+     "$ref": "#/$defs/ElementCore"
+    },
+    "is_locked": {
+     "title": "Is Locked",
+     "type": "boolean"
+    }
+   },
+   "required": [
+    "content",
+    "is_locked"
+   ],
+   "title": "ElementLock",
+   "type": "object"
+  },
+  "ElementPresentation": {
+   "additionalProperties": false,
+   "description": "Wraps the locked element with flips and label placement.",
+   "properties": {
+    "content": {
+     "$ref": "#/$defs/ElementLock"
+    },
+    "flip_horizontal": {
+     "title": "Flip Horizontal",
+     "type": "boolean"
+    },
+    "flip_vertical": {
+     "title": "Flip Vertical",
+     "type": "boolean"
+    },
+    "text_layout": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/TextLayout"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "note_style": {
+     "anyOf": [
+      {
+       "enum": [
+        "stickyNote",
+        "indexCard"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Note Style"
+    },
+    "preserves_aspect_ratio": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Preserves Aspect Ratio"
+    }
+   },
+   "required": [
+    "content",
+    "flip_horizontal",
+    "flip_vertical"
+   ],
+   "title": "ElementPresentation",
+   "type": "object"
+  },
+  "ElementStyle": {
+   "additionalProperties": false,
+   "description": "Fill and outline of an element. The three paint keys are required.",
+   "properties": {
+    "fill_hex": {
+     "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+     "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+     "title": "Fill Hex",
+     "type": "string"
+    },
+    "stroke_hex": {
+     "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+     "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+     "title": "Stroke Hex",
+     "type": "string"
+    },
+    "line_width": {
+     "maximum": 10000,
+     "minimum": 0,
+     "title": "Line Width",
+     "type": "number"
+    },
+    "fill_texture": {
+     "anyOf": [
+      {
+       "enum": [
+        "Horizontal",
+        "Vertical",
+        "Grid",
+        "SingleHatch",
+        "TripleHatch",
+        "PencilFill",
+        "PencilThinHoriztonalHatch",
+        "PencilThinSquareHatch",
+        "PencilThinCrossHatch",
+        "PencilThinDiagonalHatch",
+        "WatercolorFill",
+        "Grain",
+        "PencilVerticalHatch",
+        "PencilTriangleHatch"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Fill Texture"
+    },
+    "stroke_texture": {
+     "anyOf": [
+      {
+       "enum": [
+        "Horizontal",
+        "Vertical",
+        "Grid",
+        "SingleHatch",
+        "TripleHatch",
+        "PencilFill",
+        "PencilThinHoriztonalHatch",
+        "PencilThinSquareHatch",
+        "PencilThinCrossHatch",
+        "PencilThinDiagonalHatch",
+        "WatercolorFill",
+        "Grain",
+        "PencilVerticalHatch",
+        "PencilTriangleHatch"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Stroke Texture"
+    },
+    "stroke_pattern_override": {
+     "anyOf": [
+      {
+       "enum": [
+        "solid",
+        "dashed",
+        "dotted"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Stroke Pattern Override"
+    }
+   },
+   "required": [
+    "fill_hex",
+    "stroke_hex",
+    "line_width"
+   ],
+   "title": "ElementStyle",
+   "type": "object"
+  },
+  "Grid": {
+   "additionalProperties": false,
+   "description": "The page's snapping grid.",
+   "properties": {
+    "spacing_x": {
+     "maximum": 10000,
+     "minimum": 4,
+     "title": "Spacing X",
+     "type": "number"
+    },
+    "spacing_y": {
+     "maximum": 10000,
+     "minimum": 4,
+     "title": "Spacing Y",
+     "type": "number"
+    },
+    "origin": {
+     "$ref": "#/$defs/Point"
+    },
+    "visible": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Visible"
+    },
+    "appearance": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/GridAppearance"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    }
+   },
+   "required": [
+    "spacing_x",
+    "spacing_y",
+    "origin"
+   ],
+   "title": "Grid",
+   "type": "object"
+  },
+  "GridAppearance": {
+   "additionalProperties": false,
+   "description": "How the page grid is drawn. It never affects snapping.",
+   "properties": {
+    "minor_line": {
+     "enum": [
+      "none",
+      "solid",
+      "dashed",
+      "dotted"
+     ],
+     "title": "Minor Line",
+     "type": "string"
+    },
+    "major_line": {
+     "enum": [
+      "none",
+      "solid",
+      "dashed",
+      "dotted"
+     ],
+     "title": "Major Line",
+     "type": "string"
+    },
+    "major_interval": {
+     "maximum": 20,
+     "minimum": 2,
+     "title": "Major Interval",
+     "type": "integer"
+    },
+    "marker": {
+     "enum": [
+      "none",
+      "dot",
+      "cross"
+     ],
+     "title": "Marker",
+     "type": "string"
+    },
+    "marker_placement": {
+     "enum": [
+      "every",
+      "major"
+     ],
+     "title": "Marker Placement",
+     "type": "string"
+    },
+    "color": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB only.",
+       "pattern": "^#[0-9A-Fa-f]{6}$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Color"
+    },
+    "strength": {
+     "maximum": 1,
+     "minimum": 0.02,
+     "title": "Strength",
+     "type": "number"
+    }
+   },
+   "required": [
+    "minor_line",
+    "major_line",
+    "major_interval",
+    "marker",
+    "marker_placement",
+    "strength"
+   ],
+   "title": "GridAppearance",
+   "type": "object"
+  },
+  "Group": {
+   "additionalProperties": false,
+   "description": "A set of elements, connectors and other groups that move together.",
+   "properties": {
+    "id": {
+     "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+     "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+     "title": "Id",
+     "type": "string"
+    },
+    "members": {
+     "items": {
+      "$ref": "#/$defs/GroupMember"
+     },
+     "minItems": 2,
+     "title": "Members",
+     "type": "array"
+    },
+    "is_locked": {
+     "title": "Is Locked",
+     "type": "boolean"
+    },
+    "rotation_degrees": {
+     "exclusiveMaximum": 360,
+     "minimum": 0,
+     "title": "Rotation Degrees",
+     "type": "number"
+    }
+   },
+   "required": [
+    "id",
+    "members",
+    "is_locked",
+    "rotation_degrees"
+   ],
+   "title": "Group",
+   "type": "object"
+  },
+  "GroupMember": {
+   "additionalProperties": false,
+   "description": "One member of a group, on the same page as the group.",
+   "properties": {
+    "kind": {
+     "enum": [
+      "element",
+      "connection",
+      "group"
+     ],
+     "title": "Kind",
+     "type": "string"
+    },
+    "id": {
+     "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+     "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+     "title": "Id",
+     "type": "string"
+    }
+   },
+   "required": [
+    "kind",
+    "id"
+   ],
+   "title": "GroupMember",
+   "type": "object"
+  },
+  "Guide": {
+   "additionalProperties": false,
+   "description": "A manual ruler guide.",
+   "properties": {
+    "id": {
+     "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+     "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+     "title": "Id",
+     "type": "string"
+    },
+    "axis": {
+     "enum": [
+      "horizontal",
+      "vertical"
+     ],
+     "title": "Axis",
+     "type": "string"
+    },
+    "position": {
+     "maximum": 1000000000.0,
+     "minimum": -1000000000.0,
+     "title": "Position",
+     "type": "number"
+    }
+   },
+   "required": [
+    "id",
+    "axis",
+    "position"
+   ],
+   "title": "Guide",
+   "type": "object"
+  },
+  "Page": {
+   "additionalProperties": false,
+   "description": "One entry in the document's `pages` array. Exactly two keys.",
+   "properties": {
+    "content": {
+     "$ref": "#/$defs/PageLayout"
+    },
+    "elements": {
+     "items": {
+      "$ref": "#/$defs/Element"
+     },
+     "title": "Elements",
+     "type": "array"
+    }
+   },
+   "required": [
+    "content",
+    "elements"
+   ],
+   "title": "Page",
+   "type": "object"
+  },
+  "PageConnections": {
+   "additionalProperties": false,
+   "description": "Wraps the page core and holds the page's connectors.\n\n`elements` and `groups` at this level are always empty.",
+   "properties": {
+    "content": {
+     "$ref": "#/$defs/PageCore"
+    },
+    "elements": {
+     "items": {},
+     "maxItems": 0,
+     "title": "Elements",
+     "type": "array"
+    },
+    "connections": {
+     "items": {
+      "$ref": "#/$defs/Connection"
+     },
+     "title": "Connections",
+     "type": "array"
+    },
+    "groups": {
+     "items": {},
+     "maxItems": 0,
+     "title": "Groups",
+     "type": "array"
+    }
+   },
+   "required": [
+    "content",
+    "elements",
+    "connections",
+    "groups"
+   ],
+   "title": "PageConnections",
+   "type": "object"
+  },
+  "PageCore": {
+   "additionalProperties": false,
+   "description": "The innermost page record. Its two arrays are always empty.\n\n`width` and `height` are a reference size only: the canvas is unbounded\nand nothing is clipped to them.",
+   "properties": {
+    "id": {
+     "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+     "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+     "title": "Id",
+     "type": "string"
+    },
+    "name": {
+     "title": "Name",
+     "type": "string"
+    },
+    "width": {
+     "exclusiveMinimum": 0,
+     "maximum": 10000000.0,
+     "title": "Width",
+     "type": "number"
+    },
+    "height": {
+     "exclusiveMinimum": 0,
+     "maximum": 10000000.0,
+     "title": "Height",
+     "type": "number"
+    },
+    "elements": {
+     "items": {},
+     "maxItems": 0,
+     "title": "Elements",
+     "type": "array"
+    },
+    "connections": {
+     "items": {},
+     "maxItems": 0,
+     "title": "Connections",
+     "type": "array"
+    },
+    "grid": {
+     "$ref": "#/$defs/Grid"
+    },
+    "export_frame": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Rect"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    }
+   },
+   "required": [
+    "id",
+    "name",
+    "width",
+    "height",
+    "elements",
+    "connections",
+    "grid"
+   ],
+   "title": "PageCore",
+   "type": "object"
+  },
+  "PageLayout": {
+   "additionalProperties": false,
+   "description": "Wraps the connector layer with background, groups, guides and order.\n\n`drawableOrder` and `guides` are camelCase in the file. Without\n`drawableOrder`, connectors draw behind elements and elements stack by\n`z_index`; if it is present it must list every element and connector on\nthe page exactly once, back to front.",
+   "properties": {
+    "content": {
+     "$ref": "#/$defs/PageConnections"
+    },
+    "background": {
+     "$ref": "#/$defs/Background"
+    },
+    "elements": {
+     "items": {},
+     "maxItems": 0,
+     "title": "Elements",
+     "type": "array"
+    },
+    "groups": {
+     "items": {
+      "$ref": "#/$defs/Group"
+     },
+     "title": "Groups",
+     "type": "array"
+    },
+    "drawableOrder": {
+     "anyOf": [
+      {
+       "items": {
+        "$ref": "#/$defs/DrawableReference"
+       },
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Drawableorder"
+    },
+    "guides": {
+     "anyOf": [
+      {
+       "items": {
+        "$ref": "#/$defs/Guide"
+       },
+       "maxItems": 1000,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Guides"
+    }
+   },
+   "required": [
+    "content",
+    "background",
+    "elements",
+    "groups"
+   ],
+   "title": "PageLayout",
+   "type": "object"
+  },
+  "ParagraphRun": {
+   "additionalProperties": false,
+   "description": "An alignment override for one span of the text.",
+   "properties": {
+    "range": {
+     "$ref": "#/$defs/TextRange"
+    },
+    "alignment": {
+     "enum": [
+      "leading",
+      "center",
+      "trailing",
+      "justified"
+     ],
+     "title": "Alignment",
+     "type": "string"
+    }
+   },
+   "required": [
+    "range",
+    "alignment"
+   ],
+   "title": "ParagraphRun",
+   "type": "object"
+  },
+  "Path": {
+   "additionalProperties": false,
+   "description": "The geometry of a `path` element.",
+   "properties": {
+    "nodes": {
+     "items": {
+      "$ref": "#/$defs/PathNode"
+     },
+     "minItems": 2,
+     "title": "Nodes",
+     "type": "array"
+    },
+    "is_closed": {
+     "title": "Is Closed",
+     "type": "boolean"
+    },
+    "is_smoothed": {
+     "title": "Is Smoothed",
+     "type": "boolean"
+    },
+    "stroke_pattern": {
+     "enum": [
+      "solid",
+      "dashed",
+      "dotted"
+     ],
+     "title": "Stroke Pattern",
+     "type": "string"
+    },
+    "start_ending": {
+     "enum": [
+      "none",
+      "stop",
+      "arrow",
+      "solidArrow",
+      "circle",
+      "solidCircle",
+      "openDiamond",
+      "diamond",
+      "halfCircle",
+      "crowFoot",
+      "one",
+      "oneAndOnlyOne",
+      "zeroOrOne",
+      "oneOrMany",
+      "zeroOrMany",
+      "filledArrow",
+      "slash"
+     ],
+     "title": "Start Ending",
+     "type": "string"
+    },
+    "end_ending": {
+     "enum": [
+      "none",
+      "stop",
+      "arrow",
+      "solidArrow",
+      "circle",
+      "solidCircle",
+      "openDiamond",
+      "diamond",
+      "halfCircle",
+      "crowFoot",
+      "one",
+      "oneAndOnlyOne",
+      "zeroOrOne",
+      "oneOrMany",
+      "zeroOrMany",
+      "filledArrow",
+      "slash"
+     ],
+     "title": "End Ending",
+     "type": "string"
+    }
+   },
+   "required": [
+    "nodes",
+    "is_closed",
+    "is_smoothed",
+    "stroke_pattern",
+    "start_ending",
+    "end_ending"
+   ],
+   "title": "Path",
+   "type": "object"
+  },
+  "PathNode": {
+   "additionalProperties": false,
+   "description": "One node of a freeform path.\n\nCoordinates are relative to the top left corner of the element's frame,\nnot to the page.",
+   "properties": {
+    "point": {
+     "$ref": "#/$defs/Point"
+    },
+    "control_point": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Point"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "second_control_point": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Point"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "kind": {
+     "enum": [
+      "straight",
+      "curve"
+     ],
+     "title": "Kind",
+     "type": "string"
+    }
+   },
+   "required": [
+    "point",
+    "kind"
+   ],
+   "title": "PathNode",
+   "type": "object"
+  },
+  "Point": {
+   "additionalProperties": false,
+   "description": "A position in page coordinates: points, origin top left, y down.",
+   "properties": {
+    "x": {
+     "maximum": 1000000000.0,
+     "minimum": -1000000000.0,
+     "title": "X",
+     "type": "number"
+    },
+    "y": {
+     "maximum": 1000000000.0,
+     "minimum": -1000000000.0,
+     "title": "Y",
+     "type": "number"
+    }
+   },
+   "required": [
+    "x",
+    "y"
+   ],
+   "title": "Point",
+   "type": "object"
+  },
+  "QuickStyle": {
+   "additionalProperties": false,
+   "description": "One preset in the document's Quick Styles panel.",
+   "properties": {
+    "id": {
+     "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+     "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+     "title": "Id",
+     "type": "string"
+    },
+    "name": {
+     "minLength": 1,
+     "title": "Name",
+     "type": "string"
+    },
+    "style": {
+     "$ref": "#/$defs/QuickStyleAppearance"
+    }
+   },
+   "required": [
+    "id",
+    "name",
+    "style"
+   ],
+   "title": "QuickStyle",
+   "type": "object"
+  },
+  "QuickStyleAppearance": {
+   "additionalProperties": false,
+   "description": "The paint a Quick Style applies.",
+   "properties": {
+    "fill_hex": {
+     "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+     "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+     "title": "Fill Hex",
+     "type": "string"
+    },
+    "stroke_hex": {
+     "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+     "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+     "title": "Stroke Hex",
+     "type": "string"
+    },
+    "line_width": {
+     "maximum": 100,
+     "minimum": 1,
+     "title": "Line Width",
+     "type": "number"
+    },
+    "fill_texture": {
+     "anyOf": [
+      {
+       "enum": [
+        "Horizontal",
+        "Vertical",
+        "Grid",
+        "SingleHatch",
+        "TripleHatch",
+        "PencilFill",
+        "PencilThinHoriztonalHatch",
+        "PencilThinSquareHatch",
+        "PencilThinCrossHatch",
+        "PencilThinDiagonalHatch",
+        "WatercolorFill",
+        "Grain",
+        "PencilVerticalHatch",
+        "PencilTriangleHatch"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Fill Texture"
+    },
+    "stroke_texture": {
+     "anyOf": [
+      {
+       "enum": [
+        "Horizontal",
+        "Vertical",
+        "Grid",
+        "SingleHatch",
+        "TripleHatch",
+        "PencilFill",
+        "PencilThinHoriztonalHatch",
+        "PencilThinSquareHatch",
+        "PencilThinCrossHatch",
+        "PencilThinDiagonalHatch",
+        "WatercolorFill",
+        "Grain",
+        "PencilVerticalHatch",
+        "PencilTriangleHatch"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Stroke Texture"
+    },
+    "stroke_pattern": {
+     "anyOf": [
+      {
+       "enum": [
+        "solid",
+        "dashed",
+        "dotted"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Stroke Pattern"
+    }
+   },
+   "required": [
+    "fill_hex",
+    "stroke_hex",
+    "line_width"
+   ],
+   "title": "QuickStyleAppearance",
+   "type": "object"
+  },
+  "Rect": {
+   "additionalProperties": false,
+   "description": "An unrotated rectangle in page coordinates. Zero sizes are invalid.",
+   "properties": {
+    "x": {
+     "maximum": 1000000000.0,
+     "minimum": -1000000000.0,
+     "title": "X",
+     "type": "number"
+    },
+    "y": {
+     "maximum": 1000000000.0,
+     "minimum": -1000000000.0,
+     "title": "Y",
+     "type": "number"
+    },
+    "width": {
+     "exclusiveMinimum": 0,
+     "maximum": 10000000.0,
+     "title": "Width",
+     "type": "number"
+    },
+    "height": {
+     "exclusiveMinimum": 0,
+     "maximum": 10000000.0,
+     "title": "Height",
+     "type": "number"
+    }
+   },
+   "required": [
+    "x",
+    "y",
+    "width",
+    "height"
+   ],
+   "title": "Rect",
+   "type": "object"
+  },
+  "SymbolReference": {
+   "additionalProperties": false,
+   "description": "Names one shape in a library built into SimpleDiagrams.\n\nOnly built-in libraries resolve by reference. A reference the app cannot\nresolve still opens, but draws a dashed placeholder, so check every\nreference against `assets/built-in-shapes.json`.",
+   "properties": {
+    "library_id": {
+     "minLength": 1,
+     "title": "Library Id",
+     "type": "string"
+    },
+    "item_id": {
+     "minLength": 1,
+     "title": "Item Id",
+     "type": "string"
+    },
+    "asset_version": {
+     "exclusiveMinimum": 0,
+     "maximum": 9223372036854775807,
+     "title": "Asset Version",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "library_id",
+    "item_id",
+    "asset_version"
+   ],
+   "title": "SymbolReference",
+   "type": "object"
+  },
+  "TextContent": {
+   "additionalProperties": false,
+   "description": "The label of an element or connector. Every key except background_hex is required.\n\nRuns are only allowed over plain ASCII text. The app requires each run to\nstart and end between whole user-perceived characters, which for accented\nletters, emoji and other combined characters cannot be checked here.",
+   "properties": {
+    "string": {
+     "title": "String",
+     "type": "string"
+    },
+    "base_style": {
+     "$ref": "#/$defs/CharacterStyle"
+    },
+    "character_runs": {
+     "items": {
+      "$ref": "#/$defs/CharacterRun"
+     },
+     "title": "Character Runs",
+     "type": "array"
+    },
+    "base_alignment": {
+     "enum": [
+      "leading",
+      "center",
+      "trailing",
+      "justified"
+     ],
+     "title": "Base Alignment",
+     "type": "string"
+    },
+    "paragraph_runs": {
+     "items": {
+      "$ref": "#/$defs/ParagraphRun"
+     },
+     "title": "Paragraph Runs",
+     "type": "array"
+    },
+    "background_hex": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Background Hex"
+    }
+   },
+   "required": [
+    "string",
+    "base_style",
+    "character_runs",
+    "base_alignment",
+    "paragraph_runs"
+   ],
+   "title": "TextContent",
+   "type": "object"
+  },
+  "TextLayout": {
+   "additionalProperties": false,
+   "description": "Where a label sits, relative to its own shape.\n\n`frame` is in fractions of the shape: x and y are the region's top left\ncorner and stay inside the shape; width and height may run past it. With\nposition `above` or `below` the label sits just outside the shape and the\nframe's y is ignored.",
+   "properties": {
+    "frame": {
+     "$ref": "#/$defs/TextLayoutFrame"
+    },
+    "position": {
+     "enum": [
+      "above",
+      "top",
+      "middle",
+      "bottom",
+      "below"
+     ],
+     "title": "Position",
+     "type": "string"
+    },
+    "rotation_degrees": {
+     "anyOf": [
+      {
+       "exclusiveMaximum": 360,
+       "minimum": 0,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Rotation Degrees"
+    }
+   },
+   "required": [
+    "frame",
+    "position"
+   ],
+   "title": "TextLayout",
+   "type": "object"
+  },
+  "TextLayoutFrame": {
+   "additionalProperties": false,
+   "description": "A label region in fractions of the owning shape's width and height.",
+   "properties": {
+    "x": {
+     "maximum": 1,
+     "minimum": 0,
+     "title": "X",
+     "type": "number"
+    },
+    "y": {
+     "maximum": 1,
+     "minimum": 0,
+     "title": "Y",
+     "type": "number"
+    },
+    "width": {
+     "maximum": 8,
+     "minimum": 0.001,
+     "title": "Width",
+     "type": "number"
+    },
+    "height": {
+     "maximum": 8,
+     "minimum": 0.001,
+     "title": "Height",
+     "type": "number"
+    }
+   },
+   "required": [
+    "x",
+    "y",
+    "width",
+    "height"
+   ],
+   "title": "TextLayoutFrame",
+   "type": "object"
+  },
+  "TextRange": {
+   "additionalProperties": false,
+   "description": "A span of text measured in UTF-16 code units, not characters.",
+   "properties": {
+    "location": {
+     "maximum": 9223372036854775807,
+     "minimum": 0,
+     "title": "Location",
+     "type": "integer"
+    },
+    "length": {
+     "exclusiveMinimum": 0,
+     "maximum": 9223372036854775807,
+     "title": "Length",
+     "type": "integer"
+    }
+   },
+   "required": [
+    "location",
+    "length"
+   ],
+   "title": "TextRange",
+   "type": "object"
+  }
+ },
+ "additionalProperties": false,
+ "description": "The whole of `document.json`. Exactly these nine keys, all required.",
+ "properties": {
+  "id": {
+   "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+   "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+   "title": "Id",
+   "type": "string"
+  },
+  "schema_version": {
+   "const": 14,
+   "description": "Always 14 for package format 15. Writing 15 here is rejected.",
+   "title": "Schema Version",
+   "type": "integer"
+  },
+  "revision": {
+   "description": "Edit counter. A new document is 0.",
+   "maximum": 1000000000,
+   "minimum": 0,
+   "title": "Revision",
+   "type": "integer"
+  },
+  "name": {
+   "title": "Name",
+   "type": "string"
+  },
+  "selected_page_id": {
+   "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+   "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+   "title": "Selected Page Id",
+   "type": "string"
+  },
+  "pages": {
+   "items": {
+    "$ref": "#/$defs/Page"
+   },
+   "maxItems": 100,
+   "minItems": 1,
+   "title": "Pages",
+   "type": "array"
+  },
+  "quick_styles": {
+   "items": {
+    "$ref": "#/$defs/QuickStyle"
+   },
+   "maxItems": 32,
+   "title": "Quick Styles",
+   "type": "array"
+  },
+  "embedded_assets": {
+   "items": {},
+   "maxItems": 0,
+   "title": "Embedded Assets",
+   "type": "array"
+  },
+  "shape_data_definitions": {
+   "items": {},
+   "maxItems": 0,
+   "title": "Shape Data Definitions",
+   "type": "array"
+  }
+ },
+ "required": [
+  "id",
+  "schema_version",
+  "revision",
+  "name",
+  "selected_page_id",
+  "pages",
+  "quick_styles",
+  "embedded_assets",
+  "shape_data_definitions"
+ ],
+ "title": "SimpleDiagrams document.json",
+ "type": "object"
+}

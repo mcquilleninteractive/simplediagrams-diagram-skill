@@ -1,0 +1,14 @@
+{
+  "name": "simplediagrams-diagram-skill",
+  "displayName": "SimpleDiagrams Diagrams",
+  "version": "0.1.0",
+  "description": "Builds SimpleDiagrams documents from a description: library shapes, labels and cleanly routed connectors, checked against an exact model of the file format.",
+  "author": {
+    "name": "McQuillen Interactive Pty. Ltd.",
+    "url": "https://simplediagrams.com/"
+  },
+  "homepage": "https://simplediagrams.com/",
+  "repository": "https://github.com/mcquilleninteractive/simplediagrams-diagram-skill",
+  "license": "MIT",
+  "keywords": ["simplediagrams", "diagrams", "flowchart", "architecture", "hand-drawn"]
+}
