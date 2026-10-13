@@ -60,13 +60,24 @@ def test_catalog_matches_what_the_compiler_writes() -> None:
     """Every catalogue shape must compile to a reference the catalogue itself
     resolves, or the app would draw placeholders."""
     catalog = Catalog.load()
-    assert len(catalog.shapes) == 280
-    nodes = [
-        {"key": f"n{i}", "shape": f"{shape.library_short_name}/{shape.item_id}", "x": i * 300.0, "y": 0.0}
-        for i, shape in enumerate(catalog.shapes)
-    ]
-    document = compile_spec(_spec(nodes), catalog)
-    assert [f for f in lint(document, catalog) if f.severity == "error"] == []
+    assert len(catalog.shapes) == 427
+    # One library per page: a page holds at most 300 shapes and the catalogue has more.
+    by_library: dict[str, list] = {}
+    for shape in catalog.shapes:
+        by_library.setdefault(shape.library_short_name, []).append(shape)
+    placed = 0
+    for library, shapes in by_library.items():
+        nodes = [
+            {"key": f"n{i}", "shape": f"{library}/{shape.item_id}", "x": i * 300.0, "y": 0.0}
+            for i, shape in enumerate(shapes)
+        ]
+        document = compile_spec(_spec(nodes), catalog)
+        assert [f for f in lint(document, catalog) if f.severity == "error"] == [], library
+        placed += len(document.pages[0].elements)
+    assert placed == len(catalog.shapes)
+    document = compile_spec(
+        _spec([{"key": "n0", "shape": "basic/Square", "x": 0.0, "y": 0.0}]), catalog
+    )
     first = document.pages[0].elements[0].core
     assert (first.frame.width, first.frame.height) == (50, 50)
     assert first.style == wire.ElementStyle(fill_hex="#FFFFFF", stroke_hex="#000000", line_width=1.0)
@@ -333,7 +344,7 @@ def test_nothing_that_exists_is_ever_overwritten(tmp_path: Path) -> None:
 
 def _run(script: str, *arguments: object) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        [sys.executable, str(ROOT / "scripts" / script), *map(str, arguments)],
+        [sys.executable, str(ROOT / "scripts" / script), "--offline", *map(str, arguments)],
         capture_output=True, text=True, check=False, cwd="/",
     )
 

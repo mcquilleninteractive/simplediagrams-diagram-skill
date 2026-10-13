@@ -23,7 +23,7 @@ from pathlib import Path
 
 import sd_format as wire
 from pydantic import ValidationError
-from sd_spec import SpecError, compile_spec, load_spec
+from sd_spec import Catalog, SpecError, compile_spec, load_spec
 
 MARGIN = 40
 # XML 1.0 cannot carry these at all, even escaped.
@@ -120,12 +120,23 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("source", type=Path, help="A diagram spec (.json)")
     parser.add_argument("output", type=Path, help="New SVG to write; later pages get -2, -3 before the suffix")
+    parser.add_argument("--offline", action="store_true", help="Use cached or bundled metadata without a request")
+    parser.add_argument("--refresh-catalogue", action="store_true", help="Revalidate the catalogue now")
+    parser.add_argument("--catalogue-cache", type=Path, help="Use this cache file")
     arguments = parser.parse_args()
     if arguments.source.suffix != ".json" or arguments.output.suffix != ".svg":
         print("error   Expected a JSON spec and a new .svg output.")
         return 1
     try:
-        document = compile_spec(load_spec(arguments.source))
+        catalog = Catalog.load_current(
+            cache_path=arguments.catalogue_cache,
+            offline=arguments.offline,
+            refresh=arguments.refresh_catalogue,
+        )
+        print(f"Catalogue: {catalog.source}", file=sys.stderr)
+        if catalog.warning:
+            print(catalog.warning, file=sys.stderr)
+        document = compile_spec(load_spec(arguments.source), catalog)
     except (SpecError, ValidationError) as failure:
         for line in str(failure).splitlines():
             print(f"error   {line}")

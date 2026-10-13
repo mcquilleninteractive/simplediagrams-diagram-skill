@@ -1,8 +1,8 @@
 # Build SimpleDiagrams diagrams
 
-This Agent Skill creates new editable `.simplediagram` documents from a description. It uses a bundled catalog of built-in shapes and a small JSON spec for nodes, labels, positions, and connectors. The builder writes the document package and checks its structure and layout.
+This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It uses a bundled catalog of built-in shapes and a small JSON spec for nodes, labels, positions, and connectors. The builder writes the document package and checks its structure and layout.
 
-It uses document format 15 and a built-in shape catalog from SimpleDiagrams for macOS 5.0.9. Building needs Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
+It uses document format 15 and a built-in shape catalog from SimpleDiagrams for macOS 5.0.14 (369 shapes; the 89 UI Flow shapes added in 5.0.12 show as dashed placeholders in earlier versions). Building needs Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
 
 ## Install
 
@@ -26,11 +26,13 @@ To install by copying, keep the folder name `simplediagrams-diagram-skill`.
 - "Diagram the architecture described in this repository's README."
 - "Make an org chart for this team."
 - "Turn this procedure into a flowchart."
+- "Redraw this whiteboard photo as a diagram."
 
 ## Scope
 
 - Creates new documents using native rectangles, ellipses, notes, text, connectors, and the six bundled shape libraries.
 - Uses only the static catalog included with the skill. Downloaded or personal libraries, images, and shape data are outside this authoring profile.
+- Redraws a pictured diagram as boxes and connectors. It does not trace artwork or handwriting, embed the picture, or draw pin-level wiring.
 - Never overwrites an existing document. Keep the JSON spec to rebuild under a new name.
 
 ## Build locally
@@ -48,6 +50,7 @@ The first command checks without writing. The second creates the package at a ne
 |---|---|
 | `SKILL.md` | Agent instructions |
 | `references/visual-design.md` | Layout guidance |
+| `references/from-an-image.md` | Redrawing a photo, scan, or screenshot of a diagram |
 | `references/document-format.md` | Generated package structure |
 | `assets/built-in-shapes.json` | Available library shape IDs and natural sizes |
 | `assets/example-spec.json` | Example input |

@@ -18,7 +18,7 @@ import unicodedata
 import uuid
 from itertools import pairwise
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import TYPE_CHECKING, Annotated, Literal
 
 import sd_format as wire
 from pydantic import (
@@ -36,6 +36,9 @@ CATALOG_PATH = Path(__file__).resolve().parent.parent / "assets" / "built-in-sha
 LIBRARY_PREFIX = "com.simplediagrams.shapeLibrary."
 CATALOG_NAME = "com.simplediagrams.skill.built-in-shapes"
 CATALOG_VERSION = 1
+
+if TYPE_CHECKING:
+    from sd_catalog import ShapeLibraryCatalogue
 
 NATIVE_KINDS = ("rectangle", "ellipse", "note", "text")
 # What the app itself gives each kind when a person draws one.
@@ -138,7 +141,8 @@ class NodeSpec(SpecModel):
         description=(
             "rectangle, ellipse, note or text for a plain drawn shape, or "
             "'<library>/<item>' for a library shape, for example 'basic/Cylinder'. "
-            "Library and item names come from assets/built-in-shapes.json."
+            "Use a packaged selector returned by find_shapes.py; it searches the API "
+            "and falls back to assets/built-in-shapes.json offline."
         )
     )
     label: Label = ""
@@ -242,7 +246,7 @@ class DiagramSpec(SpecModel):
 
 
 class CatalogShape(BaseModel):
-    """One library shape the app can resolve by reference."""
+    """A discovered shape with its exact placement reference and availability."""
 
     model_config = ConfigDict(frozen=True)
 
@@ -254,19 +258,74 @@ class CatalogShape(BaseModel):
     display_name: str
     default_width: float
     default_height: float
+    built_in: bool = True
+    readable_library_id: str = ""
+    slug: str = ""
+    description: str = ""
+    keywords: tuple[str, ...] = ()
+    page_url: str = ""
+
+    @property
+    def selector(self) -> str:
+        """Use shipped item names for packaged shapes and slugs for discovery."""
+        item = self.item_id if self.built_in else self.slug
+        return f"{self.library_short_name}/{item}"
 
 
 class Catalog:
-    """The shapes built into SimpleDiagrams, loaded from the skill's asset file."""
+    """Searchable library metadata; only packaged references are placeable today."""
 
     def __init__(self, shapes: list[CatalogShape], source_app_version: str) -> None:
         self.shapes = shapes
         self.source_app_version = source_app_version
+        self.source = "bundled"
+        self.warning: str | None = None
         self._by_reference = {(shape.library_id, shape.item_id): shape for shape in shapes}
-        self._short_names = {shape.library_short_name.lower(): shape.library_id for shape in shapes}
+        self._short_names: dict[str, str | None] = {}
+        self._readable_ids = {shape.readable_library_id: shape.library_id for shape in shapes}
+        self._library_ids = {shape.library_id for shape in shapes}
+        self._by_selector = dict(self._by_reference)
+        for shape in shapes:
+            short = shape.library_short_name.lower()
+            if short in self._short_names and self._short_names[short] != shape.library_id:
+                self._short_names[short] = None
+            else:
+                self._short_names[short] = shape.library_id
+            if not shape.built_in:
+                self._by_selector[(shape.library_id, shape.slug)] = shape
+
+    @classmethod
+    def from_catalogue(
+        cls, catalogue: ShapeLibraryCatalogue, *, source: str, warning: str | None = None
+    ) -> Catalog:
+        """Copy API references unchanged, including their asset versions."""
+        shapes = [
+            CatalogShape(
+                library_id=shape.reference.library_id,
+                library_short_name=library.readable_id.rsplit(".", 1)[-1],
+                library_display_name=library.display_name,
+                readable_library_id=library.readable_id,
+                asset_version=shape.reference.asset_version,
+                item_id=shape.reference.item_id,
+                display_name=shape.display_name,
+                default_width=shape.default_width,
+                default_height=shape.default_height,
+                built_in=library.built_in,
+                slug=shape.slug,
+                description=shape.description,
+                keywords=tuple(shape.keywords),
+                page_url=library.page_url,
+            )
+            for library in catalogue.libraries
+            for shape in library.shapes
+        ]
+        result = cls(shapes, "the current catalogue")
+        result.source, result.warning = source, warning
+        return result
 
     @classmethod
     def load(cls, path: Path = CATALOG_PATH) -> Catalog:
+        """Read the bundled fallback without network access, useful for pure checks."""
         data = json.loads(path.read_text(encoding="utf-8"))
         if (data.get("catalog"), data.get("catalog_version")) != (CATALOG_NAME, CATALOG_VERSION):
             raise ValueError(f"{path} is not shape catalogue version {CATALOG_VERSION}")
@@ -280,22 +339,39 @@ class Catalog:
                 display_name=item["display_name"],
                 default_width=item["default_width"],
                 default_height=item["default_height"],
+                readable_library_id=library["library_id"],
+                slug=item.get("slug", item["item_id"]),
+                description=item.get("description", ""),
+                keywords=tuple(item.get("keywords", [])),
             )
             for library in data["libraries"]
             for item in library["shapes"]
         ]
         return cls(shapes, data["source_app_version"])
 
+    @classmethod
+    def load_current(
+        cls, *, cache_path: Path | None = None, offline: bool = False, refresh: bool = False
+    ) -> Catalog:
+        """Load one current snapshot for a complete CLI search or build."""
+        from sd_catalog import load_catalogue
+
+        result = load_catalogue(cache_path=cache_path, offline=offline, refresh=refresh)
+        return cls.from_catalogue(result.catalogue, source=result.source, warning=result.warning)
+
     def resolve(self, library: str, item: str) -> CatalogShape | None:
         """Finds a shape by full library id or short name. Item ids are case sensitive."""
-        library_id = library if library.startswith(LIBRARY_PREFIX) else self._short_names.get(library.lower())
+        library_id = (
+            library if library in self._library_ids
+            else self._readable_ids.get(library) or self._short_names.get(library.lower())
+        )
         if library_id is None:
             return None
-        return self._by_reference.get((library_id, item))
+        return self._by_selector.get((library_id, item))
 
     def find_reference(self, library_id: str, item_id: str, asset_version: int) -> CatalogShape | None:
         shape = self._by_reference.get((library_id, item_id))
-        return shape if shape and shape.asset_version == asset_version else None
+        return shape if shape and shape.built_in and shape.asset_version == asset_version else None
 
     def suggestions(self, library: str, item: str) -> list[str]:
         """Close names to offer when a shape is not found."""
@@ -624,8 +700,16 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                 if catalog_shape is None:
                     hint = catalog.suggestions(library, item)
                     raise SpecError(
-                        f"node '{node.key}': '{node.shape}' is not a shape built into "
-                        "SimpleDiagrams." + (f" Did you mean: {', '.join(hint)}?" if hint else "")
+                        f"node '{node.key}': '{node.shape}' is not in the selected catalogue."
+                        + (f" Did you mean: {', '.join(hint)}?" if hint else "")
+                    )
+                if not catalog_shape.built_in:
+                    raise SpecError(
+                        f"node '{node.key}': {catalog_shape.display_name} belongs to "
+                        f"{catalog_shape.library_display_name}, a downloaded library. "
+                        "SimpleDiagrams 5.0.16 cannot resolve its reference in a generated "
+                        "document, even when installed. Place it manually in the app to embed "
+                        "the artwork, or choose a packaged shape. Nothing has been written."
                     )
                 kind = "symbol"
 
@@ -906,7 +990,7 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
                             f"{page_name}: {reference.library_id} / {reference.item_id} "
                             f"(version {reference.asset_version}) is not built into SimpleDiagrams "
                             f"{catalog.source_app_version}. The app would draw a dashed placeholder. "
-                            "Use a shape from assets/built-in-shapes.json."
+                            "Choose a packaged shape returned by find_shapes.py."
                         ),
                     )
                 )

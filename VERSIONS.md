@@ -8,9 +8,13 @@ The skill writes one fixed document format. The builder and bundled shape catalo
 | Package format | 15 | `FORMAT_VERSION` in `scripts/sd_format.py` |
 | Document schema | 14 | `SCHEMA_VERSION` in `scripts/sd_format.py` |
 | Diagram spec | 1 | `SPEC_VERSION` in `scripts/sd_spec.py` |
-| Built-in shape catalog | Catalog 1, from SimpleDiagrams 5.0.9 | `assets/built-in-shapes.json` |
+| Built-in shape catalog | Catalog 1, from SimpleDiagrams 5.0.14 | `assets/built-in-shapes.json` |
 
-The document format began in SimpleDiagrams for macOS 5.0.8; the bundled catalog came from 5.0.9. The 280 shape IDs, versions, and sizes match the current desktop source checkout (5.0.11 development line). Check compatibility with each release before claiming support for it.
+The document format began in SimpleDiagrams for macOS 5.0.8. The bundled catalog was regenerated on 13 October 2026 from the desktop app's own bundled catalogue, which is the source of truth for the six packaged libraries: 369 shape IDs, versions and sizes, unchanged in the app since 5.0.12. The 280 shapes of the first catalog (from 5.0.9) are all still present with the same names, sizes and versions; the 89 added are UI Flow shapes that exist from 5.0.12, and a diagram using one shows a dashed placeholder in an earlier version. Check compatibility with each release before claiming support for it.
+
+Each library also lists `published_library_id`, and each shape `published_item_id`: the same shape's identifiers on the SimpleDiagrams website. They are for matching against the website's catalogue. A `symbol_reference` for a packaged shape is still written with `library_id`, `item_id` and `asset_version`, which every version from 5.0.8 understands.
+
+When the skill reads the website's catalogue, the website's information supersedes this file. This file is what the skill uses without the network.
 
 ## Compatibility rules
 

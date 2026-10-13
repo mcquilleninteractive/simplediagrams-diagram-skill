@@ -32,9 +32,19 @@ def main() -> int:
         "output", type=Path, nargs="?", help="New document to write, ending in .simplediagram"
     )
     parser.add_argument("--strict", action="store_true", help="Treat layout warnings as a failure")
+    parser.add_argument("--offline", action="store_true", help="Use cached or bundled metadata without a request")
+    parser.add_argument("--refresh-catalogue", action="store_true", help="Revalidate the catalogue now")
+    parser.add_argument("--catalogue-cache", type=Path, help="Use this cache file")
     arguments = parser.parse_args()
 
-    catalog = Catalog.load()
+    catalog = Catalog.load_current(
+        cache_path=arguments.catalogue_cache,
+        offline=arguments.offline,
+        refresh=arguments.refresh_catalogue,
+    )
+    print(f"Catalogue: {catalog.source}", file=sys.stderr)
+    if catalog.warning:
+        print(catalog.warning, file=sys.stderr)
     try:
         document = compile_spec(load_spec(arguments.spec), catalog)
     except (SpecError, ValidationError) as failure:

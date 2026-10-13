@@ -1,12 +1,14 @@
 ---
 name: simplediagrams-diagram-skill
-description: Create new editable SimpleDiagrams (.simplediagram) documents from a description using the bundled built-in shapes, labels, and connectors. Use for flowcharts, architecture diagrams, process maps, org charts, and UI flows.
+description: Create new editable SimpleDiagrams (.simplediagram) documents from a description or from an image of a diagram (a photo of a whiteboard or notebook sketch, a screenshot, a scan) using the bundled built-in shapes, labels, and connectors. Use for flowcharts, architecture diagrams, process maps, org charts, and UI flows, and to redraw a pictured diagram as an editable one.
 license: MIT
 ---
 
 # Build a SimpleDiagrams document
 
 Create a **new** `.simplediagram` document from a short JSON spec. The bundled builder knows the document format and the built-in shape catalog. Work from the user's description and source files they identify. Never replace an existing output.
+
+When the source is an image, read [from-an-image.md](references/from-an-image.md) first. It replaces step 1 below with an inventory of what the picture shows, and adds a comparison against the picture and a report of anything unclear.
 
 Read [visual-design.md](references/visual-design.md) for layout guidance. Use [example-spec.json](assets/example-spec.json) as a starting point and [diagram-spec-1.schema.json](schema/diagram-spec-1.schema.json) for all supported fields. [document-format.md](references/document-format.md) describes the generated package if a build error needs investigation.
 
