@@ -1,12 +1,12 @@
 ---
 name: simplediagrams-diagram-skill
-description: Create new editable SimpleDiagrams (.simplediagram) documents from a description or from an image of a diagram (a photo of a whiteboard or notebook sketch, a screenshot, a scan) using the bundled built-in shapes, labels, and connectors. Use for flowcharts, architecture diagrams, process maps, org charts, and UI flows, and to redraw a pictured diagram as an editable one.
+description: Create new editable SimpleDiagrams (.simplediagram) documents from a description or an image of a diagram, using the published shape catalogue, labels and connectors. Use for flowcharts, architecture diagrams, process maps, org charts, UI flows and redrawing a pictured diagram as an editable one.
 license: MIT
 ---
 
 # Build a SimpleDiagrams document
 
-Create a **new** `.simplediagram` document from a short JSON spec. The bundled builder knows the document format and the built-in shape catalog. Work from the user's description and source files they identify. Never replace an existing output.
+Create a **new** `.simplediagram` document from a short JSON spec. The builder knows the document format and reads the public shape catalogue, with a validated cache and bundled offline fallback. Work from the user's description and source files they identify. Never replace an existing output.
 
 When the source is an image, read [from-an-image.md](references/from-an-image.md) first. It replaces step 1 below with an inventory of what the picture shows, and adds a comparison against the picture and a report of anything unclear.
 
@@ -17,7 +17,7 @@ Read [visual-design.md](references/visual-design.md) for layout guidance. Use [e
 The script paths below are relative to this `SKILL.md` directory (`SKILL_DIR`). The builder needs Python 3.10+ and Pydantic 2. `uv run` may fetch Pydantic if it is not cached; use an existing local Python environment with Pydantic 2 when offline.
 
 1. Identify the things to show and their relationships. Use 5–15 nodes per page when practical.
-2. Choose shapes from the bundled catalog. Run `python3 "$SKILL_DIR/scripts/find_shapes.py"` to list libraries, or pass a search term such as `database`. Use only returned `<library>/<item>` names or the native `rectangle`, `ellipse`, `note`, and `text` shapes.
+2. Search the full catalogue with `uv run "$SKILL_DIR/scripts/find_shapes.py" database --json`, or run without a query to list libraries. Search uses descriptions and keywords as well as names. For the generated document choose results with `placeable: true`, using their returned `selector`, or the native `rectangle`, `ellipse`, `note` and `text` shapes. Downloaded-library results are discovery only: the current desktop cannot resolve those references in generated documents, even when installed. Tell the user when the closest match has this limitation; do not silently replace it with a box. Read [shape-catalogue.md](references/shape-catalogue.md) for caching, offline use and result paging.
 3. Place nodes on a grid and connect them by node key. Prefer one flow direction and short labels. Write the JSON spec beside the intended output.
 4. Check the spec without writing a document:
 

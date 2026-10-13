@@ -1,8 +1,8 @@
 # Build SimpleDiagrams diagrams
 
-This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It uses a bundled catalog of built-in shapes and a small JSON spec for nodes, labels, positions, and connectors. The builder writes the document package and checks its structure and layout.
+This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It searches the public shape catalogue and uses a small JSON spec for nodes, labels, positions and connectors. The builder writes the document package and checks its structure and layout.
 
-It uses document format 15 and a built-in shape catalog from SimpleDiagrams for macOS 5.0.14 (369 shapes; the 89 UI Flow shapes added in 5.0.12 show as dashed placeholders in earlier versions). Building needs Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
+It writes document format 15 and retains an offline catalogue from SimpleDiagrams for macOS 5.0.16 with 427 packaged shapes. The 58 new Biz shapes need 5.0.16; the 89 added UI Flow shapes need 5.0.12. Earlier apps show placeholders for shapes they do not contain. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
 
 ## Install
 
@@ -31,7 +31,8 @@ To install by copying, keep the folder name `simplediagrams-diagram-skill`.
 ## Scope
 
 - Creates new documents using native rectangles, ellipses, notes, text, connectors, and the six bundled shape libraries.
-- Uses only the static catalog included with the skill. Downloaded or personal libraries, images, and shape data are outside this authoring profile.
+- Searches all published libraries through `https://simplediagrams.com/shape-libraries/catalog.json`, with hourly ETag caching and explicit offline fallback.
+- Places packaged shapes using their exact API references. Downloaded-library metadata is searchable, but the builder refuses those placements because desktop 5.0.16 cannot yet resolve them. Their artwork must be placed manually in the app. Personal libraries, embedded images and shape data remain outside this authoring profile.
 - Redraws a pictured diagram as boxes and connectors. It does not trace artwork or handwriting, embed the picture, or draw pin-level wiring.
 - Never overwrites an existing document. Keep the JSON spec to rebuild under a new name.
 
@@ -51,10 +52,12 @@ The first command checks without writing. The second creates the package at a ne
 | `SKILL.md` | Agent instructions |
 | `references/visual-design.md` | Layout guidance |
 | `references/from-an-image.md` | Redrawing a photo, scan, or screenshot of a diagram |
+| `references/shape-catalogue.md` | API search, cache and offline behavior |
 | `references/document-format.md` | Generated package structure |
-| `assets/built-in-shapes.json` | Available library shape IDs and natural sizes |
+| `assets/built-in-shapes.json` | 427 packaged shapes for offline fallback |
 | `assets/example-spec.json` | Example input |
-| `scripts/find_shapes.py` | Search the bundled catalog |
+| `scripts/find_shapes.py` | Search names, descriptions and keywords across published libraries |
+| `scripts/sd_catalog.py` | Bounded API validation, ETag caching and offline fallback |
 | `scripts/build_diagram.py` | Check a spec and build a new package |
 | `scripts/preview_diagram.py` | Render a new wireframe SVG from a spec |
 | `scripts/sd_spec.py`, `scripts/sd_format.py`, `scripts/sd_package.py` | Spec compiler, format models, and package writer |

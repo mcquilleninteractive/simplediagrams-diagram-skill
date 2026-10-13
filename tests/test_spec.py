@@ -372,7 +372,7 @@ def test_build_refuses_bad_specs_before_writing(tmp_path: Path) -> None:
     huge.write_text(" " * (2 * 1024 * 1024 + 1))
     unknown = tmp_path / "unknown.json"
     unknown.write_text(json.dumps({"name": "X", "pages": [{"nodes": [{"key": "a", "shape": "aws/S3", "col": 0, "row": 0}]}]}))
-    for spec, message in ((huge, "limit"), (unknown, "not a shape built into"), (tmp_path / "absent.json", "Cannot read")):
+    for spec, message in ((huge, "limit"), (unknown, "not in the selected catalogue"), (tmp_path / "absent.json", "Cannot read")):
         result = _run("build_diagram.py", spec, target)
         assert result.returncode == 1 and message in result.stdout, result.stdout
     assert not target.exists()

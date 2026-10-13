@@ -204,7 +204,7 @@
      "type": "string"
     },
     "shape": {
-     "description": "rectangle, ellipse, note or text for a plain drawn shape, or '<library>/<item>' for a library shape, for example 'basic/Cylinder'. Library and item names come from assets/built-in-shapes.json.",
+     "description": "rectangle, ellipse, note or text for a plain drawn shape, or '<library>/<item>' for a library shape, for example 'basic/Cylinder'. Use a packaged selector returned by find_shapes.py; it searches the API and falls back to assets/built-in-shapes.json offline.",
      "title": "Shape",
      "type": "string"
     },
