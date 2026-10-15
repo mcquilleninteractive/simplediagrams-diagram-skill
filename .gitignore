@@ -1,11 +1,82 @@
+# Keep personal, sensitive and generated files out of this public repository.
+# Tracked files are only the skill's own Markdown, Python, JSON and bundled assets;
+# anything else must be added on purpose, with a rule below changed to allow it.
+
+# Secrets, keys and credentials
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.keychain*
+id_rsa*
+id_ed25519*
+*credentials*
+*secret*
+*token*
+.netrc
+.npmrc
+.pypirc
+
+# Local tool and editor state, which can hold your user name and folder paths
+.claude/
 .DS_Store
+._*
 __MACOSX/
+Thumbs.db
 __pycache__/
 *.py[cod]
-*~
-.idea/
-.vscode/
+.mypy_cache/
 .pytest_cache/
 .ruff_cache/
+.venv/
+venv/
+.idea/
+.vscode/
+*.swp
+*~
+
+# Builds, archives and logs; make release archives with `git archive` or GitHub
 .build/
+build/
+dist/
+*.egg-info/
 Package.resolved
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+*.log
+*.sqlite
+*.sqlite3
+*.db
+
+# Photos, scans and documents people supply for a drawing; never part of the skill
+*.png
+*.jpg
+*.jpeg
+*.heic
+*.heif
+*.gif
+*.webp
+*.tif
+*.tiff
+*.bmp
+*.pdf
+*.docx
+*.xlsx
+*.pptx
+
+# Local scratch work and diagrams made while trying the skill
+scratch/
+working/
+output/
+*.simplediagram
+
+# Previews made with the skill
+*.svg

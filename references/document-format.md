@@ -1,8 +1,8 @@
-# The `.simplediagram` document format, version 15
+# The `.simplediagram` document format, versions 15 and 16
 
 This describes what the skill writes. The exact statement of it is `scripts/sd_format.py` (Pydantic models) and the generated `schema/simplediagram-document-15.schema.json`; if this page and the models ever disagree, the models are right.
 
-The app itself writes package 17 / schema 16 and reads every version from 1. The skill keeps writing 15 / 14 so its documents open in 5.0.8 and later. The complete structure of a diagram file in every version, including what the skill leaves out, is described in SimpleDiagrams' project documentation (`desktop/diagram-document-structure.md`); this page covers only what the skill writes.
+Released SimpleDiagrams 5.0.16 writes package 17 / schema 16, and development builds after it write 18 / 17; the app reads every version from 1. The skill keeps writing 15 / 14 so its documents open in 5.0.8 and later. A document that uses a shape from a downloadable library is written at 16 / 15 instead, because only that format can name the library (see [Package 16](#package-16-the-libraries-a-document-needs)); it opens in 5.0.16 and later. This page covers only what the skill writes.
 
 Write a diagram spec and let `build_diagram.py` produce the document. This reference explains the generated package and build diagnostics.
 
@@ -10,7 +10,7 @@ Write a diagram spec and let `build_diagram.py` produce the document. This refer
 
 The **authoring profile**: shapes drawn by the app (`rectangle`, `ellipse`, `note`, `text`, `path`), shapes from the libraries built into the app (`symbol`), connectors, groups, guides, drawing order, grid and a solid page background.
 
-Not covered, and rejected by the skill's models although the app can read them: embedded images, shapes from downloaded or personal libraries (stored as embedded artwork files), shape data, image backgrounds, print layout, and content imported from older versions.
+Not covered, and rejected by the skill's models although the app can read them: embedded images, embedded shape artwork (how the app stores a personal library's shape, or a downloaded one once it is in place; the skill places downloaded shapes by reference instead, see Package 16), shape data, image backgrounds, print layout, and content imported from older versions.
 
 ## The package
 
@@ -25,7 +25,7 @@ Order flow.simplediagram/
 
 The app refuses the document if the folder has any other member, including `.DS_Store`, if `assets/` is missing, or if `assets/` contains anything it was not told about. Tools that drop empty folders (git, zip) and Finder's **Show Package Contents** are the usual ways a good document gets broken.
 
-`manifest.json` is always exactly:
+`manifest.json` is always exactly this, with `format_version` 16 for a document that names required libraries:
 
 ```json
 {"format": "com.simplediagrams.document", "format_version": 15, "contains_legacy_source": false}
@@ -33,11 +33,29 @@ The app refuses the document if the folder has any other member, including `.DS_
 
 ## Two version numbers
 
-`manifest.json` has `format_version` **15**. `document.json` has `schema_version` **14**. They are different counters and the second is always the first minus one. Writing 15 in both is refused.
+`manifest.json` has `format_version` **15**. `document.json` has `schema_version` **14**. They are different counters and the second is always the first minus one. Writing 15 in both is refused. A document that names required libraries has **16** and **15**. The builder takes the manifest's number from the document, so the two always agree.
+
+## Package 16: the libraries a document needs
+
+A shape from a downloadable library is a `symbol` whose `symbol_reference` holds the library's and shape's published UUIDs and the shape's asset version, exactly as the catalogue gives them. The document then names each such library once, in the order its shapes first appear, under a top-level `required_libraries` key:
+
+```json
+"required_libraries": [
+  {"library_id": "79FFE4B7-EA0D-87C3-AE89-D4CD62AF5202", "display_name": "Hobby Electronics Notebook"}
+]
+```
+
+- Only at schema 15 / package 16, and only when the list is not empty. The skill writes package 16 for nothing else.
+- `library_id`: the identifier the references use. ASCII letters, digits, `.`, `-` and `_`, beginning and ending with a letter or digit, at most 256 bytes.
+- `display_name`: not blank, at most 200 characters, no control characters, line breaks or text-direction controls.
+- `minimum_revision` is optional (1 to 1,000,000). The skill leaves it out: the catalogue gives a library's current revision, which is not necessarily the lowest that holds the shapes.
+- At most 64 entries, no library twice (ignoring case).
+
+The list is advisory to the app: it names the library to a person who lacks it, and nothing is drawn or refused because of it. These are the app's own rules, so a list written here is never trimmed when it is read (desktop ADR 0039).
 
 ## Shape of `document.json`
 
-Nine top-level keys, all required, no others allowed:
+Nine top-level keys, all required, and at schema 15 a tenth, `required_libraries`. No others are allowed:
 
 | Key | Value |
 |---|---|
@@ -108,7 +126,7 @@ A library shape:
 "symbol_reference": {"library_id": "com.simplediagrams.shapeLibrary.basic", "item_id": "Cylinder", "asset_version": 1}
 ```
 
-All three values must match `assets/built-in-shapes.json` exactly. A reference the app cannot resolve does not stop the document opening: the shape is drawn as a dashed placeholder showing the item name. Nothing reports this at open time, which is why the skill's validator treats it as an error.
+All three values must match a catalogue shape exactly: a packaged shape's are the app's own names, as in `assets/built-in-shapes.json`, and a downloadable shape's are its published UUIDs, as in the API. A reference the app cannot resolve does not stop the document opening: the shape is drawn as a dashed placeholder showing the item name. For a downloadable library named in `required_libraries`, the app says which library is missing and links to its page. Nothing reports a mistyped reference, which is why the skill's validator treats a reference in neither catalogue as an error.
 
 A library shape's `connection_points` and `text_layout` are written as its library gives them, which is what the app gives a copy dragged from the Library panel. Most shapes have the standard eight anchors and no layout. A few differ: BPMN's task marks have `"connection_points": []`, its events have a `text_layout` with position `below`, and its tasks have a text area that keeps clear of the picture in their corner.
 

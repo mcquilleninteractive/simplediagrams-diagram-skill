@@ -29,7 +29,7 @@ A diagram works when a reader can answer "what are the parts, and how do they re
 
 ## Connectors
 
-The build routes connectors for you: mid-side to mid-side, horizontal and vertical runs only, with branches from one side sharing a line. Your layout decides whether that comes out clean.
+The build routes connectors for you: from side to side (or from a connection point the spec names), horizontal and vertical runs only, with branches from one side sharing a line. Your layout decides whether that comes out clean.
 
 - **Prefer `orthogonal`.** Straight horizontal and vertical runs are the easiest to follow. Use `straight` only when both ends are already aligned or for a deliberately informal sketch, and `curved` for a loop back against the flow.
 - **Aligned neighbours get a perfectly straight line.** Two nodes on the same row or column connect with one segment and no bends. Aim for most of your connectors to be like this.

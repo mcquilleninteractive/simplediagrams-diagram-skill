@@ -291,3 +291,130 @@ def test_committed_schemas_match_the_models() -> None:
         capture_output=True, text=True, check=False,
     )
     assert result.returncode == 0, result.stdout + result.stderr
+
+
+# ---------------------------------------------------------------------------
+# Package 16: the libraries a document needs (desktop ADR 0039)
+# ---------------------------------------------------------------------------
+
+NOTEBOOK = "79FFE4B7-EA0D-87C3-AE89-D4CD62AF5202"
+
+
+def _with_libraries(libraries: list[dict]) -> dict:
+    document = _dumped()
+    document["schema_version"] = 15
+    document["required_libraries"] = libraries
+    return document
+
+
+def test_required_libraries_come_only_with_schema_15_and_package_16() -> None:
+    """The app refuses the list before package 16, and the skill bumps the format only for
+    a document that has one, so every other document still opens in 5.0.8."""
+    libraries = [{"library_id": NOTEBOOK, "display_name": "Hobby Electronics Notebook"}]
+    document = wire.Document.model_validate_json(json.dumps(_with_libraries(libraries)))
+    assert wire.dump(wire.manifest(document))["format_version"] == 16
+    at_14 = _with_libraries(libraries)
+    at_14["schema_version"] = 14
+    assert "required_libraries" in _rejects(at_14)
+    assert "required_libraries" in _rejects(_with_libraries([]))
+
+
+def test_the_builder_picks_the_format_from_the_libraries() -> None:
+    """A plain document stays at 15; one naming a library is 16, and leaves out a revision
+    it does not know."""
+    plain = fixtures.minimal_document()
+    assert (plain.schema_version, wire.manifest(plain).format_version) == (14, 15)
+    named = wire.document(
+        id=plain.id, name=plain.name, pages=plain.pages,
+        required_libraries=[wire.RequiredLibrary(library_id=NOTEBOOK, display_name="Notebook")],
+    )
+    assert (named.schema_version, wire.manifest(named).format_version) == (15, 16)
+    assert wire.dump(named)["required_libraries"] == [
+        {"library_id": NOTEBOOK, "display_name": "Notebook"}
+    ]
+
+
+@pytest.mark.parametrize(
+    "identifier",
+    [
+        "", ".hidden", "trailing.", "has space", "slash/inside", "café", "a" * 257,
+        "abc\n", "-a", "a-",
+    ],
+)
+def test_required_library_identifiers_follow_the_apps_rule(identifier: str) -> None:
+    """The app drops an entry it would not accept, so the skill must never write one."""
+    with pytest.raises(ValidationError):
+        wire.RequiredLibrary(library_id=identifier, display_name="Notebook")
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "", "   ", "line\nbreak", "tab\tname", "a" * 201, "evil\u202ename", "para\u2029",
+        "\u200b", " \u200b\u00a0",
+    ],
+)
+def test_required_library_names_follow_the_apps_rule(name: str) -> None:
+    """A name is shown on one line inside the app's own sentence, so it may not be blank,
+    break the line or reorder the text around it. The app trims with Foundation's whitespace
+    set, which holds U+200B, so a name of zero-width spaces is blank to it too."""
+    with pytest.raises(ValidationError):
+        wire.RequiredLibrary(library_id=NOTEBOOK, display_name=name)
+
+
+def test_required_library_names_may_use_joiners_and_any_script() -> None:
+    """Joiners that emoji and scripts such as Persian need are ordinary text to the app."""
+    for name in ("\U0001f469\u200d\U0001f4bb Library", "کتاب\u200cها"):
+        assert wire.RequiredLibrary(library_id=NOTEBOOK, display_name=name).display_name == name
+
+
+def test_required_libraries_name_each_library_once_and_at_most_64() -> None:
+    """The app keeps one entry per library, ignoring case, and at most 64."""
+    twice = [
+        {"library_id": NOTEBOOK, "display_name": "Notebook"},
+        {"library_id": NOTEBOOK.lower(), "display_name": "Notebook again"},
+    ]
+    assert "twice" in _rejects(_with_libraries(twice))
+    many = [
+        {"library_id": f"00000000-0000-4000-8000-{index:012d}", "display_name": "Library"}
+        for index in range(wire.MAX_REQUIRED_LIBRARIES + 1)
+    ]
+    assert "required_libraries" in _rejects(_with_libraries(many))
+
+
+def test_minimum_revision_is_bounded_when_given() -> None:
+    """The app reads a revision from 1 to 1,000,000 and leaves out anything else."""
+    assert wire.RequiredLibrary(library_id=NOTEBOOK, display_name="N", minimum_revision=1)
+    for revision in (0, wire.MAX_LIBRARY_REVISION + 1):
+        with pytest.raises(ValidationError):
+            wire.RequiredLibrary(library_id=NOTEBOOK, display_name="N", minimum_revision=revision)
+
+
+def test_the_largest_entries_the_app_keeps_are_accepted() -> None:
+    """Every limit is the app's own, so its largest entries must still be written: 200
+    astral emoji (400 UTF-16 units, which a UTF-16 count would refuse), a 256-byte
+    reverse-DNS identifier with every allowed mark, and 64 entries."""
+    reverse_dns = "com.example.shape-library_"
+    reverse_dns += "x" * (wire.MAX_IDENTIFIER_BYTES - len(reverse_dns))
+    emoji = "\U0001f469" * wire.MAX_REQUIRED_LIBRARY_NAME_SCALARS
+    widest = wire.RequiredLibrary(library_id=reverse_dns, display_name=emoji)
+    assert (len(widest.library_id.encode()), len(widest.display_name)) == (256, 200)
+    with pytest.raises(ValidationError):
+        wire.RequiredLibrary(library_id=reverse_dns + "x", display_name="N")
+    with pytest.raises(ValidationError):
+        wire.RequiredLibrary(library_id=NOTEBOOK, display_name=emoji + "\U0001f469")
+    most = [
+        {"library_id": f"00000000-0000-4000-8000-{index:012d}", "display_name": "Library"}
+        for index in range(wire.MAX_REQUIRED_LIBRARIES)
+    ]
+    document = wire.Document.model_validate_json(json.dumps(_with_libraries(most)))
+    assert len(document.required_libraries or []) == wire.MAX_REQUIRED_LIBRARIES
+
+
+def test_a_library_list_written_as_null_is_refused() -> None:
+    """The app takes a key that is present, even as null, to need schema 15, and would
+    refuse the whole file; a document without libraries leaves the key out."""
+    document = _dumped()
+    document["required_libraries"] = None
+    assert "never written as null" in _rejects(document)
+    assert "required_libraries" not in wire.dump(fixtures.minimal_document())

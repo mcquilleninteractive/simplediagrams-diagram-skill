@@ -1,8 +1,8 @@
 """Exercise catalogue discovery without contacting any production service.
 
 The reader must preserve placement references, validate untrusted response
-bytes, avoid repeated requests, and retain honest offline fallbacks. Temporary
-cache paths and a controlled opener isolate every test from user state.
+bytes, store nothing between runs, and fall back honestly to the packaged list.
+A controlled opener isolates every test from the network.
 """
 
 from __future__ import annotations
@@ -120,24 +120,15 @@ def _transport(
     return opener
 
 
-def _seed_cache(monkeypatch: pytest.MonkeyPatch, path: Path) -> dict[str, Any]:
-    """Fetch controlled valid data before exercising revalidation or fallback."""
-    document = _document()
-    _transport(monkeypatch, document, ETag='"first"')
-    result = catalog.load_catalogue(cache_path=path)
-    assert result.source == "live"
-    return document
-
-
 def test_live_fetch_preserves_references_and_additive_fields(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Public identity must never replace a packaged placement reference."""
     document = _document()
     document["future_field"] = {"untrusted": "inert"}
     document["libraries"][0]["shapes"][0]["future_field"] = "also inert"
-    opener = _transport(monkeypatch, document, ETag='"first"')
-    result = catalog.load_catalogue(cache_path=tmp_path / "cache.json")
+    opener = _transport(monkeypatch, document)
+    result = catalog.load_catalogue()
     assert result.source == "live"
     assert result.warning is None
     assert (
@@ -154,145 +145,56 @@ def test_live_fetch_preserves_references_and_additive_fields(
     assert timeout == catalog.REQUEST_TIMEOUT_SECONDS
 
 
-def test_warm_cache_makes_no_request(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """Ordinary repeated searches share the one-hour request allowance."""
-    path = tmp_path / "cache.json"
-    _seed_cache(monkeypatch, path)
-    opener = _transport(monkeypatch, error=AssertionError("network must not run"))
-    result = catalog.load_catalogue(cache_path=path)
-    assert result.source == "cache"
+def test_each_run_asks_once_and_stores_nothing(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The skill keeps no state outside its folder, so every command asks for itself."""
+    first = _transport(monkeypatch)
+    assert catalog.load_catalogue().source == "live"
+    second = _transport(monkeypatch)
+    assert catalog.load_catalogue().source == "live"
+    assert len(first.calls) == len(second.calls) == 1
+
+
+def test_offline_makes_no_request(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Offline means the packaged list and nothing else, and says so."""
+    opener = _transport(monkeypatch)
+    result = catalog.load_catalogue(offline=True)
     assert opener.calls == []
+    assert result.source == "bundled" and "packaged" in (result.warning or "")
 
 
-def test_304_revalidates_existing_cache_and_retains_etag(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+@pytest.mark.parametrize(
+    "fault",
+    [
+        {"error": urllib.error.URLError("unreachable")},
+        {"error": urllib.error.HTTPError(catalog.CATALOGUE_URL, 304, "Not Modified", Message(), io.BytesIO())},
+        {"error": urllib.error.HTTPError(catalog.CATALOGUE_URL, 500, "Server Error", Message(), io.BytesIO())},
+        {"body": b"not json"},
+        {"body": b'{"catalog_version":999}'},
+        {"body": b"\x00"},
+    ],
+)
+def test_a_failed_or_bad_response_falls_back_to_the_packaged_list(
+    monkeypatch: pytest.MonkeyPatch, fault: dict[str, Any]
 ) -> None:
-    """Conditional revalidation keeps exact ordered data instead of replacing it."""
-    path = tmp_path / "cache.json"
-    document = _seed_cache(monkeypatch, path)
-    opener = _transport(
-        monkeypatch,
-        error=urllib.error.HTTPError(
-            catalog.CATALOGUE_URL, 304, "Not Modified", Message(), io.BytesIO()
-        ),
-    )
-    result = catalog.load_catalogue(cache_path=path, refresh=True)
-    assert result.source == "cache"
-    assert result.catalogue == catalog.ShapeLibraryCatalogue.model_validate_json(json.dumps(document))
-    assert opener.calls[0][0].get_header("If-none-match") == '"first"'
-    assert json.loads(path.read_bytes())["etag"] == '"first"'
-    assert json.loads(path.read_bytes())["failed"] is False
-
-
-def test_failed_request_uses_stale_cache_and_throttles_failure(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """A network outage retains validated data and does not cause request loops."""
-    path = tmp_path / "cache.json"
-    _seed_cache(monkeypatch, path)
-    opener = _transport(monkeypatch, error=urllib.error.URLError("unavailable"))
-    first = catalog.load_catalogue(cache_path=path, refresh=True)
-    second = catalog.load_catalogue(cache_path=path)
-    assert first.source == second.source == "stale-cache"
-    assert first.warning and second.warning
-    assert first.catalogue == second.catalogue
-    assert len(opener.calls) == 1
-
-
-def test_expired_cache_attempts_revalidation(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """The hourly allowance must not leave a successful cache frozen forever."""
-    path = tmp_path / "cache.json"
-    monkeypatch.setattr(catalog.time, "time", lambda: 1000.0)
-    _seed_cache(monkeypatch, path)
-    monkeypatch.setattr(catalog.time, "time", lambda: 5000.0)
-    opener = _transport(monkeypatch, ETag='"second"')
-    result = catalog.load_catalogue(cache_path=path)
-    assert result.source == "live"
-    assert len(opener.calls) == 1
-
-
-def test_offline_fallback_neither_fetches_nor_writes(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """Offline discovery works without creating cache or contacting the server."""
-    path = tmp_path / "absent" / "cache.json"
-    opener = _transport(monkeypatch, error=AssertionError("offline"))
-    result = catalog.load_catalogue(cache_path=path, offline=True)
+    """A server fault is reported and the packaged list used, never guessed data."""
+    _transport(monkeypatch, **fault)
+    result = catalog.load_catalogue()
     assert result.source == "bundled"
-    assert len(result.libraries) == 7
-    assert all(library.built_in for library in result.libraries)
-    assert all(
-        shape.reference.library_id == library.readable_id
-        for library in result.libraries
-        for shape in library.shapes
-    )
-    assert opener.calls == []
-    assert not path.exists()
+    assert "failed" in (result.warning or "")
 
 
-def test_failed_first_fetch_uses_bundle_and_throttles(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """The first offline failure also receives the one-hour request allowance."""
-    path = tmp_path / "cache.json"
-    opener = _transport(monkeypatch, error=urllib.error.URLError("unavailable"))
-    assert catalog.load_catalogue(cache_path=path).source == "bundled"
-    assert catalog.load_catalogue(cache_path=path).source == "bundled"
-    assert len(opener.calls) == 1
-
-
-@pytest.mark.parametrize("cached", [b"not json", b"{}"])
-def test_corrupt_cache_is_replaced_by_valid_response(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, cached: bytes
-) -> None:
-    """Local cache corruption must not become trusted discovery data."""
-    path = tmp_path / "cache.json"
-    path.write_bytes(cached)
-    _transport(monkeypatch)
-    result = catalog.load_catalogue(cache_path=path)
-    assert result.source == "live"
-    assert catalog._read_cache(path).catalogue == result.catalogue
-
-
-@pytest.mark.parametrize("body", [b"not json", b'{"catalog_version":999}', b"\x00"])
-def test_bad_response_does_not_replace_valid_cache(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, body: bytes
-) -> None:
-    """Server faults must not overwrite the last valid catalogue."""
-    path = tmp_path / "cache.json"
-    _seed_cache(monkeypatch, path)
-    _transport(monkeypatch, body=body)
-    result = catalog.load_catalogue(cache_path=path, refresh=True)
-    assert result.source == "stale-cache"
-    assert result.shapes[0].reference.item_id == "Square"
-
-
-def test_response_byte_limit_is_checked_before_json(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """Even unparseable oversized data must stop at the transport ceiling."""
-    # A valid cached catalogue avoids reading the larger bundled fallback.
-    path = tmp_path / "cache.json"
-    _seed_cache(monkeypatch, path)
+def test_response_byte_limits_are_checked_before_json(monkeypatch: pytest.MonkeyPatch) -> None:
+    """A server cannot bypass the byte limit with its body, its length header or gzip."""
+    _transport(monkeypatch, Content_Length=str(catalog.MAX_CATALOGUE_BYTES + 1))
+    with pytest.raises(catalog.CatalogueError):
+        catalog._fetch()
+    _transport(monkeypatch, Content_Encoding="gzip")
+    with pytest.raises(catalog.CatalogueError):
+        catalog._fetch()
     monkeypatch.setattr(catalog, "MAX_CATALOGUE_BYTES", 1024)
     _transport(monkeypatch, body=b"x" * 1025)
-    assert catalog.load_catalogue(cache_path=path, refresh=True).source == "stale-cache"
-
-
-def test_declared_large_body_and_unexpected_gzip_are_rejected(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """A server cannot bypass the byte limit with length or encoding headers."""
-    path = tmp_path / "cache.json"
-    _seed_cache(monkeypatch, path)
-    _transport(monkeypatch, Content_Length=str(catalog.MAX_CATALOGUE_BYTES + 1))
-    assert catalog.load_catalogue(cache_path=path, refresh=True).source == "stale-cache"
-    _transport(monkeypatch, Content_Encoding="gzip")
-    assert catalog.load_catalogue(cache_path=path, refresh=True).source == "stale-cache"
+    with pytest.raises(catalog.CatalogueError):
+        catalog._fetch()
 
 
 @pytest.mark.parametrize(
@@ -389,52 +291,6 @@ def test_redirect_handler_never_follows_another_address() -> None:
         )
         is None
     )
-
-
-def test_cache_write_failure_keeps_valid_live_result(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """Read-only cache storage should not discard useful validated response data."""
-    _transport(monkeypatch)
-    monkeypatch.setattr(
-        catalog,
-        "_write_cache",
-        lambda *args: (_ for _ in ()).throw(OSError("read only")),
-    )
-    result = catalog.load_catalogue(cache_path=tmp_path / "cache.json")
-    assert result.source == "live"
-    assert "could not be saved" in result.warning
-
-
-def test_unsolicited_304_has_no_data_to_trust(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """A server's conditional response cannot fabricate a missing cache."""
-    _transport(
-        monkeypatch,
-        error=urllib.error.HTTPError(
-            catalog.CATALOGUE_URL, 304, "Not Modified", Message(), io.BytesIO()
-        ),
-    )
-    assert (
-        catalog.load_catalogue(cache_path=tmp_path / "cache.json").source == "bundled"
-    )
-
-
-def test_304_requires_a_conditional_request(
-    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
-) -> None:
-    """A server cannot revalidate a cached response lacking an ETag."""
-    path = tmp_path / "cache.json"
-    _transport(monkeypatch)
-    assert catalog.load_catalogue(cache_path=path).source == "live"
-    _transport(
-        monkeypatch,
-        error=urllib.error.HTTPError(
-            catalog.CATALOGUE_URL, 304, "Not Modified", Message(), io.BytesIO()
-        ),
-    )
-    assert catalog.load_catalogue(cache_path=path, refresh=True).source == "stale-cache"
 
 
 @pytest.mark.parametrize(

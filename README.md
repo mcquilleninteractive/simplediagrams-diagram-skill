@@ -2,7 +2,7 @@
 
 This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It searches the public shape catalogue and uses a small JSON spec for nodes, labels, positions and connectors. The builder writes the document package and checks its structure and layout.
 
-It writes document format 15, which opens in SimpleDiagrams for macOS 5.0.8 and later, and retains an offline catalogue from SimpleDiagrams after 5.0.16 (unreleased) with 510 packaged shapes in seven libraries. The 83 BPMN shapes need the first release after 5.0.16; the 58 newer Biz shapes need 5.0.16; the 89 added UI Flow shapes need 5.0.12. Earlier apps show placeholders for shapes they do not contain. The builder says when a document needs a newer app. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
+It writes document format 15, which opens in SimpleDiagrams for macOS 5.0.8 and later. A document that uses a shape from a downloadable library is written at format 16, which names that library and opens in 5.0.16 and later; its shapes appear in the first release after 5.0.16 with the library installed. The skill retains an offline catalogue from SimpleDiagrams after 5.0.16 (unreleased) with 516 packaged shapes in seven libraries. The 89 BPMN shapes need the first release after 5.0.16; the 58 newer Biz shapes need 5.0.16; the 89 added UI Flow shapes need 5.0.12. Earlier apps show placeholders for shapes they do not contain. The builder says when a document needs a newer app or a library. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
 
 ## Install
 
@@ -31,10 +31,11 @@ To install by copying, keep the folder name `simplediagrams-diagram-skill`.
 ## Scope
 
 - Creates new documents using native rectangles, ellipses, notes, text, connectors, and the seven bundled shape libraries, BPMN included. A library shape gets the connection points and label placement its library gives it, as in the app.
-- Searches all published libraries through `https://simplediagrams.com/shape-libraries/catalog.json`, with hourly ETag caching and explicit offline fallback.
-- Places packaged shapes using their exact API references. Downloaded-library metadata is searchable, but the builder refuses those placements because desktop 5.0.16 cannot yet resolve them. Their artwork must be placed manually in the app. Personal libraries, embedded images and shape data remain outside this authoring profile.
-- Redraws a pictured diagram as boxes and connectors. It does not trace artwork or handwriting, embed the picture, or draw pin-level wiring.
+- Searches all published libraries through `https://simplediagrams.com/shape-libraries/catalog.json`, with one request per command, nothing stored, and the bundled packaged list offline.
+- Places every catalogued shape by its exact API reference: packaged shapes by the app's own names, downloadable ones by their published UUIDs. A document with downloadable shapes names their libraries, so SimpleDiagrams puts the artwork in place when the library is installed and otherwise names the library and links to its page. Personal libraries, embedded images and shape data remain outside this authoring profile.
+- Redraws a pictured diagram as boxes and connectors. It does not trace artwork or handwriting or embed the picture. A connector can attach to any connection point a shape has, so pin-level wiring is drawn where the parts' library shapes give their pins or leads as connection points.
 - Never overwrites an existing document. Keep the JSON spec to rebuild under a new name.
+- The scripts send nothing but the one catalogue request, which carries no diagram content; the AI service running the skill handles your files under its own policies.
 
 ## Build locally
 
@@ -52,15 +53,15 @@ The first command checks without writing. The second creates the package at a ne
 | `SKILL.md` | Agent instructions |
 | `references/visual-design.md` | Layout guidance |
 | `references/from-an-image.md` | Redrawing a photo, scan, or screenshot of a diagram |
-| `references/shape-catalogue.md` | API search, cache and offline behavior |
+| `references/shape-catalogue.md` | API search, requests and offline behavior |
 | `references/document-format.md` | Generated package structure |
-| `assets/built-in-shapes.json` | 510 packaged shapes, with their connection points and label placement, for offline fallback |
+| `assets/built-in-shapes.json` | 516 packaged shapes, with their connection points and label placement, for offline fallback |
 | `assets/example-spec.json` | Example input |
 | `scripts/find_shapes.py` | Search names, descriptions and keywords across published libraries |
-| `scripts/sd_catalog.py` | Bounded API validation, ETag caching and offline fallback |
+| `scripts/sd_catalog.py` | One bounded, validated catalogue request, with the packaged fallback |
 | `scripts/build_diagram.py` | Check a spec and build a new package |
 | `scripts/preview_diagram.py` | Render a new wireframe SVG from a spec |
-| `scripts/sd_spec.py`, `scripts/sd_format.py`, `scripts/sd_package.py` | Spec compiler, format models, and package writer |
+| `scripts/sd_spec.py`, `scripts/sd_format.py`, `scripts/sd_package.py` | Spec compiler, format models, and package writer (checked in memory before writing) |
 | `schema/` | Generated JSON Schemas |
 
 The skill is MIT licensed. SimpleDiagrams and its built-in shapes have separate licenses.

@@ -1522,9 +1522,50 @@
    "title": "Rect",
    "type": "object"
   },
+  "RequiredLibrary": {
+   "additionalProperties": false,
+   "description": "One library a document's shapes come from, so a reader who lacks it is told its name.\n\nThe app has no network access, so the document carries the name beside the identifier.\nThe entry is advisory: the app never draws, places or refuses anything because of it.\nThese rules are the app's own (`DiagramRequiredLibrary`), so a list written here is\nnever trimmed when the app reads it.",
+   "properties": {
+    "library_id": {
+     "description": "The identifier the document's references use for the library: its published UUID. ASCII letters, digits, '.', '-' and '_', beginning and ending with a letter or digit.",
+     "maxLength": 256,
+     "pattern": "^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$",
+     "title": "Library Id",
+     "type": "string"
+    },
+    "display_name": {
+     "description": "The library's name, shown to a person: not blank, with no line breaks, control characters or direction controls.",
+     "maxLength": 200,
+     "minLength": 1,
+     "title": "Display Name",
+     "type": "string"
+    },
+    "minimum_revision": {
+     "anyOf": [
+      {
+       "maximum": 1000000,
+       "minimum": 1,
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "The lowest library revision holding every shape used, when known.",
+     "title": "Minimum Revision"
+    }
+   },
+   "required": [
+    "library_id",
+    "display_name"
+   ],
+   "title": "RequiredLibrary",
+   "type": "object"
+  },
   "SymbolReference": {
    "additionalProperties": false,
-   "description": "Names one shape in a library built into SimpleDiagrams.\n\nOnly built-in libraries resolve by reference. A reference the app cannot\nresolve still opens, but draws a dashed placeholder, so check every\nreference against `assets/built-in-shapes.json`.",
+   "description": "Names one shape in a library: one built into SimpleDiagrams, or a downloaded one.\n\nA built-in shape is named by the app's own library and item names. A downloaded\nshape is named by its library's and item's published UUIDs; the app puts its\nartwork in place when the document opens with that library installed (desktop\nADR 0039), and the document lists the library in `required_libraries`. A reference\nthe app cannot resolve still opens, but draws a dashed placeholder.",
    "properties": {
     "library_id": {
      "minLength": 1,
@@ -1715,7 +1756,7 @@
   }
  },
  "additionalProperties": false,
- "description": "The whole of `document.json`. Exactly these nine keys, all required.",
+ "description": "The whole of `document.json`: these nine keys, all required, and from schema 15\n`required_libraries` when the document names any.",
  "properties": {
   "id": {
    "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
@@ -1724,8 +1765,11 @@
    "type": "string"
   },
   "schema_version": {
-   "const": 14,
-   "description": "Always 14 for package format 15. Writing 15 here is rejected.",
+   "description": "14 for package format 15, 15 for package format 16. Schema 15 is written only with required_libraries.",
+   "enum": [
+    14,
+    15
+   ],
    "title": "Schema Version",
    "type": "integer"
   },
@@ -1773,6 +1817,16 @@
    "items": {},
    "maxItems": 0,
    "title": "Shape Data Definitions",
+   "type": "array"
+  },
+  "required_libraries": {
+   "description": "The downloaded libraries the document's shapes come from. Schema 15 only, and only when not empty; left out otherwise, never null.",
+   "items": {
+    "$ref": "#/$defs/RequiredLibrary"
+   },
+   "maxItems": 64,
+   "minItems": 1,
+   "title": "Required Libraries",
    "type": "array"
   }
  },

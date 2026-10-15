@@ -1,7 +1,8 @@
 """Read the public shape catalogue with a bounded, anonymous HTTP request.
 
-The API is the authority after a successful fetch. A validated disk cache and
-bundled packaged-library snapshot keep discovery usable without the network.
+The API is the authority after a successful fetch. Each command makes at most one
+request and stores nothing; the bundled packaged-library snapshot keeps discovery
+usable without the network.
 Nothing here downloads artwork or executes catalogue content. Placement code
 must copy a shape's ``reference`` unchanged and check desktop support itself.
 """
@@ -9,9 +10,6 @@ must copy a shape's ``reference`` unchanged and check desktop support itself.
 from __future__ import annotations
 
 import json
-import os
-import tempfile
-import time
 import unicodedata
 import urllib.error
 import urllib.request
@@ -36,9 +34,7 @@ BUNDLED_PATH = (
     Path(__file__).resolve().parent.parent / "assets" / "built-in-shapes.json"
 )
 MAX_CATALOGUE_BYTES = 8 * 1024 * 1024
-CACHE_INTERVAL_SECONDS = 3600
 REQUEST_TIMEOUT_SECONDS = 10
-MAX_CACHE_BYTES = MAX_CATALOGUE_BYTES + 8192
 _MAX_NUMBER = 2_147_483_647
 
 
@@ -222,7 +218,7 @@ class ShapeLibraryCatalogue(CatalogueModel):
         return self
 
 
-CatalogueSource = Literal["live", "cache", "stale-cache", "bundled"]
+CatalogueSource = Literal["live", "bundled"]
 
 
 class CatalogueResult(BaseModel):
@@ -242,26 +238,6 @@ class CatalogueResult(BaseModel):
     def shapes(self) -> tuple[CatalogueShape, ...]:
         """Return shapes in library order for simple discovery clients."""
         return tuple(shape for library in self.libraries for shape in library.shapes)
-
-
-class _CacheRecord(CatalogueModel):
-    """Keep one validated response, its ETag and its last request in one file."""
-
-    cache_version: Literal[1] = 1
-    attempted_at: float = Field(ge=0)
-    etag: Annotated[str, Field(min_length=1, max_length=256)] | None = None
-    failed: bool = False
-    catalogue: ShapeLibraryCatalogue | None = None
-
-    @field_validator("etag")
-    @classmethod
-    def safe_etag(cls, value: str | None) -> str | None:
-        """An HTTP validator must not introduce header control characters."""
-        if value is not None and any(
-            ord(character) < 32 or ord(character) == 127 for character in value
-        ):
-            raise ValueError("ETag contains a control character")
-        return value
 
 
 class _NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -284,63 +260,19 @@ class CatalogueError(ValueError):
     """Report response bytes that cannot safely become a catalogue."""
 
 
-def _default_cache_path() -> Path:
-    """Use a per-user cache without requiring changes to skill installation."""
-    return Path.home() / ".cache" / "simplediagrams" / "shape-catalogue-v1.json"
-
-
-def _read_cache(path: Path) -> _CacheRecord | None:
-    """Treat absent, oversized or corrupt cache files as unavailable."""
-    try:
-        with path.open("rb") as source:
-            payload = source.read(MAX_CACHE_BYTES + 1)
-        if len(payload) > MAX_CACHE_BYTES:
-            return None
-        return _CacheRecord.model_validate_json(payload)
-    except (OSError, ValueError, RecursionError):
-        return None
-
-
-def _write_cache(path: Path, record: _CacheRecord) -> None:
-    """Replace the whole cache atomically, leaving the old file on failure."""
-    payload = record.model_dump_json().encode("utf-8")
-    if len(payload) > MAX_CACHE_BYTES:
-        raise CatalogueError("cache exceeds the byte limit")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary_path: Path | None = None
-    try:
-        with tempfile.NamedTemporaryFile(
-            dir=path.parent, prefix=".catalogue-", delete=False
-        ) as output:
-            temporary_path = Path(output.name)
-            output.write(payload)
-        os.replace(temporary_path, path)
-    finally:
-        if temporary_path is not None:
-            temporary_path.unlink(missing_ok=True)
-
-
-def _fetch(etag: str | None) -> tuple[ShapeLibraryCatalogue | None, str | None]:
-    """Make one request; a None catalogue means the server answered 304."""
+def _fetch() -> ShapeLibraryCatalogue:
+    """Make the one anonymous request and validate the whole answer before using it."""
     headers = {
         "Accept": "application/json",
         "Accept-Encoding": "identity",
         "User-Agent": "SimpleDiagrams-Diagram-Skill/1",
     }
-    if etag is not None:
-        headers["If-None-Match"] = etag
     request = urllib.request.Request(CATALOGUE_URL, headers=headers, method="GET")
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect())
     try:
         response = opener.open(request, timeout=REQUEST_TIMEOUT_SECONDS)
     except urllib.error.HTTPError as error:
         error.close()
-        if error.code == 304:
-            if etag is None:
-                raise CatalogueError(
-                    "304 response has no conditional validator"
-                ) from error
-            return None, etag
         raise
     with response:
         if response.status != 200 or response.geturl() != CATALOGUE_URL:
@@ -357,11 +289,7 @@ def _fetch(etag: str | None) -> tuple[ShapeLibraryCatalogue | None, str | None]:
         payload = response.read(MAX_CATALOGUE_BYTES + 1)
         if len(payload) > MAX_CATALOGUE_BYTES:
             raise CatalogueError("catalogue exceeds the byte limit")
-        catalogue = ShapeLibraryCatalogue.model_validate_json(payload)
-        received_etag = response.headers.get("ETag")
-        # Check the validator before it can be stored or reused as a header.
-        record = _CacheRecord(attempted_at=0.0, etag=received_etag, catalogue=catalogue)
-        return catalogue, record.etag
+        return ShapeLibraryCatalogue.model_validate_json(payload)
 
 
 def _bundled_catalogue() -> ShapeLibraryCatalogue:
@@ -425,67 +353,23 @@ def _bundled_catalogue() -> ShapeLibraryCatalogue:
     )
 
 
-def load_catalogue(
-    *, cache_path: Path | None = None, offline: bool = False, refresh: bool = False
-) -> CatalogueResult:
-    """Load once per hour, revalidate by ETag, and retain a validated fallback.
+def load_catalogue(*, offline: bool = False) -> CatalogueResult:
+    """The current catalogue from one request, or the packaged list.
 
-    ``offline`` never makes a request or writes a cache. ``refresh`` bypasses
-    the hourly interval, but never the byte or model limits. Network failures
-    are reported with stale data or the bundled snapshot, never guessed data.
+    Nothing is stored between runs, so each command asks once. `offline` makes no
+    request. A failed request is reported and the packaged list used, never guessed data.
     """
-    path = cache_path if cache_path is not None else _default_cache_path()
-    cache = _read_cache(path)
-    now = time.time()
-    fresh = cache is not None and 0 <= now - cache.attempted_at < CACHE_INTERVAL_SECONDS
-    if offline or (fresh and not refresh):
-        if cache is not None and cache.catalogue is not None:
-            return CatalogueResult(
-                catalogue=cache.catalogue,
-                source="stale-cache" if cache.failed else "cache",
-                warning="The last catalogue request failed; using the validated cache."
-                if cache.failed
-                else None,
-            )
+    if offline:
         return CatalogueResult(
             catalogue=_bundled_catalogue(),
             source="bundled",
-            warning="No validated API cache is available; using packaged shapes only.",
+            warning="Offline: only packaged shapes are available.",
         )
-    warning = None
-    source: CatalogueSource
     try:
-        catalogue, etag = _fetch(
-            cache.etag if cache is not None and cache.catalogue is not None else None
-        )
-        if catalogue is None:
-            if cache is None or cache.catalogue is None:
-                raise CatalogueError("304 response has no cached catalogue")
-            catalogue = cache.catalogue
-            source = "cache"
-        else:
-            source = "live"
-        record = _CacheRecord(attempted_at=now, etag=etag, catalogue=catalogue)
+        return CatalogueResult(catalogue=_fetch(), source="live")
     except (OSError, HTTPException, ValueError, RecursionError):
-        warning = (
-            "The catalogue request failed; using the validated cache."
-            if cache is not None and cache.catalogue is not None
-            else "The catalogue request failed; using packaged shapes only."
+        return CatalogueResult(
+            catalogue=_bundled_catalogue(),
+            source="bundled",
+            warning="The catalogue request failed; using packaged shapes only.",
         )
-        record = _CacheRecord(
-            attempted_at=now,
-            etag=cache.etag if cache is not None else None,
-            failed=True,
-            catalogue=cache.catalogue if cache is not None else None,
-        )
-        catalogue = (
-            record.catalogue if record.catalogue is not None else _bundled_catalogue()
-        )
-        source = "stale-cache" if record.catalogue is not None else "bundled"
-    try:
-        _write_cache(path, record)
-    except (OSError, ValueError):
-        warning = (
-            warning + " " if warning else ""
-        ) + "The catalogue cache could not be saved."
-    return CatalogueResult(catalogue=catalogue, source=source, warning=warning)

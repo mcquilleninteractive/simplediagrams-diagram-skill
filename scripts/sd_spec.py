@@ -14,11 +14,14 @@ from __future__ import annotations
 
 import json
 import math
+import os
+import stat
+import sys
 import unicodedata
 import uuid
-from itertools import pairwise
+from itertools import pairwise, product
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Any, Literal
+from typing import TYPE_CHECKING, Annotated, Any, Literal, NamedTuple, TextIO
 
 import sd_format as wire
 from pydantic import (
@@ -38,7 +41,7 @@ CATALOG_NAME = "com.simplediagrams.skill.built-in-shapes"
 CATALOG_VERSION = 1
 
 if TYPE_CHECKING:
-    from sd_catalog import ShapeLibraryCatalogue
+    from sd_catalog import CatalogueSource, ShapeLibraryCatalogue
 
 NATIVE_KINDS = ("rectangle", "ellipse", "note", "text")
 # What the app itself gives each kind when a person draws one.
@@ -57,6 +60,8 @@ DEFAULT_SIZE: dict[str, tuple[float, float]] = {
 # Mid-side anchors of the eight every shape carries.
 SIDE_ANCHOR = {"left": 0, "right": 1, "top": 2, "bottom": 3}
 SIDE_VECTOR = {"left": (-1, 0), "right": (1, 0), "top": (0, -1), "bottom": (0, 1)}
+# The app's standard eight anchors, as fractions of the frame, for a shape that names none.
+STANDARD_POINTS = {anchor.id: (anchor.x, anchor.y) for anchor in wire.standard_connection_points()}
 
 # Rough advance of the app's standard font, as a fraction of the font size.
 AVERAGE_GLYPH_WIDTH = 0.56
@@ -83,6 +88,7 @@ GridPosition = Annotated[float, Field(ge=-10_000, le=10_000, allow_inf_nan=False
 Size = Annotated[float, Field(ge=1, le=100_000, allow_inf_nan=False)]
 Pitch = Annotated[float, Field(ge=10, le=10_000, allow_inf_nan=False)]
 Side = Literal["left", "right", "top", "bottom"]
+PointId = Annotated[int, Field(ge=0, le=wire.INT64_MAX)]
 
 
 def _check_plain_text(value: str, *, allow_newlines: bool) -> str:
@@ -106,6 +112,13 @@ Label = Annotated[
 Name = Annotated[
     str,
     StringConstraints(min_length=1, max_length=MAX_NAME_CHARACTERS),
+    AfterValidator(lambda value: _check_plain_text(value, allow_newlines=False)),
+]
+# A native kind or '<library>/<item>': a library ID is at most 256 characters and an item
+# name at most 200, so this is generous.
+Selector = Annotated[
+    str,
+    StringConstraints(min_length=1, max_length=512),
     AfterValidator(lambda value: _check_plain_text(value, allow_newlines=False)),
 ]
 
@@ -137,12 +150,13 @@ class NodeSpec(SpecModel):
     """
 
     key: Key = Field(description="Your own name for this node, unique on the page.")
-    shape: str = Field(
+    shape: Selector = Field(
         description=(
             "rectangle, ellipse, note or text for a plain drawn shape, or "
             "'<library>/<item>' for a library shape, for example 'basic/Cylinder'. "
-            "Use a packaged selector returned by find_shapes.py; it searches the API "
-            "and falls back to assets/built-in-shapes.json offline."
+            "Use a selector returned by find_shapes.py, which searches the API and "
+            "falls back to assets/built-in-shapes.json offline. A packaged shape needs "
+            "nothing installed; a downloadable one needs its library installed."
         )
     )
     label: Label = ""
@@ -196,13 +210,41 @@ class EdgeSpec(SpecModel):
             "curved: one direct line with a gentle bow."
         ),
     )
-    source_side: Side | None = Field(default=None, description="Chosen automatically if omitted.")
-    target_side: Side | None = Field(default=None, description="Chosen automatically if omitted.")
+    source_side: Side | None = Field(
+        default=None,
+        description="The side the connector leaves from, at the shape's anchor on that side "
+        "(its middle on most shapes). Chosen "
+        "automatically when neither this nor source_point is given.",
+    )
+    target_side: Side | None = Field(
+        default=None,
+        description="The side the connector arrives at, at the shape's anchor on that side "
+        "(its middle on most shapes). Chosen "
+        "automatically when neither this nor target_point is given.",
+    )
+    source_point: PointId | None = Field(
+        default=None,
+        description="The id of the source shape's connection point to leave from, as "
+        "find_shapes.py lists it, such as a component's lead end. Instead of source_side.",
+    )
+    target_point: PointId | None = Field(
+        default=None,
+        description="The id of the target shape's connection point to arrive at. Instead of "
+        "target_side.",
+    )
     start_ending: wire.Ending = "none"
     end_ending: wire.Ending = "arrow"
     pattern: wire.StrokePattern = "solid"
     stroke: wire.Color = "#495057"
     line_width: float = Field(default=2, ge=0, le=10_000, allow_inf_nan=False)
+
+    @model_validator(mode="after")
+    def _one_way_to_attach(self) -> EdgeSpec:
+        if self.source_side is not None and self.source_point is not None:
+            raise ValueError("give source_side or source_point, not both")
+        if self.target_side is not None and self.target_point is not None:
+            raise ValueError("give target_side or target_point, not both")
+        return self
 
 
 class PageSpec(SpecModel):
@@ -273,23 +315,24 @@ class CatalogShape(BaseModel):
     text_region: tuple[float, float, float, float] | None = None
     # The library's label position; None means the middle unless the spec says otherwise.
     text_position: wire.TextPosition | None = None
-
-    @property
-    def anchor_ids(self) -> frozenset[int] | None:
-        """The anchor numbers a connector may attach to; None means the standard eight."""
-        if self.connection_points is None:
-            return None
-        return frozenset(point[0] for point in self.connection_points)
+    # For a packaged shape added after 5.0.8, the app version it first shipped in, or
+    # "after X (unreleased)" until that release is published. None: every app has it.
+    first_release: str | None = None
 
     @property
     def selector(self) -> str:
-        """Use shipped item names for packaged shapes and slugs for discovery."""
+        """`<short name>/<item>`: shipped item names for packaged shapes, slugs for discovery.
+
+        Ambiguous when two libraries share the short name; offer `Catalog.selector`, which
+        names the library in full then.
+        """
         item = self.item_id if self.built_in else self.slug
         return f"{self.library_short_name}/{item}"
 
 
 class Catalog:
-    """Searchable library metadata; only packaged references are placeable today."""
+    """Searchable library metadata. Every shape is placeable: a packaged one by the app's
+    own names, a downloaded one by its published UUIDs, which needs its library installed."""
 
     def __init__(self, shapes: list[CatalogShape], source_app_version: str) -> None:
         self.shapes = shapes
@@ -315,7 +358,7 @@ class Catalog:
         cls,
         catalogue: ShapeLibraryCatalogue,
         *,
-        source: str,
+        source: CatalogueSource,
         warning: str | None = None,
         packaged: Catalog | None = None,
     ) -> Catalog:
@@ -323,9 +366,9 @@ class Catalog:
 
         ``packaged`` is the bundled list made from the desktop app's own catalogue. The
         app is the source of truth for the libraries it packages and the website copies
-        them, sometimes later, so when it is given: a packaged shape's connection points
-        and label placement come from it, and a packaged library the website does not
-        list yet is added from it.
+        them, sometimes later, so when it is given: a packaged shape's connection points,
+        label placement and first release come from it, and any packaged shape the website
+        does not list yet, alone or with its whole library, is added from it.
         """
         known = (
             {(shape.library_id, shape.item_id, shape.asset_version): shape for shape in packaged.shapes}
@@ -342,6 +385,7 @@ class Catalog:
                     "connection_points": app.connection_points,
                     "text_region": app.text_region,
                     "text_position": app.text_position,
+                    "first_release": app.first_release,
                 }
             region = shape.text_region
             return {
@@ -376,8 +420,8 @@ class Catalog:
             for shape in library.shapes
         ]
         if packaged is not None:
-            listed = {shape.library_id for shape in shapes}
-            shapes += [shape for shape in packaged.shapes if shape.library_id not in listed]
+            listed = {(shape.library_id, shape.item_id) for shape in shapes}
+            shapes += [s for s in packaged.shapes if (s.library_id, s.item_id) not in listed]
         result = cls(shapes, "the current catalogue")
         result.source, result.warning = source, warning
         return result
@@ -409,6 +453,7 @@ class Catalog:
                 if item.get("text_region") is None
                 else tuple(item["text_region"][key] for key in ("x", "y", "width", "height")),
                 text_position=item.get("text_position"),
+                first_release=item.get("first_release"),
             )
             for library in data["libraries"]
             for item in library["shapes"]
@@ -416,39 +461,52 @@ class Catalog:
         return cls(shapes, data["source_app_version"])
 
     @classmethod
-    def load_current(
-        cls, *, cache_path: Path | None = None, offline: bool = False, refresh: bool = False
-    ) -> Catalog:
+    def load_current(cls, *, offline: bool = False) -> Catalog:
         """Load one current snapshot for a complete CLI search or build."""
         from sd_catalog import load_catalogue
 
-        result = load_catalogue(cache_path=cache_path, offline=offline, refresh=refresh)
+        result = load_catalogue(offline=offline)
         return cls.from_catalogue(
             result.catalogue, source=result.source, warning=result.warning, packaged=cls.load()
         )
 
+    def find_library(self, library: str) -> str | None:
+        """The library a selector names, by full library id, readable id or short name."""
+        if library in self._library_ids:
+            return library
+        return self._readable_ids.get(library) or self._short_names.get(library.lower())
+
     def resolve(self, library: str, item: str) -> CatalogShape | None:
         """Finds a shape by full library id or short name. Item ids are case sensitive."""
-        library_id = (
-            library if library in self._library_ids
-            else self._readable_ids.get(library) or self._short_names.get(library.lower())
-        )
+        library_id = self.find_library(library)
         if library_id is None:
             return None
         return self._by_selector.get((library_id, item))
 
     def find_reference(self, library_id: str, item_id: str, asset_version: int) -> CatalogShape | None:
+        """The packaged or downloaded shape a reference names, at exactly its asset version."""
         shape = self._by_reference.get((library_id, item_id))
-        return shape if shape and shape.built_in and shape.asset_version == asset_version else None
+        return shape if shape and shape.asset_version == asset_version else None
+
+    def selector(self, shape: CatalogShape) -> str:
+        """The selector to offer for a shape: its short name while that names one library,
+        else its readable library ID, which `resolve` also accepts."""
+        if self._short_names.get(shape.library_short_name.lower()) is not None:
+            return shape.selector
+        library = shape.readable_library_id or shape.library_id
+        item = shape.item_id if shape.built_in else shape.slug
+        return f"{library}/{item}"
 
     def suggestions(self, library: str, item: str) -> list[str]:
-        """Close names to offer when a shape is not found."""
+        """Close names to offer when a shape is not found, matched on the name a selector
+        uses: a packaged shape's item ID or a downloadable shape's slug."""
         wanted = item.lower()
-        return sorted(
-            f"{shape.library_short_name}/{shape.item_id}"
-            for shape in self.shapes
-            if wanted in shape.item_id.lower() or shape.item_id.lower() in wanted
-        )[:8]
+        found = []
+        for shape in self.shapes:
+            name = (shape.item_id if shape.built_in else shape.slug).lower()
+            if wanted in name or name in wanted:
+                found.append(self.selector(shape))
+        return sorted(found)[:8]
 
 
 # ---------------------------------------------------------------------------
@@ -460,20 +518,81 @@ class SpecError(ValueError):
     """A spec that is well formed but cannot be turned into a document."""
 
 
+class NotRegularFile(ValueError):
+    """A path that names a pipe, device or folder where a file was expected."""
+
+
+class FileTooLarge(ValueError):
+    """A file holding more bytes than the reader allows."""
+
+
+def read_limited(path: Path, limit: int) -> bytes:
+    """Reads a regular file of at most `limit` bytes, counting the bytes actually read.
+
+    The size a file reports can be wrong (a pipe reports 0) or grow before it is read,
+    so the read itself is bounded. Where the system allows, the file is opened without
+    waiting, so a pipe with no writer is refused at once instead of stalling.
+
+    Raises:
+        OSError: The file cannot be opened or read.
+        NotRegularFile: The path is not a regular file, such as a folder or a pipe.
+        FileTooLarge: It holds more than `limit` bytes.
+    """
+    flags = os.O_RDONLY | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_BINARY", 0)
+    descriptor = os.open(path, flags)
+    try:
+        if not stat.S_ISREG(os.fstat(descriptor).st_mode):
+            raise NotRegularFile(f"{path} is not a regular file")
+        source = os.fdopen(descriptor, "rb")
+    except BaseException:
+        os.close(descriptor)
+        raise
+    with source:
+        data = source.read(limit + 1)
+    if len(data) > limit:
+        raise FileTooLarge(f"{path} is larger than {limit} bytes")
+    return data
+
+
+def terminal_safe(text: str) -> str:
+    """`text` with control characters other than line breaks, and direction controls,
+    written as `\\uXXXX` escapes.
+
+    Values from a spec, a file name or the catalogue reach the terminal in diagnostics; an
+    escape sequence among them could drive the terminal, and a direction control could
+    reorder the line. JSON output stays valid: inside a string the escape means the same
+    character, and JSON already escapes control characters itself.
+    """
+    return "".join(
+        f"\\u{ord(character):04x}"
+        if (unicodedata.category(character) == "Cc" and character != "\n")
+        or character in wire.DIRECTION_CONTROLS
+        else character
+        for character in text
+    )
+
+
+def echo(text: str, *, file: TextIO | None = None) -> None:
+    """Prints one diagnostic, made safe for the terminal by `terminal_safe`."""
+    print(terminal_safe(text), file=file or sys.stdout)
+
+
 def load_spec(path: Path) -> DiagramSpec:
     """Reads a spec file, refusing an oversized one before parsing it.
 
     Raises:
-        SpecError: The file is missing, too large, or not a valid spec.
+        SpecError: The file is missing, not a regular file, too large, or not a valid spec.
     """
     try:
-        size = path.stat().st_size
+        data = read_limited(path, MAX_SPEC_BYTES)
     except OSError as failure:
         raise SpecError(f"Cannot read the spec {path}: {failure.strerror}") from failure
-    if size > MAX_SPEC_BYTES:
-        raise SpecError(f"The spec {path} is {size} bytes; the limit is {MAX_SPEC_BYTES}.")
+    except NotRegularFile as failure:
+        raise SpecError(f"The spec {path} is not a regular file.") from failure
+    except FileTooLarge as failure:
+        raise SpecError(f"The spec {path} is over the limit of {MAX_SPEC_BYTES} bytes.") from failure
     try:
-        return DiagramSpec.model_validate_json(path.read_bytes())
+        return DiagramSpec.model_validate_json(data)
     except ValidationError as failure:
         lines = [
             f"spec: {'.'.join(str(part) for part in detail['loc']) or '(top level)'}: {detail['msg']}"
@@ -498,23 +617,55 @@ def _snap(value: float) -> float:
     return float(round(value * 1000) / 1000)
 
 
+class _Anchor(NamedTuple):
+    """A connection point of a placed node: its id, where it is on the page, and the sides
+    a route may leave it by, which are those of the frame edges nearest to it."""
+
+    id: int
+    x: float
+    y: float
+    exits: tuple[str, ...]
+
+
 class _Placed:
     """A node after sizing, with the geometry edges are routed against."""
 
     def __init__(
         self, spec: NodeSpec, element_id: str, x: float, y: float, w: float, h: float,
-        anchor_ids: frozenset[int] | None = None, display_name: str = "",
+        points: dict[int, tuple[float, float]] | None = None, display_name: str = "",
     ) -> None:
         self.spec = spec
         self.element_id = element_id
         self.x, self.y, self.w, self.h = x, y, w, h
-        # None: the standard eight. Otherwise the anchors the library gives this shape.
-        self.anchor_ids = anchor_ids
+        # Each anchor's position as fractions of the frame: the library's for a library
+        # shape, else the app's standard eight. Connectors attach only to these.
+        self.points = STANDARD_POINTS if points is None else points
         self.display_name = display_name or spec.key
 
-    def has_side_anchor(self, side: str) -> bool:
-        """Whether a connector can attach at the middle of this side, where routes end."""
-        return self.anchor_ids is None or SIDE_ANCHOR[side] in self.anchor_ids
+    def anchor(self, point_id: int) -> _Anchor:
+        """Where a connection point is on the page, and the sides a route may leave it by."""
+        fx, fy = self.points[point_id]
+        distances = {
+            "left": fx * self.w, "right": (1 - fx) * self.w,
+            "top": fy * self.h, "bottom": (1 - fy) * self.h,
+        }
+        nearest = min(distances.values())
+        exits = tuple(side for side, distance in distances.items() if distance - nearest < 0.5)
+        return _Anchor(point_id, self.x + fx * self.w, self.y + fy * self.h, exits)
+
+    def side_anchor(self, side: str) -> _Anchor | None:
+        """The anchor the app numbers for a side (0 left, 1 right, 2 top, 3 bottom), leaving
+        by that side, when the shape has it and it lies on that side."""
+        point_id = SIDE_ANCHOR[side]
+        if point_id not in self.points:
+            return None
+        anchor = self.anchor(point_id)
+        return anchor._replace(exits=(side,)) if side in anchor.exits else None
+
+    @property
+    def point_ids(self) -> str:
+        """The shape's anchor ids, for a message saying which can be named."""
+        return ", ".join(str(point_id) for point_id in sorted(self.points))
 
     @property
     def cx(self) -> float:
@@ -527,14 +678,6 @@ class _Placed:
     @property
     def rect(self) -> wire.Rect:
         return wire.Rect(x=self.x, y=self.y, width=float(self.w), height=float(self.h))
-
-    def anchor(self, side: str) -> tuple[float, float]:
-        return {
-            "left": (self.x, self.cy),
-            "right": (self.x + self.w, self.cy),
-            "top": (self.cx, self.y),
-            "bottom": (self.cx, self.y + self.h),
-        }[side]
 
 
 def _node_size(node: NodeSpec, catalog_shape: CatalogShape | None) -> tuple[float, float]:
@@ -578,31 +721,63 @@ def _candidate_sides(a: _Placed, b: _Placed) -> list[tuple[str, str]]:
     return [first, second, (first[0], second[1]), (second[0], first[1])]
 
 
+def _named_point(end: _Placed, point_id: int, other: _Placed) -> list[_Anchor]:
+    """A named anchor, once for each side it may leave by, the side facing `other` first."""
+    anchor = end.anchor(point_id)
+    toward = (other.cx - anchor.x, other.cy - anchor.y)
+
+    def facing(side: str) -> float:
+        return -(SIDE_VECTOR[side][0] * toward[0] + SIDE_VECTOR[side][1] * toward[1])
+
+    return [anchor._replace(exits=(side,)) for side in sorted(anchor.exits, key=facing)]
+
+
 def _choose_route(
     edge: EdgeSpec, source: _Placed, target: _Placed, obstacles: list[wire.Rect]
-) -> tuple[str, str, _Route]:
-    """Picks sides, honouring any the spec fixed, that keep the route off everything else."""
-    candidates = [
-        (side_a, side_b)
-        for side_a, side_b in _candidate_sides(source, target)
-        if edge.source_side in (None, side_a) and edge.target_side in (None, side_b)
-    ]
-    if not candidates:
-        preferred = _candidate_sides(source, target)[0]
-        candidates = [(edge.source_side or preferred[0], edge.target_side or preferred[1])]
-    best: tuple[int, str, str, _Route] | None = None
-    for side_a, side_b in candidates:
-        route = _orthogonal(source.anchor(side_a), side_a, target.anchor(side_b), side_b)
+) -> tuple[_Anchor, _Anchor, _Route]:
+    """Picks the anchors and the route between them that keep off everything else.
+
+    A named point is used as given. A named side, or a side chosen automatically, is the
+    anchor the app numbers for that side, and only a side the shape has an anchor on is
+    tried. The best side pairs for the shapes' placement are tried first. When none of those
+    is available, an orthogonal route searches every pair; a straight or curved line, which
+    the orthogonal score does not describe, first takes any fixed side with the best other
+    side, as it always has. Each returned anchor carries the one side it leaves by.
+    """
+    named_source = (
+        _named_point(source, edge.source_point, target) if edge.source_point is not None else None
+    )
+    named_target = (
+        _named_point(target, edge.target_point, source) if edge.target_point is not None else None
+    )
+    preferred = _candidate_sides(source, target)
+    fallback = (edge.source_side or preferred[0][0], edge.target_side or preferred[0][1])
+    everything = [fallback] + [pair for pair in product(SIDE_ANCHOR, SIDE_ANCHOR) if pair != fallback]
+    candidates: list[tuple[_Anchor, _Anchor]] = []
+    passes = (preferred, everything) if edge.route == "orthogonal" else (preferred, [fallback], everything)
+    for pairs in passes:
+        for side_a, side_b in pairs:
+            if edge.source_side not in (None, side_a) or edge.target_side not in (None, side_b):
+                continue
+            side_source, side_target = source.side_anchor(side_a), target.side_anchor(side_b)
+            starts = named_source if named_source is not None else [side_source] if side_source else []
+            ends = named_target if named_target is not None else [side_target] if side_target else []
+            candidates += [(a, b) for a in starts for b in ends if (a, b) not in candidates]
+        if candidates:
+            break
+    best: tuple[int, _Anchor, _Anchor, _Route] | None = None
+    for start, end in candidates:
+        route = _orthogonal((start.x, start.y), start.exits[0], (end.x, end.y), end.exits[0])
         segments = [(p[0], p[1], q[0], q[1]) for p, q in pairwise(route.points)]
         hits = sum(
             any(_segment_hits_rect(segment, obstacle) for segment in segments)
             for obstacle in [*obstacles, source.rect, target.rect]
         )
         if best is None or hits < best[0]:
-            best = (hits, side_a, side_b, route)
+            best = (hits, start, end, route)
         if hits == 0:
             break
-    assert best is not None
+    assert best is not None, "the caller checks that each end has an anchor to use"
     return best[1], best[2], best[3]
 
 
@@ -749,13 +924,23 @@ def _spread_channels(routes: list[tuple[_Route, tuple, tuple]]) -> None:
 def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Document:
     """Builds the exact document a spec describes.
 
+    A shape from a downloaded library is placed by reference, and its library is named in
+    the document's `required_libraries`, so the document is written at package format 16.
+    SimpleDiagrams puts the artwork in place when the document opens with that library
+    installed (desktop ADR 0039); without it, the shape is a dashed box and the app names
+    the library. A document without such shapes stays at format 15.
+
     Raises:
-        SpecError: A node names a shape that is not built into SimpleDiagrams.
+        SpecError: A node names a shape the catalogue does not have, the shapes come from
+            more downloadable libraries than a document can name, or the catalogue gives a
+            library a name a document cannot hold.
     """
     catalog = catalog or Catalog.load()
     document_id = spec.id.upper() if spec.id else str(uuid.uuid4()).upper()
     namespace = uuid.UUID(document_id)
     pages: list[wire.Page] = []
+    # The downloaded libraries used, in the order their shapes first appear.
+    downloaded_libraries: dict[str, CatalogShape] = {}
 
     for page_index, page in enumerate(spec.pages):
         placed: dict[str, _Placed] = {}
@@ -780,15 +965,17 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                     raise SpecError(
                         f"node '{node.key}': '{node.shape}' is not in the selected catalogue."
                         + (f" Did you mean: {', '.join(hint)}?" if hint else "")
+                        + (
+                            " This run had only the packaged shapes (offline, or the catalogue "
+                            "request failed); a downloadable shape needs a successful catalogue "
+                            "request."
+                            if catalog.find_library(library) is None
+                            and not any(not shape.built_in for shape in catalog.shapes)
+                            else ""
+                        )
                     )
                 if not catalog_shape.built_in:
-                    raise SpecError(
-                        f"node '{node.key}': {catalog_shape.display_name} belongs to "
-                        f"{catalog_shape.library_display_name}, a downloaded library. "
-                        "SimpleDiagrams 5.0.16 cannot resolve its reference in a generated "
-                        "document, even when installed. Place it manually in the app to embed "
-                        "the artwork, or choose a packaged shape. Nothing has been written."
-                    )
+                    downloaded_libraries.setdefault(catalog_shape.library_id, catalog_shape)
                 kind = "symbol"
 
             width, height = _node_size(node, catalog_shape)
@@ -800,7 +987,11 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
             element_id = _new_id(namespace, f"page:{page_index}:node:{node.key}")
             item_placed = _Placed(
                 node, element_id, _snap(centre_x - width / 2), _snap(centre_y - height / 2), width, height,
-                anchor_ids=catalog_shape.anchor_ids if catalog_shape else None,
+                points=(
+                    {point_id: (x, y) for point_id, x, y in catalog_shape.connection_points}
+                    if catalog_shape is not None and catalog_shape.connection_points is not None
+                    else None
+                ),
                 display_name=catalog_shape.display_name if catalog_shape else node.key,
             )
             placed[node.key] = item_placed
@@ -821,6 +1012,9 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
             label_width, label_height = estimate_text_size(node.label, node.font_size, node.bold)
             # A label outside its shape is confined to the shape's width. One
             # that would wrap becomes a separate caption grouped with the shape.
+            # A downloaded shape keeps its label because every published library's artwork
+            # is an editable vector; the app draws no label on SVG or image artwork, so if
+            # the catalogue ever marks such shapes, caption their labels whatever the width.
             caption = outside and label_width > width
             text_layout: wire.TextLayout | None = None
             if (position != "middle" or region is not None) and not caption and kind != "text":
@@ -911,42 +1105,58 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                 if area is not None:
                     label_areas.append(area)
 
-        routed: list[tuple[EdgeSpec, _Placed, _Placed, str, str, _Route | None]] = []
+        routed: list[tuple[EdgeSpec, _Placed, _Placed, _Anchor, _Anchor, _Route | None]] = []
         for edge in page.edges:
             source, target = placed[edge.source], placed[edge.target]
-            for end in (source, target):
-                if end.anchor_ids is not None and not any(
-                    end.has_side_anchor(side) for side in SIDE_ANCHOR
+            for end, role, side, point in (
+                (source, "source", edge.source_side, edge.source_point),
+                (target, "target", edge.target_side, edge.target_point),
+            ):
+                where = f"edge {edge.source} -> {edge.target}: {end.display_name} ('{end.spec.key}')"
+                if not end.points:
+                    raise SpecError(
+                        f"{where} has no connection points, because it is meant to sit on "
+                        "another shape. Connect the shape it marks instead."
+                    )
+                if point is not None and point not in end.points:
+                    raise SpecError(
+                        f"{where} has no connection point {point}. Its points are "
+                        f"{end.point_ids}."
+                    )
+                if side is not None and end.side_anchor(side) is None:
+                    raise SpecError(
+                        f"{where} has no connection point on its {side}. Choose "
+                        f"another side, or name one of its points with {role}_point: "
+                        f"{end.point_ids}."
+                    )
+                if point is None and side is None and not any(
+                    end.side_anchor(each) for each in SIDE_ANCHOR
                 ):
                     raise SpecError(
-                        f"edge {edge.source} -> {edge.target}: {end.display_name} "
-                        f"('{end.spec.key}') has no connection points, because it is meant to "
-                        "sit on another shape. Connect the shape it marks instead."
+                        f"{where} has no connection point for a side, so name "
+                        f"one of its points with {role}_point: {end.point_ids}."
                     )
             obstacles = [
                 other.rect for other in placed.values() if other is not source and other is not target
             ] + label_areas
-            side_a, side_b, route = _choose_route(edge, source, target, obstacles)
-            for end, side in ((source, side_a), (target, side_b)):
-                if not end.has_side_anchor(side):
-                    raise SpecError(
-                        f"edge {edge.source} -> {edge.target}: {end.display_name} "
-                        f"('{end.spec.key}') has no connection point at the middle of its {side}. "
-                        "Set source_side or target_side to a side it has one on."
-                    )
-            routed.append((edge, source, target, side_a, side_b, route if edge.route == "orthogonal" else None))
+            start_anchor, end_anchor, route = _choose_route(edge, source, target, obstacles)
+            routed.append(
+                (edge, source, target, start_anchor, end_anchor,
+                 route if edge.route == "orthogonal" else None)
+            )
 
+        # Connectors leaving or reaching the same anchor share a run, as one branching line.
         _spread_channels(
             [
-                (route, (source.element_id, side_a), (target.element_id, side_b))
-                for _, source, target, side_a, side_b, route in routed
+                (route, (source.element_id, start_anchor.id), (target.element_id, end_anchor.id))
+                for _, source, target, start_anchor, end_anchor, route in routed
                 if route is not None
             ]
         )
 
         connections: list[wire.Connection] = []
-        for edge_index, (edge, source, target, side_a, side_b, route) in enumerate(routed):
-            start, end = source.anchor(side_a), target.anchor(side_b)
+        for edge_index, (edge, source, target, start_anchor, end_anchor, route) in enumerate(routed):
+            start, end = (start_anchor.x, start_anchor.y), (end_anchor.x, end_anchor.y)
             if route is not None:
                 route_points = [(px, py, "straight") for px, py in _without_repeats(route.points)]
             elif edge.route == "curved":
@@ -971,10 +1181,10 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                     id=_new_id(namespace, f"page:{page_index}:edge:{edge_index}"),
                     points=[wire.ConnectorPoint(x=_snap(px), y=_snap(py), kind=kind) for px, py, kind in route_points],
                     start_attachment=wire.Attachment(
-                        element_id=source.element_id, connection_point_id=SIDE_ANCHOR[side_a]
+                        element_id=source.element_id, connection_point_id=start_anchor.id
                     ),
                     end_attachment=wire.Attachment(
-                        element_id=target.element_id, connection_point_id=SIDE_ANCHOR[side_b]
+                        element_id=target.element_id, connection_point_id=end_anchor.id
                     ),
                     stroke_hex=edge.stroke,
                     line_width=float(edge.line_width),
@@ -996,7 +1206,33 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
             )
         )
 
-    return wire.document(id=document_id, name=spec.name, pages=pages)
+    if len(downloaded_libraries) > wire.MAX_REQUIRED_LIBRARIES:
+        raise SpecError(
+            f"the diagram uses shapes from {len(downloaded_libraries)} downloadable libraries, "
+            f"and a document can name at most {wire.MAX_REQUIRED_LIBRARIES}. Use shapes from "
+            "fewer libraries, or packaged shapes."
+        )
+    # The revision is left out: the catalogue gives a library's current revision, which holds
+    # every shape used but is not necessarily the lowest that does, and the entry must not
+    # tell a person with an older revision that it is too old when it is not.
+    required: list[wire.RequiredLibrary] = []
+    for shape in downloaded_libraries.values():
+        try:
+            required.append(
+                wire.RequiredLibrary(
+                    library_id=shape.library_id, display_name=shape.library_display_name
+                )
+            )
+        except ValidationError:
+            raise SpecError(
+                f"the catalogue's name for library {shape.library_id}, "
+                f"{shape.library_display_name!r}, cannot be written into a document: it is "
+                "blank, or holds a line break, control character or direction control. Use "
+                "shapes from another library until the catalogue is corrected."
+            ) from None
+    return wire.document(
+        id=document_id, name=spec.name, pages=pages, required_libraries=required or None
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1004,41 +1240,88 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
 # ---------------------------------------------------------------------------
 
 
-# Packaged libraries that arrived after the document format began (5.0.8). An earlier app
-# opens the document but draws their shapes as dashed placeholders. Replace the wording
-# with the version number when the release that includes the library is published.
-LIBRARY_FIRST_RELEASE: dict[str, str] = {
-    "com.simplediagrams.shapeLibrary.bpmn": "the first SimpleDiagrams release after 5.0.16",
-}
+# The unreleased desktop version that brings the BPMN library and puts a downloaded
+# library's shapes in place (desktop ADR 0039). Replace the wording with "SimpleDiagrams"
+# and its version number when that release is published, here and in the docs.
+NEXT_RELEASE = "the first SimpleDiagrams release after 5.0.16"
+
+# The first app that reads package format 16, and the first that puts a downloaded
+# library's shapes in place when such a document opens.
+FORMAT_16_FIRST_RELEASE = "5.0.16"
+DOWNLOADED_SHAPES_FIRST_RELEASE = NEXT_RELEASE
 
 
-def app_requirements(document: wire.Document) -> list[str]:
+def _release_order(release: str) -> tuple[int, ...]:
+    """Sorts versions in release order, an unreleased one last."""
+    if release.startswith("after "):
+        return (1_000_000,)
+    return tuple(int(part) for part in release.split(".") if part.isdigit())
+
+
+def _release_wording(release: str) -> str:
+    """`5.0.12` as "SimpleDiagrams 5.0.12 or later"; "after 5.0.16 (unreleased)" as the
+    first release after 5.0.16."""
+    if release.startswith("after "):
+        published = release.removeprefix("after ").split(" ")[0]
+        return f"the first SimpleDiagrams release after {published} or a later one"
+    return f"SimpleDiagrams {release} or later"
+
+
+def app_requirements(document: wire.Document, catalog: Catalog | None = None) -> list[str]:
     """What this document needs beyond the 5.0.8 the format began with, in plain words.
 
     Not findings: a document that needs a newer app is not wrong, and a strict build
     must not fail because of it. The builder prints these so whoever sends the file
-    can say which version opens it.
+    can say which version opens it, and which shows every shape.
     """
+    catalog = catalog or Catalog.load()
     endings: set[str] = set()
-    libraries: set[str] = set()
+    # Release -> library name -> how many of the document's shapes first shipped then.
+    newer: dict[str, dict[str, int]] = {}
     for page in document.pages:
         for connection in page.connections:
             content = connection.content
             endings |= {content.start_ending, content.end_ending} & wire.ENDINGS_FROM_5_0_11
         for element in page.elements:
             reference = element.core.symbol_reference
-            if reference is not None and reference.library_id in LIBRARY_FIRST_RELEASE:
-                libraries.add(reference.library_id)
+            shape = (
+                catalog.find_reference(
+                    reference.library_id, reference.item_id, reference.asset_version
+                )
+                if reference is not None
+                else None
+            )
+            if shape is not None and shape.built_in and shape.first_release:
+                libraries = newer.setdefault(shape.first_release, {})
+                libraries[shape.library_display_name] = libraries.get(shape.library_display_name, 0) + 1
     needs = []
+    if document.required_libraries:
+        needs.append(
+            f"SimpleDiagrams {FORMAT_16_FIRST_RELEASE} or later to open the file at all "
+            "(format 16, because it names the libraries below)"
+        )
     if endings:
         names = ", ".join(sorted(endings))
         noun = "line ending" if len(endings) == 1 else "line endings"
         needs.append(f"SimpleDiagrams 5.0.11 or later, for the {noun} {names}")
-    for library in sorted(libraries):
-        short = library.rsplit(".", 1)[-1]
+    for release in sorted(newer, key=_release_order):
+        counts = newer[release]
+        shapes = " and ".join(
+            f"{count} {name} {'shape' if count == 1 else 'shapes'}"
+            for name, count in sorted(counts.items())
+        )
+        drawn = (
+            "it as a dashed placeholder" if sum(counts.values()) == 1 else "them as dashed placeholders"
+        )
         needs.append(
-            f"{LIBRARY_FIRST_RELEASE[library]}, for the {short} library's shapes; "
-            "an earlier app draws them as dashed placeholders"
+            f"{_release_wording(release)}, for {shapes} added in that release; an earlier "
+            f"app draws {drawn}"
+        )
+    for required in document.required_libraries or []:
+        needs.append(
+            f"the {required.display_name} library installed, with "
+            f"{DOWNLOADED_SHAPES_FIRST_RELEASE} or a later one, to show its shapes; without "
+            "the library they are dashed boxes, and the app names it and links to its page"
         )
     return needs
 
@@ -1110,6 +1393,32 @@ def _collinear_overlap(a: tuple[float, float, float, float], b: tuple[float, flo
     return False
 
 
+def _own_end_inset(frame: wire.Rect, point: wire.ConnectorPoint) -> float:
+    """How far in to test a connector against the shape it starts or ends on.
+
+    A connection point may lie inside the frame, such as a lead end a little way in from
+    the edge; the stub leaving it must not count as running back through the shape.
+    """
+    inside = min(
+        point.x - frame.x, frame.x + frame.width - point.x,
+        point.y - frame.y, frame.y + frame.height - point.y,
+    )
+    return max(3.0, inside + 0.5)
+
+
+def _default_symbol_paint(style: wire.ElementStyle) -> bool:
+    """True when a library shape carries only the paint the compiler gives it by default."""
+    fill, stroke, line_width = DEFAULT_STYLE["symbol"]
+    return (
+        style.fill_hex.upper() == fill
+        and style.stroke_hex.upper() == stroke
+        and style.line_width == line_width
+        and style.fill_texture is None
+        and style.stroke_texture is None
+        and style.stroke_pattern_override is None
+    )
+
+
 def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Finding]:
     """Checks a document for things the app accepts but a reader would not.
 
@@ -1117,6 +1426,8 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
     placeholder. Warnings are layout problems: overlaps, connectors through
     shapes or labels, crossings, connectors drawn over each other and labels
     that do not fit. Sizes of text are estimates, so label warnings are advice.
+    Paint set on a downloaded library's shape is also a warning, because the app
+    draws such a shape in its library's own colours.
     """
     catalog = catalog or Catalog.load()
     findings: list[Finding] = []
@@ -1132,18 +1443,32 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
         for element in page.elements:
             core = element.core
             reference = core.symbol_reference
-            if reference and not catalog.find_reference(
-                reference.library_id, reference.item_id, reference.asset_version
-            ):
+            shape = (
+                catalog.find_reference(
+                    reference.library_id, reference.item_id, reference.asset_version
+                )
+                if reference
+                else None
+            )
+            if shape is not None and not shape.built_in and not _default_symbol_paint(core.style):
+                warn(
+                    "downloaded-shape-paint",
+                    f"{page_name}: {_name(element)} is a {shape.library_display_name} shape, "
+                    "which SimpleDiagrams draws in its library's own colours, so the fill, "
+                    "stroke and line width set for it are not used. Leave them out; the "
+                    "colours can be changed in the app once the shape is in place.",
+                )
+            if reference and shape is None:
                 findings.append(
                     Finding(
                         severity="error",
                         code="unresolved-shape",
                         message=(
                             f"{page_name}: {reference.library_id} / {reference.item_id} "
-                            f"(version {reference.asset_version}) is not built into SimpleDiagrams "
-                            f"{catalog.source_app_version}. The app would draw a dashed placeholder. "
-                            "Choose a packaged shape returned by find_shapes.py."
+                            f"(version {reference.asset_version}) is in neither SimpleDiagrams "
+                            f"{catalog.source_app_version} nor the library catalogue. The app "
+                            "would draw a dashed placeholder. Choose a shape returned by "
+                            "find_shapes.py."
                         ),
                     )
                 )
@@ -1211,13 +1536,19 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
                         "moves the attached end with the rotation, so the stored route will not "
                         "match. Leave connected shapes unrotated.",
                     )
-                if not any(_segment_hits_rect(segment, element.core.frame) for segment in segments):
+                inset = 3.0
+                if is_end:
+                    route = connection.content.points
+                    for attachment, point in zip(attachments, (route[0], route[-1]), strict=True):
+                        if attachment and attachment.element_id.upper() == element.core.id.upper():
+                            inset = _own_end_inset(element.core.frame, point)
+                if not any(_segment_hits_rect(segment, element.core.frame, inset) for segment in segments):
                     continue
                 if is_end:
                     warn(
                         "connector-through-shape",
                         f"{page_name}: the connector from {ends} runs back through {_name(element)}, "
-                        "one of its own ends. Change or remove source_side and target_side.",
+                        "one of its own ends. Change or remove its sides or points.",
                     )
                 else:
                     warn(

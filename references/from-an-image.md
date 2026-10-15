@@ -24,13 +24,13 @@ Count as you go. "Nine things, eleven lines" is what you check the finished diag
 
 ## 3. Choose the level of detail
 
-The spec connects one node to another, side to side. It has no pins, ports, or attachment points partway along a shape, and no freehand lines. So decide what a node is:
+The spec connects one node to another, side to side, or at a connection point the node's library shape gives it, such as a component's lead end. It has no freehand lines. So decide what a node is:
 
 - **A picture of boxes and arrows** maps one to one. Each box is a node, each line an edge.
-- **A picture with detail inside its parts** (a chip with sixteen numbered pins, a table with rows, a screen with widgets) becomes a block diagram: one node per part, one edge per relationship between two parts, and the edge label carries what the bundle of lines is ("7 segments", "CLK"). Say in the report that pin-level or cell-level detail was not drawn.
+- **A picture with detail inside its parts** (a chip with sixteen numbered pins, a table with rows, a screen with widgets) becomes a block diagram: one node per part, one edge per relationship between two parts, and the edge label carries what the bundle of lines is ("7 segments", "CLK"). Say in the report that pin-level or cell-level detail was not drawn. The exception is a part whose library shape gives its pins or leads as connection points (find_shapes.py lists them as `connection_points`): wire to those with `source_point`/`target_point`.
 - **Past about fifteen nodes**, split into pages as [visual-design.md](visual-design.md) describes, following the picture's own groupings.
 
-If the picture can only be useful at a level the spec cannot express (a wiring diagram whose whole point is which pin goes where), say so before building rather than deliver a block diagram as if it were the same thing.
+If the picture can only be useful at a level the spec cannot express (a wiring diagram whose whole point is which pin goes where, with no library shapes that give those pins as connection points), say so before building rather than deliver a block diagram as if it were the same thing.
 
 ## 4. Turn the inventory into a spec
 

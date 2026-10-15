@@ -2683,7 +2683,8 @@
       "currency",
       "coin",
       "money"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "coin-yuan",
@@ -2702,7 +2703,8 @@
       "currency",
       "coin",
       "money"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "coin-swiss-franc",
@@ -2720,7 +2722,8 @@
       "currency",
       "coin",
       "money"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "CoinBlank",
@@ -2754,7 +2757,8 @@
       "entrepreneur",
       "co-founder",
       "cofounder"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "engineer",
@@ -2770,7 +2774,8 @@
       "programmer",
       "software",
       "code"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "designer",
@@ -2786,7 +2791,8 @@
       "ui",
       "design",
       "creative"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "product-manager",
@@ -2801,7 +2807,8 @@
       "pm",
       "product owner",
       "roadmap"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "investor",
@@ -2817,7 +2824,8 @@
       "venture capital",
       "angel",
       "funding"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "recruiter",
@@ -2833,7 +2841,8 @@
       "people team",
       "talent",
       "hiring"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "support-agent",
@@ -2849,7 +2858,8 @@
       "help desk",
       "agent",
       "customer success"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "stand-up-meeting",
@@ -2867,7 +2877,8 @@
       "team meeting",
       "stand up",
       "daily standup"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "org-chart",
@@ -2883,7 +2894,8 @@
       "organization",
       "hierarchy",
       "reporting lines"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "one-on-one",
@@ -2901,7 +2913,8 @@
       "catch-up",
       "one on one",
       "one to one"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "all-hands",
@@ -2917,7 +2930,8 @@
       "company meeting",
       "all hands",
       "announcement"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "video-call",
@@ -2933,7 +2947,8 @@
       "remote meeting",
       "online meeting",
       "call"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "hiring",
@@ -2949,7 +2964,8 @@
       "open role",
       "vacancy",
       "headcount"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "onboarding",
@@ -2965,7 +2981,8 @@
       "new starter",
       "induction",
       "orientation"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "performance-review",
@@ -2981,7 +2998,8 @@
       "feedback",
       "evaluation",
       "rating"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "brainstorm",
@@ -2997,7 +3015,8 @@
       "sticky notes",
       "workshop",
       "ideation"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "distributed-team",
@@ -3013,7 +3032,8 @@
       "remote work",
       "global team",
       "time zones"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "seed-funding",
@@ -3031,7 +3051,8 @@
       "investment",
       "venture capital",
       "vc"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "funding-round",
@@ -3048,7 +3069,8 @@
       "raise",
       "venture capital",
       "vc"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "term-sheet",
@@ -3064,7 +3086,8 @@
       "deal",
       "valuation",
       "agreement"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "cap-table",
@@ -3081,7 +3104,8 @@
       "ownership",
       "shares",
       "capitalization table"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "burn-rate",
@@ -3097,7 +3121,8 @@
       "cash burn",
       "spending",
       "expenses"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "recurring-revenue",
@@ -3113,7 +3138,8 @@
       "arr",
       "subscription",
       "revenue"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "payment",
@@ -3129,7 +3155,8 @@
       "checkout",
       "card",
       "contactless"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "invoice",
@@ -3145,7 +3172,8 @@
       "billing",
       "accounts receivable",
       "payment due"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "payroll",
@@ -3161,7 +3189,8 @@
       "wages",
       "pay run",
       "compensation"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "pricing-plans",
@@ -3177,7 +3206,8 @@
       "tiers",
       "subscription",
       "packages"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "kanban-board",
@@ -3193,7 +3223,8 @@
       "scrum board",
       "tickets",
       "work in progress"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "ai-assistant",
@@ -3209,7 +3240,8 @@
       "chatbot",
       "llm",
       "copilot"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "roadmap",
@@ -3225,7 +3257,8 @@
       "plan",
       "gantt",
       "milestones"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "sprint",
@@ -3241,7 +3274,8 @@
       "agile",
       "scrum",
       "cycle"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "backlog",
@@ -3257,7 +3291,8 @@
       "priorities",
       "queue",
       "product backlog"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "launch",
@@ -3274,7 +3309,8 @@
       "ship",
       "kick-off",
       "go live"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "release",
@@ -3290,7 +3326,8 @@
       "deployment",
       "version",
       "ship"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "feature-flag",
@@ -3306,7 +3343,8 @@
       "flag",
       "rollout",
       "kill switch"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "ab-test",
@@ -3322,7 +3360,8 @@
       "split test",
       "experiment",
       "variant"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "user-feedback",
@@ -3338,7 +3377,8 @@
       "rating",
       "nps",
       "voice of customer"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "customer-journey",
@@ -3354,7 +3394,8 @@
       "touchpoints",
       "user journey",
       "cx"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "integration",
@@ -3370,7 +3411,8 @@
       "connector",
       "webhook",
       "sync"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "dashboard",
@@ -3386,7 +3428,8 @@
       "analytics",
       "kpi",
       "reporting"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "security",
@@ -3402,7 +3445,8 @@
       "protection",
       "compliance",
       "infosec"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "growth-curve",
@@ -3418,7 +3462,8 @@
       "traction",
       "scale",
       "exponential"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "funnel",
@@ -3434,7 +3479,8 @@
       "sales funnel",
       "drop-off",
       "acquisition"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "flywheel",
@@ -3449,7 +3495,8 @@
       "growth loop",
       "virtuous cycle",
       "momentum"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "north-star-metric",
@@ -3465,7 +3512,8 @@
       "kpi",
       "key metric",
       "goal"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "okrs",
@@ -3481,7 +3529,8 @@
       "key results",
       "goals",
       "targets"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "churn",
@@ -3497,7 +3546,8 @@
       "cancellation",
       "lost customers",
       "churn rate"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "retention",
@@ -3513,7 +3563,8 @@
       "cohort analysis",
       "loyalty",
       "returning customers"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "network-effect",
@@ -3529,7 +3580,8 @@
       "viral",
       "community",
       "platform"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "pivot",
@@ -3544,7 +3596,8 @@
       "change of direction",
       "strategy shift",
       "turnaround"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "two-by-two-matrix",
@@ -3562,7 +3615,8 @@
       "prioritization",
       "2 x 2",
       "two by two"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "product-market-fit",
@@ -3579,7 +3633,8 @@
       "traction",
       "demand",
       "product market fit"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "sales-pipeline",
@@ -3595,7 +3650,8 @@
       "deals",
       "crm",
       "sales stages"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "marketplace",
@@ -3611,7 +3667,8 @@
       "platform",
       "buyers",
       "sellers"
-     ]
+     ],
+     "first_release": "5.0.16"
     },
     {
      "item_id": "persona",
@@ -3627,7 +3684,8 @@
       "customer profile",
       "audience",
       "segment"
-     ]
+     ],
+     "first_release": "5.0.16"
     }
    ]
   },
@@ -4034,7 +4092,8 @@
       "phone",
       "app",
       "touch"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "phone-list-screen",
@@ -4054,7 +4113,8 @@
       "phone",
       "app",
       "touch"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "phone-chat-screen",
@@ -4074,7 +4134,8 @@
       "phone",
       "app",
       "touch"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "bottom-sheet",
@@ -4094,7 +4155,8 @@
       "phone",
       "app",
       "touch"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "tablet-screen",
@@ -4113,7 +4175,8 @@
       "phone",
       "app",
       "touch"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "mobile-status-bar",
@@ -4132,7 +4195,8 @@
       "phone",
       "app",
       "touch"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "mobile-app-bar",
@@ -4152,7 +4216,8 @@
       "phone",
       "app",
       "touch"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "mobile-tab-bar",
@@ -4171,7 +4236,8 @@
       "phone",
       "app",
       "touch"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "floating-action-button",
@@ -4191,7 +4257,8 @@
       "phone",
       "app",
       "touch"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "on-screen-keyboard",
@@ -4209,7 +4276,8 @@
       "phone",
       "app",
       "touch"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "push-notification",
@@ -4228,7 +4296,8 @@
       "phone",
       "app",
       "touch"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "pull-to-refresh",
@@ -4247,7 +4316,8 @@
       "phone",
       "app",
       "touch"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "button",
@@ -4265,7 +4335,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "primary-button",
@@ -4285,7 +4356,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "icon-button",
@@ -4304,7 +4376,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "segmented-control",
@@ -4324,7 +4397,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "text-field",
@@ -4344,7 +4418,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "text-area",
@@ -4364,7 +4439,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "search-field",
@@ -4384,7 +4460,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "password-field",
@@ -4404,7 +4481,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "dropdown",
@@ -4424,7 +4502,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "dropdown-open",
@@ -4444,7 +4523,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "date-picker",
@@ -4464,7 +4544,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "checkbox",
@@ -4484,7 +4565,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "checkbox-checked",
@@ -4504,7 +4586,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "radio",
@@ -4524,7 +4607,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "radio-selected",
@@ -4544,7 +4628,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "toggle-off",
@@ -4563,7 +4648,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "toggle-on",
@@ -4582,7 +4668,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "slider",
@@ -4602,7 +4689,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "stepper",
@@ -4623,7 +4711,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "tab-strip",
@@ -4642,7 +4731,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "breadcrumb",
@@ -4662,7 +4752,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "pagination",
@@ -4682,7 +4773,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "navigation-bar",
@@ -4704,7 +4796,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "sidebar-nav",
@@ -4724,7 +4817,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "context-menu",
@@ -4744,7 +4838,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "tooltip",
@@ -4764,7 +4859,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "toast",
@@ -4784,7 +4880,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "alert-banner",
@@ -4804,7 +4901,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "badge",
@@ -4824,7 +4922,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "tag-chip",
@@ -4844,7 +4943,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "progress-ring",
@@ -4864,7 +4964,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "step-indicator",
@@ -4885,7 +4986,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "scrollbar",
@@ -4903,7 +5005,8 @@
       "widget",
       "ui",
       "component"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "card",
@@ -4922,7 +5025,8 @@
       "ui",
       "component",
       "wireframe"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "list-row",
@@ -4941,7 +5045,8 @@
       "ui",
       "component",
       "wireframe"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "table",
@@ -4961,7 +5066,8 @@
       "ui",
       "component",
       "wireframe"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "accordion",
@@ -4980,7 +5086,8 @@
       "ui",
       "component",
       "wireframe"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "text-block",
@@ -5001,7 +5108,8 @@
       "ui",
       "component",
       "wireframe"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "image-placeholder",
@@ -5020,7 +5128,8 @@
       "ui",
       "component",
       "wireframe"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "video-player",
@@ -5040,7 +5149,8 @@
       "ui",
       "component",
       "wireframe"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "carousel",
@@ -5060,7 +5170,8 @@
       "ui",
       "component",
       "wireframe"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "file-upload",
@@ -5080,7 +5191,8 @@
       "ui",
       "component",
       "wireframe"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "avatar",
@@ -5099,7 +5211,8 @@
       "ui",
       "component",
       "wireframe"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "rating-stars",
@@ -5119,7 +5232,8 @@
       "ui",
       "component",
       "wireframe"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "ai-prompt-field",
@@ -5139,7 +5253,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "ai-chat",
@@ -5159,7 +5274,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "chat-message",
@@ -5179,7 +5295,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "ai-response",
@@ -5199,7 +5316,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "ai-suggestion-chips",
@@ -5219,7 +5337,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "ai-generate-button",
@@ -5239,7 +5358,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "ai-sparkle-icon",
@@ -5259,7 +5379,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "ai-assistant-icon",
@@ -5279,7 +5400,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "ai-model-icon",
@@ -5299,7 +5421,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "ai-thinking-icon",
@@ -5321,7 +5444,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "voice-input-icon",
@@ -5341,7 +5465,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "magic-wand-icon",
@@ -5361,7 +5486,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "regenerate-icon",
@@ -5381,7 +5507,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "ai-image-icon",
@@ -5401,7 +5528,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "ai-summary-icon",
@@ -5421,7 +5549,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "thumbs-up-icon",
@@ -5441,7 +5570,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "thumbs-down-icon",
@@ -5461,7 +5591,8 @@
       "artificial intelligence",
       "assistant",
       "llm"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "UserIcon",
@@ -5750,7 +5881,8 @@
       "complete",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "close-icon",
@@ -5769,7 +5901,8 @@
       "error",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "home-icon",
@@ -5786,7 +5919,8 @@
       "main",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "search-icon",
@@ -5804,7 +5938,8 @@
       "lookup",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "menu-icon",
@@ -5821,7 +5956,8 @@
       "drawer",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "settings-icon",
@@ -5839,7 +5975,8 @@
       "options",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "notification-icon",
@@ -5856,7 +5993,8 @@
       "reminder",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "favorite-icon",
@@ -5874,7 +6012,8 @@
       "save",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "share-icon",
@@ -5891,7 +6030,8 @@
       "link",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "edit-icon",
@@ -5909,7 +6049,8 @@
       "compose",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "delete-icon",
@@ -5927,7 +6068,8 @@
       "discard",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "location-icon",
@@ -5945,7 +6087,8 @@
       "gps",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "fingerprint-icon",
@@ -5963,7 +6106,8 @@
       "security",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "tap-gesture-icon",
@@ -5981,7 +6125,8 @@
       "gesture",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "swipe-gesture-icon",
@@ -5999,7 +6144,8 @@
       "gesture",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     },
     {
      "item_id": "pinch-gesture-icon",
@@ -6017,7 +6163,8 @@
       "gesture",
       "icon",
       "symbol"
-     ]
+     ],
+     "first_release": "5.0.12"
     }
    ]
   },
@@ -6048,7 +6195,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "message-start-event",
@@ -6073,7 +6221,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "timer-start-event",
@@ -6100,7 +6249,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "conditional-start-event",
@@ -6125,7 +6275,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "signal-start-event",
@@ -6150,7 +6301,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "multiple-start-event",
@@ -6175,7 +6327,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "error-start-event",
@@ -6201,7 +6354,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "compensation-start-event",
@@ -6227,7 +6381,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "escalation-start-event",
@@ -6251,7 +6406,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "parallel-multiple-start-event",
@@ -6276,7 +6432,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "message-start-event-non-interrupting",
@@ -6302,7 +6459,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "timer-start-event-non-interrupting",
@@ -6330,7 +6488,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "conditional-start-event-non-interrupting",
@@ -6356,7 +6515,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "signal-start-event-non-interrupting",
@@ -6382,7 +6542,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "multiple-start-event-non-interrupting",
@@ -6408,7 +6569,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "escalation-start-event-non-interrupting",
@@ -6433,7 +6595,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "parallel-multiple-start-event-non-interrupting",
@@ -6459,7 +6622,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "intermediate-event",
@@ -6483,7 +6647,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "message-intermediate-catch-event",
@@ -6510,7 +6675,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "timer-intermediate-catch-event",
@@ -6539,7 +6705,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "error-intermediate-catch-event",
@@ -6567,7 +6734,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "cancel-intermediate-catch-event",
@@ -6593,7 +6761,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "compensation-intermediate-catch-event",
@@ -6621,7 +6790,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "conditional-intermediate-catch-event",
@@ -6648,7 +6818,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "link-intermediate-catch-event",
@@ -6676,7 +6847,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "signal-intermediate-catch-event",
@@ -6703,7 +6875,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "multiple-intermediate-catch-event",
@@ -6730,7 +6903,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "escalation-intermediate-catch-event",
@@ -6756,7 +6930,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "parallel-multiple-intermediate-catch-event",
@@ -6783,7 +6958,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "message-intermediate-catch-event-non-interrupting",
@@ -6810,7 +6986,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "timer-intermediate-catch-event-non-interrupting",
@@ -6839,7 +7016,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "conditional-intermediate-catch-event-non-interrupting",
@@ -6866,7 +7044,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "signal-intermediate-catch-event-non-interrupting",
@@ -6893,7 +7072,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "multiple-intermediate-catch-event-non-interrupting",
@@ -6920,7 +7100,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "escalation-intermediate-catch-event-non-interrupting",
@@ -6946,7 +7127,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "parallel-multiple-intermediate-catch-event-non-interrupting",
@@ -6973,7 +7155,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "message-intermediate-throw-event",
@@ -6999,7 +7182,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "compensation-intermediate-throw-event",
@@ -7026,7 +7210,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "link-intermediate-throw-event",
@@ -7053,7 +7238,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "signal-intermediate-throw-event",
@@ -7079,7 +7265,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "multiple-intermediate-throw-event",
@@ -7105,7 +7292,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "escalation-intermediate-throw-event",
@@ -7130,7 +7318,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "end-event",
@@ -7153,7 +7342,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "message-end-event",
@@ -7179,7 +7369,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "error-end-event",
@@ -7206,7 +7397,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "cancel-end-event",
@@ -7231,7 +7423,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "compensation-end-event",
@@ -7258,7 +7451,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "signal-end-event",
@@ -7284,7 +7478,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "terminate-end-event",
@@ -7309,7 +7504,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "multiple-end-event",
@@ -7335,7 +7531,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "escalation-end-event",
@@ -7360,7 +7557,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "exclusive-gateway",
@@ -7385,7 +7583,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "event-based-gateway",
@@ -7409,7 +7608,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "event-based-gateway-instantiate",
@@ -7432,7 +7632,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "inclusive-gateway",
@@ -7455,7 +7656,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "parallel-gateway",
@@ -7480,7 +7682,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "parallel-event-based-gateway-instantiate",
@@ -7504,7 +7707,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "complex-gateway",
@@ -7527,7 +7731,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "service-task",
@@ -7551,7 +7756,8 @@
       "width": 0.86,
       "x": 0.07,
       "y": 0.26
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "receive-task",
@@ -7574,7 +7780,8 @@
       "width": 0.86,
       "x": 0.07,
       "y": 0.26
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "send-task",
@@ -7597,7 +7804,8 @@
       "width": 0.86,
       "x": 0.07,
       "y": 0.26
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "user-task",
@@ -7620,7 +7828,8 @@
       "width": 0.86,
       "x": 0.07,
       "y": 0.26
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "script-task",
@@ -7642,7 +7851,8 @@
       "width": 0.86,
       "x": 0.07,
       "y": 0.26
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "manual-task",
@@ -7665,7 +7875,8 @@
       "width": 0.86,
       "x": 0.07,
       "y": 0.26
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "instantiating-receive-task",
@@ -7688,7 +7899,8 @@
       "width": 0.86,
       "x": 0.07,
       "y": 0.26
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "business-rule-task",
@@ -7712,7 +7924,8 @@
       "width": 0.86,
       "x": 0.07,
       "y": 0.26
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "collapsed-sub-process",
@@ -7735,7 +7948,8 @@
       "width": 0.86,
       "x": 0.07,
       "y": 0.1
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "call-activity",
@@ -7758,7 +7972,8 @@
       "width": 0.84,
       "x": 0.08,
       "y": 0.12
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "event-sub-process",
@@ -7781,7 +7996,8 @@
       "x": 0.06,
       "y": 0.1
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "transaction",
@@ -7803,7 +8019,8 @@
       "width": 0.82,
       "x": 0.09,
       "y": 0.14
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "loop-mark",
@@ -7821,7 +8038,8 @@
       "marker",
       "standard loop"
      ],
-     "connection_points": []
+     "connection_points": [],
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "multi-instance-parallel-mark",
@@ -7840,7 +8058,8 @@
       "three bars",
       "for each"
      ],
-     "connection_points": []
+     "connection_points": [],
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "multi-instance-sequential-mark",
@@ -7859,7 +8078,8 @@
       "three bars",
       "for each"
      ],
-     "connection_points": []
+     "connection_points": [],
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "compensation-mark",
@@ -7877,7 +8097,8 @@
       "marker",
       "rewind"
      ],
-     "connection_points": []
+     "connection_points": [],
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "ad-hoc-mark",
@@ -7895,7 +8116,8 @@
       "marker",
       "any order"
      ],
-     "connection_points": []
+     "connection_points": [],
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "sub-process-mark",
@@ -7913,7 +8135,8 @@
       "marker",
       "collapsed"
      ],
-     "connection_points": []
+     "connection_points": [],
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "data-object",
@@ -7937,7 +8160,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "data-object-collection",
@@ -7961,7 +8185,108 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
+    },
+    {
+     "item_id": "data-input",
+     "display_name": "Data input",
+     "default_width": 39.75,
+     "default_height": 49.375,
+     "published_item_id": "32167D3A-08CB-84A2-9300-BBFF59ADC21F",
+     "slug": "data-input",
+     "description": "Information the process needs from outside before it can start, such as an application form. Its arrow is outlined.",
+     "keywords": [
+      "bpmn",
+      "data input",
+      "input",
+      "information",
+      "arrow",
+      "page"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
+    },
+    {
+     "item_id": "data-input-collection",
+     "display_name": "Data input, collection",
+     "default_width": 39.75,
+     "default_height": 49.375,
+     "published_item_id": "DF3433C6-20AF-89CB-8936-4F64404C7E7B",
+     "slug": "data-input-collection",
+     "description": "A set of the same kind of information the process needs from outside, such as a batch of claims.",
+     "keywords": [
+      "bpmn",
+      "data input",
+      "input",
+      "collection",
+      "list",
+      "several"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
+    },
+    {
+     "item_id": "data-output",
+     "display_name": "Data output",
+     "default_width": 39.75,
+     "default_height": 49.375,
+     "published_item_id": "1C612834-D77B-842C-8870-9E7ADE224C9A",
+     "slug": "data-output",
+     "description": "Information the process hands back when it finishes, such as an approved order. Its arrow is solid.",
+     "keywords": [
+      "bpmn",
+      "data output",
+      "output",
+      "result",
+      "arrow",
+      "page"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
+    },
+    {
+     "item_id": "data-output-collection",
+     "display_name": "Data output, collection",
+     "default_width": 39.75,
+     "default_height": 49.375,
+     "published_item_id": "0D2E8B5A-BC44-8F86-9DAD-D1BA268B0642",
+     "slug": "data-output-collection",
+     "description": "A set of the same kind of information the process hands back, such as a list of invoices.",
+     "keywords": [
+      "bpmn",
+      "data output",
+      "output",
+      "collection",
+      "list",
+      "several"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "data-store",
@@ -7985,7 +8310,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "message",
@@ -8008,7 +8334,8 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "message-non-initiating",
@@ -8033,13 +8360,64 @@
       "x": 0,
       "y": 0
      },
-     "text_position": "below"
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
+    },
+    {
+     "item_id": "conversation",
+     "display_name": "Conversation",
+     "default_width": 45,
+     "default_height": 40.5,
+     "published_item_id": "66D634B0-9E72-84EE-B941-53DACD9C50D1",
+     "slug": "conversation",
+     "description": "For a conversation diagram: the messages two or more participants exchange about one thing, such as an order, shown as one exchange. Lines join it to each participant's pool.",
+     "keywords": [
+      "bpmn",
+      "conversation",
+      "hexagon",
+      "exchange",
+      "participants",
+      "collaboration"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
+    },
+    {
+     "item_id": "call-conversation",
+     "display_name": "Call conversation",
+     "default_width": 45,
+     "default_height": 40.5,
+     "published_item_id": "49169FFA-E482-8556-A2C8-E26343F37D29",
+     "slug": "call-conversation",
+     "description": "A conversation defined somewhere else and reused here. Its border is heavy, like a call activity's.",
+     "keywords": [
+      "bpmn",
+      "conversation",
+      "call",
+      "hexagon",
+      "reuse",
+      "heavy border"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below",
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "text-annotation",
      "display_name": "Text annotation",
      "default_width": 100,
-     "default_height": 54,
+     "default_height": 48,
      "published_item_id": "AE05760C-6D7D-85F4-9910-C876C2473346",
      "slug": "text-annotation",
      "description": "A note for the reader. Its text sits to the right of the bracket.",
@@ -8056,7 +8434,8 @@
       "width": 0.83,
       "x": 0.15,
       "y": 0.06
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     },
     {
      "item_id": "group",
@@ -8079,7 +8458,8 @@
       "width": 0.9,
       "x": 0.05,
       "y": 0.04
-     }
+     },
+     "first_release": "after 5.0.16 (unreleased)"
     }
    ]
   }

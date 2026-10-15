@@ -6,7 +6,7 @@ license: MIT
 
 # Build a SimpleDiagrams document
 
-Create a **new** `.simplediagram` document from a short JSON spec. The builder knows the document format and reads the public shape catalogue, with a validated cache and bundled offline fallback. Work from the user's description and source files they identify. Never replace an existing output.
+Create a **new** `.simplediagram` document from a short JSON spec. The builder knows the document format and reads the public shape catalogue with one request per command, falling back to the packaged list bundled with the skill. It stores nothing between runs and writes only the new document or preview you name. Work from the user's description and source files they identify. Never replace an existing output.
 
 When the source is an image, read [from-an-image.md](references/from-an-image.md) first. It replaces step 1 below with an inventory of what the picture shows, and adds a comparison against the picture and a report of anything unclear.
 
@@ -17,7 +17,7 @@ Read [visual-design.md](references/visual-design.md) for layout guidance. Use [e
 The script paths below are relative to this `SKILL.md` directory (`SKILL_DIR`). The builder needs Python 3.10+ and Pydantic 2. `uv run` may fetch Pydantic if it is not cached; use an existing local Python environment with Pydantic 2 when offline.
 
 1. Identify the things to show and their relationships. Use 5–15 nodes per page when practical.
-2. Search the full catalogue with `uv run "$SKILL_DIR/scripts/find_shapes.py" database --json`, or run without a query to list libraries. Search uses descriptions and keywords as well as names. For the generated document choose results with `placeable: true`, using their returned `selector`, or the native `rectangle`, `ellipse`, `note` and `text` shapes. Downloaded-library results are discovery only: the current desktop cannot resolve those references in generated documents, even when installed. Tell the user when the closest match has this limitation; do not silently replace it with a box. Read [shape-catalogue.md](references/shape-catalogue.md) for caching, offline use and result paging.
+2. Search the full catalogue with `uv run "$SKILL_DIR/scripts/find_shapes.py" database --json`, or run without a query to list libraries. Search uses descriptions and keywords as well as names. Use a result's returned `selector`, or the native `rectangle`, `ellipse`, `note` and `text` shapes. Every result can be placed. Prefer a packaged result (`packaged: true`) when it fits as well: it needs no library. A document opens in apps since 5.0.8 unless the build's `needs` lines say otherwise (5.0.16 for one with downloadable shapes), and a packaged shape added in a later release is a dashed placeholder in an earlier app; the `needs` lines name the release each newer shape needs. Use a downloadable result when it is the shape the diagram needs; the document then names its library, and the build prints `needs` lines saying which library and SimpleDiagrams version show it. Pass those lines on to the user. The app draws a downloadable shape in its library's own colours, so leave `fill`, `stroke` and `line_width` off it, and once its shapes are in place the app saves the file in its own current format. Read [shape-catalogue.md](references/shape-catalogue.md) for requests, offline use and result paging.
 3. Place nodes on a grid and connect them by node key. Prefer one flow direction and short labels. Write the JSON spec beside the intended output.
 4. Check the spec without writing a document:
 
@@ -57,7 +57,7 @@ The script paths below are relative to this `SKILL.md` directory (`SKILL_DIR`). 
 ```
 
 - Each node needs a page-unique `key`, a `shape`, and either grid `col`/`row` or point `x`/`y`. Set `width`/`height` for labeled boxes; use `scale` and `label_position: "below"` for pictorial library shapes. A library shape that has its own label placement (a BPMN event puts its name below) gets it unless the spec sets `label_position`.
-- Each edge names a source and target node. The builder routes it and adds a target arrow by default. Use `source_side`/`target_side` only when the automatic route needs correction. Some library shapes have no connection points (BPMN task marks sit on a task): connect the shape they mark instead.
+- Each edge names a source and target node. The builder routes it and adds a target arrow by default. Use `source_side`/`target_side` only when the automatic route needs correction. To attach to one particular connection point, such as a component's lead end, give `source_point`/`target_point` with an id from the shape's `connection_points` (the `points:` line in find_shapes.py's listing) instead of a side; the route starts exactly there. Some library shapes have no connection points (BPMN task marks sit on a task): connect the shape they mark instead.
 - For BPMN process diagrams use the `bpmn` library: events, gateways, typed tasks, sub-processes, data and messages. Plain tasks and plain gateways are Basic shapes; pools and lanes are not offered yet.
 - Keep colors and shape meanings consistent. Leave connected shapes unrotated.
 - The output is a folder with `manifest.json`, `document.json`, and an empty `assets/` directory. Let the builder write it; do not edit the generated files.

@@ -51,7 +51,7 @@
       }
      ],
      "default": null,
-     "description": "Chosen automatically if omitted.",
+     "description": "The side the connector leaves from, at the shape's anchor on that side (its middle on most shapes). Chosen automatically when neither this nor source_point is given.",
      "title": "Source Side"
     },
     "target_side": {
@@ -70,8 +70,38 @@
       }
      ],
      "default": null,
-     "description": "Chosen automatically if omitted.",
+     "description": "The side the connector arrives at, at the shape's anchor on that side (its middle on most shapes). Chosen automatically when neither this nor target_point is given.",
      "title": "Target Side"
+    },
+    "source_point": {
+     "anyOf": [
+      {
+       "maximum": 9223372036854775807,
+       "minimum": 0,
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "The id of the source shape's connection point to leave from, as find_shapes.py lists it, such as a component's lead end. Instead of source_side.",
+     "title": "Source Point"
+    },
+    "target_point": {
+     "anyOf": [
+      {
+       "maximum": 9223372036854775807,
+       "minimum": 0,
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "The id of the target shape's connection point to arrive at. Instead of target_side.",
+     "title": "Target Point"
     },
     "start_ending": {
      "default": "none",
@@ -210,7 +240,9 @@
      "type": "string"
     },
     "shape": {
-     "description": "rectangle, ellipse, note or text for a plain drawn shape, or '<library>/<item>' for a library shape, for example 'basic/Cylinder'. Use a packaged selector returned by find_shapes.py; it searches the API and falls back to assets/built-in-shapes.json offline.",
+     "description": "rectangle, ellipse, note or text for a plain drawn shape, or '<library>/<item>' for a library shape, for example 'basic/Cylinder'. Use a selector returned by find_shapes.py, which searches the API and falls back to assets/built-in-shapes.json offline. A packaged shape needs nothing installed; a downloadable one needs its library installed.",
+     "maxLength": 512,
+     "minLength": 1,
      "title": "Shape",
      "type": "string"
     },

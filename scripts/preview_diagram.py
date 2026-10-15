@@ -23,7 +23,7 @@ from pathlib import Path
 
 import sd_format as wire
 from pydantic import ValidationError
-from sd_spec import Catalog, SpecError, compile_spec, load_spec
+from sd_spec import Catalog, SpecError, compile_spec, echo, load_spec
 
 MARGIN = 40
 # XML 1.0 cannot carry these at all, even escaped.
@@ -116,46 +116,40 @@ def _page_svg(page: wire.Page) -> str:
     return "\n".join(parts)
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("source", type=Path, help="A diagram spec (.json)")
     parser.add_argument("output", type=Path, help="New SVG to write; later pages get -2, -3 before the suffix")
-    parser.add_argument("--offline", action="store_true", help="Use cached or bundled metadata without a request")
-    parser.add_argument("--refresh-catalogue", action="store_true", help="Revalidate the catalogue now")
-    parser.add_argument("--catalogue-cache", type=Path, help="Use this cache file")
-    arguments = parser.parse_args()
+    parser.add_argument("--offline", action="store_true", help="Use the packaged shapes only, without a request")
+    arguments = parser.parse_args(argv)
     if arguments.source.suffix != ".json" or arguments.output.suffix != ".svg":
-        print("error   Expected a JSON spec and a new .svg output.")
+        echo("error   Expected a JSON spec and a new .svg output.")
         return 1
     try:
-        catalog = Catalog.load_current(
-            cache_path=arguments.catalogue_cache,
-            offline=arguments.offline,
-            refresh=arguments.refresh_catalogue,
-        )
-        print(f"Catalogue: {catalog.source}", file=sys.stderr)
+        catalog = Catalog.load_current(offline=arguments.offline)
+        echo(f"Catalogue: {catalog.source}", file=sys.stderr)
         if catalog.warning:
-            print(catalog.warning, file=sys.stderr)
+            echo(catalog.warning, file=sys.stderr)
         document = compile_spec(load_spec(arguments.source), catalog)
     except (SpecError, ValidationError) as failure:
         for line in str(failure).splitlines():
-            print(f"error   {line}")
+            echo(f"error   {line}")
         return 1
     targets = [
         arguments.output if index == 0 else arguments.output.with_stem(f"{arguments.output.stem}-{index + 1}")
         for index in range(len(document.pages))
     ]
     if any(target.exists() or target.is_symlink() for target in targets):
-        print("error   A preview output already exists; choose a new name.")
+        echo("error   A preview output already exists; choose a new name.")
         return 1
     for target, page in zip(targets, document.pages, strict=True):
         try:
             with target.open("x", encoding="utf-8") as stream:
                 stream.write(_page_svg(page))
         except OSError as failure:
-            print(f"error   Could not write {target}: {failure}")
+            echo(f"error   Could not write {target}: {failure}")
             return 1
-        print(f"Wrote {target}")
+        echo(f"Wrote {target}")
     return 0
 
 

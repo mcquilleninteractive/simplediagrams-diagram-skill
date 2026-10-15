@@ -10,8 +10,11 @@
    "type": "string"
   },
   "format_version": {
-   "const": 15,
-   "description": "Package format. document.json's schema_version is this minus one.",
+   "description": "Package format. document.json's schema_version is this minus one. 16 only for a document that names required libraries.",
+   "enum": [
+    15,
+    16
+   ],
    "title": "Format Version",
    "type": "integer"
   },
