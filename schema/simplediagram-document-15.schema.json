@@ -232,7 +232,10 @@
       "oneOrMany",
       "zeroOrMany",
       "filledArrow",
-      "slash"
+      "slash",
+      "circlePlus",
+      "cross",
+      "halfArrow"
      ],
      "title": "Start Ending",
      "type": "string"
@@ -255,7 +258,10 @@
       "oneOrMany",
       "zeroOrMany",
       "filledArrow",
-      "slash"
+      "slash",
+      "circlePlus",
+      "cross",
+      "halfArrow"
      ],
      "title": "End Ending",
      "type": "string"
@@ -277,7 +283,10 @@
         "WatercolorFill",
         "Grain",
         "PencilVerticalHatch",
-        "PencilTriangleHatch"
+        "PencilTriangleHatch",
+        "PencilRandomHatch",
+        "PencilHorizontal",
+        "Chalk"
        ],
        "type": "string"
       },
@@ -665,7 +674,10 @@
         "WatercolorFill",
         "Grain",
         "PencilVerticalHatch",
-        "PencilTriangleHatch"
+        "PencilTriangleHatch",
+        "PencilRandomHatch",
+        "PencilHorizontal",
+        "Chalk"
        ],
        "type": "string"
       },
@@ -693,7 +705,10 @@
         "WatercolorFill",
         "Grain",
         "PencilVerticalHatch",
-        "PencilTriangleHatch"
+        "PencilTriangleHatch",
+        "PencilRandomHatch",
+        "PencilHorizontal",
+        "Chalk"
        ],
        "type": "string"
       },
@@ -1217,7 +1232,10 @@
       "oneOrMany",
       "zeroOrMany",
       "filledArrow",
-      "slash"
+      "slash",
+      "circlePlus",
+      "cross",
+      "halfArrow"
      ],
      "title": "Start Ending",
      "type": "string"
@@ -1240,7 +1258,10 @@
       "oneOrMany",
       "zeroOrMany",
       "filledArrow",
-      "slash"
+      "slash",
+      "circlePlus",
+      "cross",
+      "halfArrow"
      ],
      "title": "End Ending",
      "type": "string"
@@ -1392,7 +1413,10 @@
         "WatercolorFill",
         "Grain",
         "PencilVerticalHatch",
-        "PencilTriangleHatch"
+        "PencilTriangleHatch",
+        "PencilRandomHatch",
+        "PencilHorizontal",
+        "Chalk"
        ],
        "type": "string"
       },
@@ -1420,7 +1444,10 @@
         "WatercolorFill",
         "Grain",
         "PencilVerticalHatch",
-        "PencilTriangleHatch"
+        "PencilTriangleHatch",
+        "PencilRandomHatch",
+        "PencilHorizontal",
+        "Chalk"
        ],
        "type": "string"
       },

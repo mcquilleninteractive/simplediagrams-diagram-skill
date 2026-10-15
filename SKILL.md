@@ -56,7 +56,9 @@ The script paths below are relative to this `SKILL.md` directory (`SKILL_DIR`). 
 }
 ```
 
-- Each node needs a page-unique `key`, a `shape`, and either grid `col`/`row` or point `x`/`y`. Set `width`/`height` for labeled boxes; use `scale` and `label_position: "below"` for pictorial library shapes.
-- Each edge names a source and target node. The builder routes it and adds a target arrow by default. Use `source_side`/`target_side` only when the automatic route needs correction.
+- Each node needs a page-unique `key`, a `shape`, and either grid `col`/`row` or point `x`/`y`. Set `width`/`height` for labeled boxes; use `scale` and `label_position: "below"` for pictorial library shapes. A library shape that has its own label placement (a BPMN event puts its name below) gets it unless the spec sets `label_position`.
+- Each edge names a source and target node. The builder routes it and adds a target arrow by default. Use `source_side`/`target_side` only when the automatic route needs correction. Some library shapes have no connection points (BPMN task marks sit on a task): connect the shape they mark instead.
+- For BPMN process diagrams use the `bpmn` library: events, gateways, typed tasks, sub-processes, data and messages. Plain tasks and plain gateways are Basic shapes; pools and lanes are not offered yet.
 - Keep colors and shape meanings consistent. Leave connected shapes unrotated.
 - The output is a folder with `manifest.json`, `document.json`, and an empty `assets/` directory. Let the builder write it; do not edit the generated files.
+- The builder prints a `needs` line when the document needs a newer app than 5.0.8: the line endings `circlePlus`, `cross` and `halfArrow` need 5.0.11; BPMN shapes need the first release after 5.0.16. Tell the user which version opens the document.

@@ -119,7 +119,14 @@ Ending = Literal[
     "zeroOrMany",
     "filledArrow",
     "slash",
+    # Added in SimpleDiagrams 5.0.11 without a format change: an earlier app refuses a
+    # document that uses one. `requirements()` in sd_spec reports it.
+    "circlePlus",
+    "cross",
+    "halfArrow",
 ]
+# The endings an app before 5.0.11 does not know.
+ENDINGS_FROM_5_0_11 = frozenset({"circlePlus", "cross", "halfArrow"})
 # The spelling "Horiztonal" is the app's stored value, not a typo to correct.
 Texture = Literal[
     "Horizontal",
@@ -136,6 +143,10 @@ Texture = Literal[
     "Grain",
     "PencilVerticalHatch",
     "PencilTriangleHatch",
+    # In every app version that reads format 15.
+    "PencilRandomHatch",
+    "PencilHorizontal",
+    "Chalk",
 ]
 GridLineStyle = Literal["none", "solid", "dashed", "dotted"]
 GridMarker = Literal["none", "dot", "cross"]

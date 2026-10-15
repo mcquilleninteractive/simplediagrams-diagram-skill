@@ -2,7 +2,7 @@
 
 This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It searches the public shape catalogue and uses a small JSON spec for nodes, labels, positions and connectors. The builder writes the document package and checks its structure and layout.
 
-It writes document format 15 and retains an offline catalogue from SimpleDiagrams for macOS 5.0.16 with 427 packaged shapes. The 58 new Biz shapes need 5.0.16; the 89 added UI Flow shapes need 5.0.12. Earlier apps show placeholders for shapes they do not contain. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
+It writes document format 15, which opens in SimpleDiagrams for macOS 5.0.8 and later, and retains an offline catalogue from SimpleDiagrams after 5.0.16 (unreleased) with 510 packaged shapes in seven libraries. The 83 BPMN shapes need the first release after 5.0.16; the 58 newer Biz shapes need 5.0.16; the 89 added UI Flow shapes need 5.0.12. Earlier apps show placeholders for shapes they do not contain. The builder says when a document needs a newer app. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
 
 ## Install
 
@@ -30,7 +30,7 @@ To install by copying, keep the folder name `simplediagrams-diagram-skill`.
 
 ## Scope
 
-- Creates new documents using native rectangles, ellipses, notes, text, connectors, and the six bundled shape libraries.
+- Creates new documents using native rectangles, ellipses, notes, text, connectors, and the seven bundled shape libraries, BPMN included. A library shape gets the connection points and label placement its library gives it, as in the app.
 - Searches all published libraries through `https://simplediagrams.com/shape-libraries/catalog.json`, with hourly ETag caching and explicit offline fallback.
 - Places packaged shapes using their exact API references. Downloaded-library metadata is searchable, but the builder refuses those placements because desktop 5.0.16 cannot yet resolve them. Their artwork must be placed manually in the app. Personal libraries, embedded images and shape data remain outside this authoring profile.
 - Redraws a pictured diagram as boxes and connectors. It does not trace artwork or handwriting, embed the picture, or draw pin-level wiring.
@@ -54,7 +54,7 @@ The first command checks without writing. The second creates the package at a ne
 | `references/from-an-image.md` | Redrawing a photo, scan, or screenshot of a diagram |
 | `references/shape-catalogue.md` | API search, cache and offline behavior |
 | `references/document-format.md` | Generated package structure |
-| `assets/built-in-shapes.json` | 427 packaged shapes for offline fallback |
+| `assets/built-in-shapes.json` | 510 packaged shapes, with their connection points and label placement, for offline fallback |
 | `assets/example-spec.json` | Example input |
 | `scripts/find_shapes.py` | Search names, descriptions and keywords across published libraries |
 | `scripts/sd_catalog.py` | Bounded API validation, ETag caching and offline fallback |

@@ -18,7 +18,7 @@ import unicodedata
 import uuid
 from itertools import pairwise
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Literal
+from typing import TYPE_CHECKING, Annotated, Any, Literal
 
 import sd_format as wire
 from pydantic import (
@@ -156,11 +156,13 @@ class NodeSpec(SpecModel):
         default=1, ge=0.1, le=100, allow_inf_nan=False,
         description="Multiplies a library shape's natural size, keeping its proportions.",
     )
-    label_position: wire.TextPosition = Field(
-        default="middle",
+    label_position: wire.TextPosition | None = Field(
+        default=None,
         description=(
             "Use 'below' or 'above' for icons whose artwork would hide a label. A label wider "
-            "than its shape is then written as a separate caption grouped with the shape."
+            "than its shape is then written as a separate caption grouped with the shape. "
+            "Leave it out to use the library's own placement, such as below a BPMN event; "
+            "a shape whose library says nothing puts its label in the middle."
         ),
     )
     fill: wire.Color | None = None
@@ -264,6 +266,20 @@ class CatalogShape(BaseModel):
     description: str = ""
     keywords: tuple[str, ...] = ()
     page_url: str = ""
+    # (id, x, y) for each anchor; None means the standard eight every shape has. An empty
+    # tuple is a shape connectors may not attach to, such as a BPMN task mark.
+    connection_points: tuple[tuple[int, float, float], ...] | None = None
+    # (x, y, width, height) as fractions of the frame; None means the app's own inset.
+    text_region: tuple[float, float, float, float] | None = None
+    # The library's label position; None means the middle unless the spec says otherwise.
+    text_position: wire.TextPosition | None = None
+
+    @property
+    def anchor_ids(self) -> frozenset[int] | None:
+        """The anchor numbers a connector may attach to; None means the standard eight."""
+        if self.connection_points is None:
+            return None
+        return frozenset(point[0] for point in self.connection_points)
 
     @property
     def selector(self) -> str:
@@ -296,9 +312,48 @@ class Catalog:
 
     @classmethod
     def from_catalogue(
-        cls, catalogue: ShapeLibraryCatalogue, *, source: str, warning: str | None = None
+        cls,
+        catalogue: ShapeLibraryCatalogue,
+        *,
+        source: str,
+        warning: str | None = None,
+        packaged: Catalog | None = None,
     ) -> Catalog:
-        """Copy API references unchanged, including their asset versions."""
+        """Copy API references unchanged, including their asset versions.
+
+        ``packaged`` is the bundled list made from the desktop app's own catalogue. The
+        app is the source of truth for the libraries it packages and the website copies
+        them, sometimes later, so when it is given: a packaged shape's connection points
+        and label placement come from it, and a packaged library the website does not
+        list yet is added from it.
+        """
+        known = (
+            {(shape.library_id, shape.item_id, shape.asset_version): shape for shape in packaged.shapes}
+            if packaged is not None
+            else {}
+        )
+
+        def geometry(shape: Any, built_in: bool) -> dict[str, Any]:
+            app = known.get(
+                (shape.reference.library_id, shape.reference.item_id, shape.reference.asset_version)
+            ) if built_in else None
+            if app is not None:
+                return {
+                    "connection_points": app.connection_points,
+                    "text_region": app.text_region,
+                    "text_position": app.text_position,
+                }
+            region = shape.text_region
+            return {
+                "connection_points": None
+                if shape.connection_points == "standard"
+                else tuple((point.id, point.x, point.y) for point in shape.connection_points),
+                "text_region": None
+                if region is None
+                else (region.x, region.y, region.width, region.height),
+                "text_position": shape.text_position,
+            }
+
         shapes = [
             CatalogShape(
                 library_id=shape.reference.library_id,
@@ -315,10 +370,14 @@ class Catalog:
                 description=shape.description,
                 keywords=tuple(shape.keywords),
                 page_url=library.page_url,
+                **geometry(shape, library.built_in),
             )
             for library in catalogue.libraries
             for shape in library.shapes
         ]
+        if packaged is not None:
+            listed = {shape.library_id for shape in shapes}
+            shapes += [shape for shape in packaged.shapes if shape.library_id not in listed]
         result = cls(shapes, "the current catalogue")
         result.source, result.warning = source, warning
         return result
@@ -343,6 +402,13 @@ class Catalog:
                 slug=item.get("slug", item["item_id"]),
                 description=item.get("description", ""),
                 keywords=tuple(item.get("keywords", [])),
+                connection_points=None
+                if item.get("connection_points") is None
+                else tuple((point["id"], point["x"], point["y"]) for point in item["connection_points"]),
+                text_region=None
+                if item.get("text_region") is None
+                else tuple(item["text_region"][key] for key in ("x", "y", "width", "height")),
+                text_position=item.get("text_position"),
             )
             for library in data["libraries"]
             for item in library["shapes"]
@@ -357,7 +423,9 @@ class Catalog:
         from sd_catalog import load_catalogue
 
         result = load_catalogue(cache_path=cache_path, offline=offline, refresh=refresh)
-        return cls.from_catalogue(result.catalogue, source=result.source, warning=result.warning)
+        return cls.from_catalogue(
+            result.catalogue, source=result.source, warning=result.warning, packaged=cls.load()
+        )
 
     def resolve(self, library: str, item: str) -> CatalogShape | None:
         """Finds a shape by full library id or short name. Item ids are case sensitive."""
@@ -433,10 +501,20 @@ def _snap(value: float) -> float:
 class _Placed:
     """A node after sizing, with the geometry edges are routed against."""
 
-    def __init__(self, spec: NodeSpec, element_id: str, x: float, y: float, w: float, h: float) -> None:
+    def __init__(
+        self, spec: NodeSpec, element_id: str, x: float, y: float, w: float, h: float,
+        anchor_ids: frozenset[int] | None = None, display_name: str = "",
+    ) -> None:
         self.spec = spec
         self.element_id = element_id
         self.x, self.y, self.w, self.h = x, y, w, h
+        # None: the standard eight. Otherwise the anchors the library gives this shape.
+        self.anchor_ids = anchor_ids
+        self.display_name = display_name or spec.key
+
+    def has_side_anchor(self, side: str) -> bool:
+        """Whether a connector can attach at the middle of this side, where routes end."""
+        return self.anchor_ids is None or SIDE_ANCHOR[side] in self.anchor_ids
 
     @property
     def cx(self) -> float:
@@ -721,7 +799,9 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                 centre_x, centre_y = node.x, node.y
             element_id = _new_id(namespace, f"page:{page_index}:node:{node.key}")
             item_placed = _Placed(
-                node, element_id, _snap(centre_x - width / 2), _snap(centre_y - height / 2), width, height
+                node, element_id, _snap(centre_x - width / 2), _snap(centre_y - height / 2), width, height,
+                anchor_ids=catalog_shape.anchor_ids if catalog_shape else None,
+                display_name=catalog_shape.display_name if catalog_shape else node.key,
             )
             placed[node.key] = item_placed
 
@@ -731,14 +811,25 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                 weight="bold" if node.bold else "medium",
                 color_hex=node.text_color or "#212529",
             )
-            outside = node.label_position in ("above", "below") and bool(node.label) and kind != "text"
+            # The spec's choice, else the library's (a BPMN event's name goes below it),
+            # else the middle, which is what a placed shape has always had.
+            position = node.label_position or (
+                catalog_shape.text_position if catalog_shape else None
+            ) or "middle"
+            region = catalog_shape.text_region if catalog_shape else None
+            outside = position in ("above", "below") and bool(node.label) and kind != "text"
             label_width, label_height = estimate_text_size(node.label, node.font_size, node.bold)
             # A label outside its shape is confined to the shape's width. One
             # that would wrap becomes a separate caption grouped with the shape.
             caption = outside and label_width > width
             text_layout: wire.TextLayout | None = None
-            if node.label_position != "middle" and not caption and kind != "text":
-                if outside:
+            if (position != "middle" or region is not None) and not caption and kind != "text":
+                if region is not None:
+                    # The library's own label area, as the app gives a copy placed by hand.
+                    frame = wire.TextLayoutFrame(
+                        x=region[0], y=region[1], width=region[2], height=region[3]
+                    )
+                elif outside:
                     frame = wire.TextLayoutFrame(x=0.0, y=0.0, width=1.0, height=1.0)
                 else:
                     # The app's own default label region: a 10 by 8 point inset.
@@ -748,7 +839,7 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                         width=max(0.001, (width - 2 * inset_x) / width),
                         height=max(0.001, (height - 2 * inset_y) / height),
                     )
-                text_layout = wire.TextLayout(frame=frame, position=node.label_position)
+                text_layout = wire.TextLayout(frame=frame, position=position)
             text = wire.text_content("" if caption else node.label, base_style=base_style)
             elements.append(
                 wire.element(
@@ -772,6 +863,13 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                         if catalog_shape
                         else None
                     ),
+                    # The anchors the library gives the shape, as the app gives a copy placed
+                    # by hand; None writes the standard eight.
+                    connection_points=(
+                        [wire.ConnectionPointAnchor(id=i, x=x, y=y) for i, x, y in catalog_shape.connection_points]
+                        if catalog_shape is not None and catalog_shape.connection_points is not None
+                        else None
+                    ),
                     text_layout=text_layout,
                 )
             )
@@ -779,7 +877,7 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                 caption_width, caption_height = math.ceil(label_width + 24), math.ceil(label_height + 12)
                 caption_top = (
                     item_placed.y - CAPTION_GAP - caption_height
-                    if node.label_position == "above"
+                    if position == "above"
                     else item_placed.y + height + CAPTION_GAP
                 )
                 caption_frame = wire.Rect(
@@ -816,10 +914,26 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
         routed: list[tuple[EdgeSpec, _Placed, _Placed, str, str, _Route | None]] = []
         for edge in page.edges:
             source, target = placed[edge.source], placed[edge.target]
+            for end in (source, target):
+                if end.anchor_ids is not None and not any(
+                    end.has_side_anchor(side) for side in SIDE_ANCHOR
+                ):
+                    raise SpecError(
+                        f"edge {edge.source} -> {edge.target}: {end.display_name} "
+                        f"('{end.spec.key}') has no connection points, because it is meant to "
+                        "sit on another shape. Connect the shape it marks instead."
+                    )
             obstacles = [
                 other.rect for other in placed.values() if other is not source and other is not target
             ] + label_areas
             side_a, side_b, route = _choose_route(edge, source, target, obstacles)
+            for end, side in ((source, side_a), (target, side_b)):
+                if not end.has_side_anchor(side):
+                    raise SpecError(
+                        f"edge {edge.source} -> {edge.target}: {end.display_name} "
+                        f"('{end.spec.key}') has no connection point at the middle of its {side}. "
+                        "Set source_side or target_side to a side it has one on."
+                    )
             routed.append((edge, source, target, side_a, side_b, route if edge.route == "orthogonal" else None))
 
         _spread_channels(
@@ -888,6 +1002,45 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
 # ---------------------------------------------------------------------------
 # Layout checks
 # ---------------------------------------------------------------------------
+
+
+# Packaged libraries that arrived after the document format began (5.0.8). An earlier app
+# opens the document but draws their shapes as dashed placeholders. Replace the wording
+# with the version number when the release that includes the library is published.
+LIBRARY_FIRST_RELEASE: dict[str, str] = {
+    "com.simplediagrams.shapeLibrary.bpmn": "the first SimpleDiagrams release after 5.0.16",
+}
+
+
+def app_requirements(document: wire.Document) -> list[str]:
+    """What this document needs beyond the 5.0.8 the format began with, in plain words.
+
+    Not findings: a document that needs a newer app is not wrong, and a strict build
+    must not fail because of it. The builder prints these so whoever sends the file
+    can say which version opens it.
+    """
+    endings: set[str] = set()
+    libraries: set[str] = set()
+    for page in document.pages:
+        for connection in page.connections:
+            content = connection.content
+            endings |= {content.start_ending, content.end_ending} & wire.ENDINGS_FROM_5_0_11
+        for element in page.elements:
+            reference = element.core.symbol_reference
+            if reference is not None and reference.library_id in LIBRARY_FIRST_RELEASE:
+                libraries.add(reference.library_id)
+    needs = []
+    if endings:
+        names = ", ".join(sorted(endings))
+        noun = "line ending" if len(endings) == 1 else "line endings"
+        needs.append(f"SimpleDiagrams 5.0.11 or later, for the {noun} {names}")
+    for library in sorted(libraries):
+        short = library.rsplit(".", 1)[-1]
+        needs.append(
+            f"{LIBRARY_FIRST_RELEASE[library]}, for the {short} library's shapes; "
+            "an earlier app draws them as dashed placeholders"
+        )
+    return needs
 
 
 class Finding(BaseModel):

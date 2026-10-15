@@ -180,7 +180,7 @@ def test_304_revalidates_existing_cache_and_retains_etag(
     )
     result = catalog.load_catalogue(cache_path=path, refresh=True)
     assert result.source == "cache"
-    assert result.catalogue.model_dump(mode="json") == document
+    assert result.catalogue == catalog.ShapeLibraryCatalogue.model_validate_json(json.dumps(document))
     assert opener.calls[0][0].get_header("If-none-match") == '"first"'
     assert json.loads(path.read_bytes())["etag"] == '"first"'
     assert json.loads(path.read_bytes())["failed"] is False
@@ -223,7 +223,7 @@ def test_offline_fallback_neither_fetches_nor_writes(
     opener = _transport(monkeypatch, error=AssertionError("offline"))
     result = catalog.load_catalogue(cache_path=path, offline=True)
     assert result.source == "bundled"
-    assert len(result.libraries) == 6
+    assert len(result.libraries) == 7
     assert all(library.built_in for library in result.libraries)
     assert all(
         shape.reference.library_id == library.readable_id

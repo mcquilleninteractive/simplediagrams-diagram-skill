@@ -23,7 +23,7 @@ sys.path[:0] = [str(ROOT / "scripts"), str(ROOT / "tests")]
 import fixtures
 import sd_format as wire
 from sd_package import PackageError, check_package, write_package
-from sd_spec import Catalog, DiagramSpec, SpecError, compile_spec, lint
+from sd_spec import Catalog, DiagramSpec, SpecError, app_requirements, compile_spec, lint
 
 SPEC_ID = "11111111-2222-4333-8444-555555555555"
 
@@ -60,7 +60,7 @@ def test_catalog_matches_what_the_compiler_writes() -> None:
     """Every catalogue shape must compile to a reference the catalogue itself
     resolves, or the app would draw placeholders."""
     catalog = Catalog.load()
-    assert len(catalog.shapes) == 427
+    assert len(catalog.shapes) == 510
     # One library per page: a page holds at most 300 shapes and the catalogue has more.
     by_library: dict[str, list] = {}
     for shape in catalog.shapes:
@@ -207,6 +207,100 @@ def test_wide_outside_label_becomes_a_grouped_caption() -> None:
     assert caption.frame.y >= icon.frame.y + icon.frame.height
     assert [{m.id for m in g.members} for g in document.pages[0].content.groups] == [{icon.id, caption.id}]
     assert lint(document) == []
+
+
+def test_library_shapes_get_the_points_and_label_their_library_gives_them() -> None:
+    """A shape placed by the skill must match one placed by hand in the app: a BPMN
+    event's name sits below it, a task's text keeps clear of its picture, and a task
+    mark offers connectors nothing to attach to (desktop ADR 0042)."""
+    document = compile_spec(
+        _spec([
+            {"key": "start", "shape": "bpmn/start-event", "label": "Go", "col": 0, "row": 0},
+            {"key": "task", "shape": "bpmn/user-task", "label": "Check", "col": 1, "row": 0},
+            {"key": "loop", "shape": "bpmn/loop-mark", "col": 2, "row": 0},
+            _box("plain", 3, 0),
+        ])
+    )
+    start, task, loop, plain = (element for element in document.pages[0].elements)
+    layout = start.content.text_layout
+    assert (layout.position, layout.frame.x, layout.frame.width) == ("below", 0, 1)
+    region = task.content.text_layout
+    assert region.position == "middle"
+    assert (region.frame.x, region.frame.y, region.frame.width, region.frame.height) == (
+        0.07, 0.26, 0.86, 0.52
+    )
+    assert loop.core.connection_points == []
+    assert start.core.connection_points == wire.standard_connection_points()
+    assert plain.content.text_layout is None, "A shape whose library says nothing is unchanged."
+    assert lint(document) == []
+
+
+def test_the_spec_can_still_choose_the_label_position() -> None:
+    """The library's placement is a default, not a rule: a spec that asks for the
+    middle gets the middle, inside the library's own text area, as the Shape panel
+    would give a copy placed by hand."""
+    document = compile_spec(
+        _spec([{"key": "e", "shape": "bpmn/start-event", "label": "Go", "col": 0, "row": 0,
+                "label_position": "middle"}])
+    )
+    layout = document.pages[0].elements[0].content.text_layout
+    assert (layout.position, layout.frame.width, layout.frame.height) == ("middle", 1, 1)
+
+
+def test_an_edge_to_a_shape_without_connection_points_is_refused() -> None:
+    """A task mark has no anchors, so a connector attached to it would name an anchor
+    that does not exist and the app would refuse the whole document."""
+    with pytest.raises(SpecError, match="has no connection points"):
+        compile_spec(
+            _spec(
+                [_box("a", 0, 0), {"key": "loop", "shape": "bpmn/loop-mark", "col": 1, "row": 0}],
+                [{"source": "a", "target": "loop"}],
+            )
+        )
+
+
+def test_packaged_facts_come_from_the_apps_own_list() -> None:
+    """The website copies the app's packaged libraries and may lag behind it, so a
+    packaged library it does not list yet is still offered, and a packaged shape's
+    points and label come from the list made from the app, not from the website."""
+    from sd_catalog import ShapeLibraryCatalogue, _bundled_catalogue
+
+    bundled = json.loads(_bundled_catalogue().model_dump_json())
+    without_bpmn = [
+        library for library in bundled["libraries"]
+        if library["readable_id"] != "com.simplediagrams.shapeLibrary.bpmn"
+    ]
+    assert len(without_bpmn) == len(bundled["libraries"]) - 1
+    website = ShapeLibraryCatalogue.model_validate_json(
+        json.dumps(bundled | {"libraries": without_bpmn})
+    )
+    plain = Catalog.from_catalogue(website, source="cache")
+    assert plain.resolve("bpmn", "loop-mark") is None, "Without the app's list, nothing is added."
+
+    merged = Catalog.from_catalogue(website, source="cache", packaged=Catalog.load())
+    mark = merged.resolve("bpmn", "loop-mark")
+    assert mark is not None and mark.connection_points == ()
+    assert merged.resolve("bpmn", "start-event").text_position == "below"
+    assert len(merged.shapes) == len(Catalog.load().shapes)
+
+
+def test_the_build_names_what_needs_a_newer_app() -> None:
+    """A document is not wrong for needing a newer app, but whoever sends it must be
+    able to say which version opens it: 5.0.11 for the newer line endings, and the
+    release that first ships BPMN for its shapes."""
+    plain = compile_spec(_spec([_box("a", 0, 0), _box("b", 1, 0)], [{"source": "a", "target": "b"}]))
+    assert app_requirements(plain) == []
+    newer = compile_spec(
+        _spec(
+            [_box("a", 0, 0), {"key": "e", "shape": "bpmn/end-event", "label": "Done", "col": 1, "row": 0}],
+            [{"source": "a", "target": "e", "end_ending": "cross"}],
+        )
+    )
+    needs = app_requirements(newer)
+    assert len(needs) == 2
+    assert needs[0].startswith("SimpleDiagrams 5.0.11 or later") and "cross" in needs[0]
+    assert "bpmn library" in needs[1] and "placeholders" in needs[1]
+    assert lint(newer) == [], "Needing a newer app is reported, never as a warning."
 
 
 def test_routes_do_not_run_through_labels_under_icons() -> None:

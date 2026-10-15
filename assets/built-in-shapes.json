@@ -1,7 +1,7 @@
 {
  "catalog": "com.simplediagrams.skill.built-in-shapes",
  "catalog_version": 1,
- "source_app_version": "5.0.16",
+ "source_app_version": "after 5.0.16 (unreleased)",
  "note": "Shapes that SimpleDiagrams resolves by reference. A symbol_reference uses library_id, item_id and the library's asset_version exactly as listed.",
  "libraries": [
   {
@@ -6018,6 +6018,2068 @@
       "icon",
       "symbol"
      ]
+    }
+   ]
+  },
+  {
+   "library_id": "com.simplediagrams.shapeLibrary.bpmn",
+   "short_name": "bpmn",
+   "display_name": "BPMN",
+   "asset_version": 1,
+   "published_library_id": "59613409-693A-8B85-825C-F3F846CF81E4",
+   "shapes": [
+    {
+     "item_id": "start-event",
+     "display_name": "Start event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "251574B6-DB25-8391-94F5-46D8EC6ED633",
+     "slug": "start-event",
+     "description": "Where the process starts.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "begin"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "message-start-event",
+     "display_name": "Message start event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "4C814417-16E6-8815-8306-9CF5FAB03711",
+     "slug": "message-start-event",
+     "description": "The process starts when a message arrives.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "begin",
+      "message",
+      "envelope",
+      "mail"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "timer-start-event",
+     "display_name": "Timer start event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "C5C352EF-F8B2-8A35-877C-B94E8151DC6B",
+     "slug": "timer-start-event",
+     "description": "The process starts when a set time is reached or a period has passed.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "begin",
+      "timer",
+      "clock",
+      "time",
+      "delay",
+      "schedule"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "conditional-start-event",
+     "display_name": "Conditional start event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "8F8ED358-9163-8F37-91C5-1094C80A98FD",
+     "slug": "conditional-start-event",
+     "description": "The process starts when a condition becomes true.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "begin",
+      "conditional",
+      "condition",
+      "rule"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "signal-start-event",
+     "display_name": "Signal start event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "EBAE477A-AF08-8719-A6D9-44732EF50A87",
+     "slug": "signal-start-event",
+     "description": "The process starts when a signal is broadcast.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "begin",
+      "signal",
+      "broadcast",
+      "triangle"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "multiple-start-event",
+     "display_name": "Multiple start event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "51DD161A-2FB6-86B1-9F0F-FA2BDA329555",
+     "slug": "multiple-start-event",
+     "description": "The process starts when any one of several things happens.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "begin",
+      "multiple",
+      "pentagon",
+      "several"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "error-start-event",
+     "display_name": "Error start event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "9D1D569E-A948-842A-8FF9-8050F746E1EF",
+     "slug": "error-start-event",
+     "description": "The process starts when an error is raised. Used as the start of an event sub-process.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "begin",
+      "error",
+      "exception",
+      "fault",
+      "lightning"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "compensation-start-event",
+     "display_name": "Compensation start event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "3B4D39B9-4951-8062-9D1C-904254A1A921",
+     "slug": "compensation-start-event",
+     "description": "The process starts when earlier work has to be undone. Used as the start of an event sub-process.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "begin",
+      "compensation",
+      "undo",
+      "rollback",
+      "rewind"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "escalation-start-event",
+     "display_name": "Escalation start event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "6DC45F2A-D272-8DF6-8F87-CDF5109CDBE9",
+     "slug": "escalation-start-event",
+     "description": "The process starts when an escalation is raised. Used as the start of an event sub-process.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "begin",
+      "escalation",
+      "escalate"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "parallel-multiple-start-event",
+     "display_name": "Parallel multiple start event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "B1BB1BDF-B9CC-8EA5-8714-F9607CA24037",
+     "slug": "parallel-multiple-start-event",
+     "description": "The process starts when all of several things have happened.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "begin",
+      "parallel multiple",
+      "plus",
+      "all"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "message-start-event-non-interrupting",
+     "display_name": "Message start event, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "8916283F-F35D-8796-9457-0E4597B6F7AE",
+     "slug": "message-start-event-non-interrupting",
+     "description": "Starts an event sub-process when a message arrives, without stopping the work already under way.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "non-interrupting",
+      "dashed",
+      "message",
+      "envelope",
+      "mail"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "timer-start-event-non-interrupting",
+     "display_name": "Timer start event, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "00104E2B-8E96-8699-BBF9-C7FAA3BD1E31",
+     "slug": "timer-start-event-non-interrupting",
+     "description": "Starts an event sub-process when a set time is reached or a period has passed, without stopping the work already under way.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "non-interrupting",
+      "dashed",
+      "timer",
+      "clock",
+      "time",
+      "delay",
+      "schedule"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "conditional-start-event-non-interrupting",
+     "display_name": "Conditional start event, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "EC9A37F7-C8FD-8559-8D32-61A8C1CBC5C2",
+     "slug": "conditional-start-event-non-interrupting",
+     "description": "Starts an event sub-process when a condition becomes true, without stopping the work already under way.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "non-interrupting",
+      "dashed",
+      "conditional",
+      "condition",
+      "rule"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "signal-start-event-non-interrupting",
+     "display_name": "Signal start event, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "CEDD7D78-9FDD-84B2-B719-92D3BA0FDC51",
+     "slug": "signal-start-event-non-interrupting",
+     "description": "Starts an event sub-process when a signal is broadcast, without stopping the work already under way.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "non-interrupting",
+      "dashed",
+      "signal",
+      "broadcast",
+      "triangle"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "multiple-start-event-non-interrupting",
+     "display_name": "Multiple start event, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "2C99016C-AAF0-89FA-BF9B-00471ACC4EA2",
+     "slug": "multiple-start-event-non-interrupting",
+     "description": "Starts an event sub-process when any one of several things happens, without stopping the work already under way.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "non-interrupting",
+      "dashed",
+      "multiple",
+      "pentagon",
+      "several"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "escalation-start-event-non-interrupting",
+     "display_name": "Escalation start event, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "16525FD4-73D1-8D84-A684-231B65332ADA",
+     "slug": "escalation-start-event-non-interrupting",
+     "description": "Starts an event sub-process when an escalation is raised, without stopping the work already under way.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "non-interrupting",
+      "dashed",
+      "escalation",
+      "escalate"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "parallel-multiple-start-event-non-interrupting",
+     "display_name": "Parallel multiple start event, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "0CCF8EB3-7F40-8BFE-B91F-A586891204FD",
+     "slug": "parallel-multiple-start-event-non-interrupting",
+     "description": "Starts an event sub-process when all of several things have happened, without stopping the work already under way.",
+     "keywords": [
+      "bpmn",
+      "start",
+      "event",
+      "non-interrupting",
+      "dashed",
+      "parallel multiple",
+      "plus",
+      "all"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "intermediate-event",
+     "display_name": "Intermediate event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "E73C601F-CBEC-885E-A599-052837908928",
+     "slug": "intermediate-event",
+     "description": "Something that happens partway through the process.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "catch",
+      "wait",
+      "boundary"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "message-intermediate-catch-event",
+     "display_name": "Message intermediate event, catching",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "274A85C5-27C5-8897-AA5F-4E2C1EAABDD0",
+     "slug": "message-intermediate-catch-event",
+     "description": "The flow waits here until a message arrives. Placed on the edge of a task, it takes over from the task when that happens.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "catch",
+      "wait",
+      "boundary",
+      "message",
+      "envelope",
+      "mail"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "timer-intermediate-catch-event",
+     "display_name": "Timer intermediate event, catching",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "4C04FECF-8CD8-855D-BC46-BF066F7BD237",
+     "slug": "timer-intermediate-catch-event",
+     "description": "The flow waits here until a set time is reached or a period has passed. Placed on the edge of a task, it takes over from the task when that happens.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "catch",
+      "wait",
+      "boundary",
+      "timer",
+      "clock",
+      "time",
+      "delay",
+      "schedule"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "error-intermediate-catch-event",
+     "display_name": "Error intermediate event, catching",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "12C46D8A-AF8B-80FC-B562-C48121AD904B",
+     "slug": "error-intermediate-catch-event",
+     "description": "The flow waits here until an error is raised. Placed on the edge of a task, it takes over from the task when that happens.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "catch",
+      "wait",
+      "boundary",
+      "error",
+      "exception",
+      "fault",
+      "lightning"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "cancel-intermediate-catch-event",
+     "display_name": "Cancel intermediate event, catching",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "1DF7BB40-C940-859B-8B37-8EA32F515E31",
+     "slug": "cancel-intermediate-catch-event",
+     "description": "The flow waits here until a transaction is cancelled. Placed on the edge of a task, it takes over from the task when that happens.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "catch",
+      "wait",
+      "boundary",
+      "cancel",
+      "abort"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "compensation-intermediate-catch-event",
+     "display_name": "Compensation intermediate event, catching",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "9D78F02F-CFD2-805C-BACF-F503C07D2C1B",
+     "slug": "compensation-intermediate-catch-event",
+     "description": "The flow waits here until earlier work has to be undone. Placed on the edge of a task, it takes over from the task when that happens.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "catch",
+      "wait",
+      "boundary",
+      "compensation",
+      "undo",
+      "rollback",
+      "rewind"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "conditional-intermediate-catch-event",
+     "display_name": "Conditional intermediate event, catching",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "27BFFAAE-29B2-8FEF-8A41-43532A4D3747",
+     "slug": "conditional-intermediate-catch-event",
+     "description": "The flow waits here until a condition becomes true. Placed on the edge of a task, it takes over from the task when that happens.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "catch",
+      "wait",
+      "boundary",
+      "conditional",
+      "condition",
+      "rule"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "link-intermediate-catch-event",
+     "display_name": "Link intermediate event, catching",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "EFE60EFC-426B-8D66-AD37-2949449C1DB6",
+     "slug": "link-intermediate-catch-event",
+     "description": "The flow waits here until the flow arrives from a matching link elsewhere on the page. Placed on the edge of a task, it takes over from the task when that happens.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "catch",
+      "wait",
+      "boundary",
+      "link",
+      "arrow",
+      "jump",
+      "off-page"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "signal-intermediate-catch-event",
+     "display_name": "Signal intermediate event, catching",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "BEC3A1EB-B1B1-8746-94F7-D2819C4372DE",
+     "slug": "signal-intermediate-catch-event",
+     "description": "The flow waits here until a signal is broadcast. Placed on the edge of a task, it takes over from the task when that happens.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "catch",
+      "wait",
+      "boundary",
+      "signal",
+      "broadcast",
+      "triangle"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "multiple-intermediate-catch-event",
+     "display_name": "Multiple intermediate event, catching",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "BB34F4B4-7220-877D-801F-0D54BC93DD02",
+     "slug": "multiple-intermediate-catch-event",
+     "description": "The flow waits here until any one of several things happens. Placed on the edge of a task, it takes over from the task when that happens.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "catch",
+      "wait",
+      "boundary",
+      "multiple",
+      "pentagon",
+      "several"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "escalation-intermediate-catch-event",
+     "display_name": "Escalation intermediate event, catching",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "B44A6EBE-838B-8CBF-9154-199B32286FA5",
+     "slug": "escalation-intermediate-catch-event",
+     "description": "The flow waits here until an escalation is raised. Placed on the edge of a task, it takes over from the task when that happens.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "catch",
+      "wait",
+      "boundary",
+      "escalation",
+      "escalate"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "parallel-multiple-intermediate-catch-event",
+     "display_name": "Parallel multiple intermediate event, catching",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "2498F173-B595-823A-9A63-5111A6A9693D",
+     "slug": "parallel-multiple-intermediate-catch-event",
+     "description": "The flow waits here until all of several things have happened. Placed on the edge of a task, it takes over from the task when that happens.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "catch",
+      "wait",
+      "boundary",
+      "parallel multiple",
+      "plus",
+      "all"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "message-intermediate-catch-event-non-interrupting",
+     "display_name": "Message intermediate event, catching, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "987B7ED2-EDBC-8E6D-A166-5D4C52326EAA",
+     "slug": "message-intermediate-catch-event-non-interrupting",
+     "description": "Placed on the edge of a task: when a message arrives, a side branch starts and the task carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "boundary",
+      "non-interrupting",
+      "dashed",
+      "message",
+      "envelope",
+      "mail"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "timer-intermediate-catch-event-non-interrupting",
+     "display_name": "Timer intermediate event, catching, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "C8F797F8-A00F-8A65-AF57-8A5D1888ABA0",
+     "slug": "timer-intermediate-catch-event-non-interrupting",
+     "description": "Placed on the edge of a task: when a set time is reached or a period has passed, a side branch starts and the task carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "boundary",
+      "non-interrupting",
+      "dashed",
+      "timer",
+      "clock",
+      "time",
+      "delay",
+      "schedule"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "conditional-intermediate-catch-event-non-interrupting",
+     "display_name": "Conditional intermediate event, catching, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "255F3FB2-CA15-84A7-8542-D533A5D06DD2",
+     "slug": "conditional-intermediate-catch-event-non-interrupting",
+     "description": "Placed on the edge of a task: when a condition becomes true, a side branch starts and the task carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "boundary",
+      "non-interrupting",
+      "dashed",
+      "conditional",
+      "condition",
+      "rule"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "signal-intermediate-catch-event-non-interrupting",
+     "display_name": "Signal intermediate event, catching, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "69C62C11-441A-8471-880A-836E2F886BF9",
+     "slug": "signal-intermediate-catch-event-non-interrupting",
+     "description": "Placed on the edge of a task: when a signal is broadcast, a side branch starts and the task carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "boundary",
+      "non-interrupting",
+      "dashed",
+      "signal",
+      "broadcast",
+      "triangle"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "multiple-intermediate-catch-event-non-interrupting",
+     "display_name": "Multiple intermediate event, catching, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "B8E3CD31-0893-8A7F-9D9C-4272D59DCDEA",
+     "slug": "multiple-intermediate-catch-event-non-interrupting",
+     "description": "Placed on the edge of a task: when any one of several things happens, a side branch starts and the task carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "boundary",
+      "non-interrupting",
+      "dashed",
+      "multiple",
+      "pentagon",
+      "several"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "escalation-intermediate-catch-event-non-interrupting",
+     "display_name": "Escalation intermediate event, catching, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "702B1EED-09A9-88C0-AD1E-644AE6226C55",
+     "slug": "escalation-intermediate-catch-event-non-interrupting",
+     "description": "Placed on the edge of a task: when an escalation is raised, a side branch starts and the task carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "boundary",
+      "non-interrupting",
+      "dashed",
+      "escalation",
+      "escalate"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "parallel-multiple-intermediate-catch-event-non-interrupting",
+     "display_name": "Parallel multiple intermediate event, catching, non-interrupting",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "E6FFF400-554B-865C-9ACC-97196B2DFFFD",
+     "slug": "parallel-multiple-intermediate-catch-event-non-interrupting",
+     "description": "Placed on the edge of a task: when all of several things have happened, a side branch starts and the task carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "boundary",
+      "non-interrupting",
+      "dashed",
+      "parallel multiple",
+      "plus",
+      "all"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "message-intermediate-throw-event",
+     "display_name": "Message intermediate event, throwing",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "CB1C88C7-5ABD-816E-B58C-45DFD2DB8941",
+     "slug": "message-intermediate-throw-event",
+     "description": "The process sends a message here and carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "throw",
+      "send",
+      "message",
+      "envelope",
+      "mail"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "compensation-intermediate-throw-event",
+     "display_name": "Compensation intermediate event, throwing",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "EDB164B1-A1FF-8C3F-9AB2-375DD96A04A3",
+     "slug": "compensation-intermediate-throw-event",
+     "description": "The process asks for earlier work to be undone here and carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "throw",
+      "send",
+      "compensation",
+      "undo",
+      "rollback",
+      "rewind"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "link-intermediate-throw-event",
+     "display_name": "Link intermediate event, throwing",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "EBEB0900-FFBD-816A-A600-1D26ECC45668",
+     "slug": "link-intermediate-throw-event",
+     "description": "The process jumps to a matching link elsewhere on the page here and carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "throw",
+      "send",
+      "link",
+      "arrow",
+      "jump",
+      "off-page"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "signal-intermediate-throw-event",
+     "display_name": "Signal intermediate event, throwing",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "9F206F69-BD1F-8F9C-94BE-1964AE5DF784",
+     "slug": "signal-intermediate-throw-event",
+     "description": "The process broadcasts a signal here and carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "throw",
+      "send",
+      "signal",
+      "broadcast",
+      "triangle"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "multiple-intermediate-throw-event",
+     "display_name": "Multiple intermediate event, throwing",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "99D94F66-5757-8EC0-B924-0BB0D32D96E5",
+     "slug": "multiple-intermediate-throw-event",
+     "description": "The process sends several things at once here and carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "throw",
+      "send",
+      "multiple",
+      "pentagon",
+      "several"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "escalation-intermediate-throw-event",
+     "display_name": "Escalation intermediate event, throwing",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "F6EA9F09-B3C0-8043-86A6-19260C9E9DB3",
+     "slug": "escalation-intermediate-throw-event",
+     "description": "The process raises an escalation here and carries on.",
+     "keywords": [
+      "bpmn",
+      "intermediate",
+      "event",
+      "throw",
+      "send",
+      "escalation",
+      "escalate"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "end-event",
+     "display_name": "End event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "43E13E47-042A-8FD8-9E0D-5B673103D0B7",
+     "slug": "end-event",
+     "description": "This path of the process ends here.",
+     "keywords": [
+      "bpmn",
+      "end",
+      "event",
+      "finish",
+      "stop"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "message-end-event",
+     "display_name": "Message end event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "9DA10990-B027-8E5C-B9EF-F8FD8915318B",
+     "slug": "message-end-event",
+     "description": "This path of the process ends and sends a message.",
+     "keywords": [
+      "bpmn",
+      "end",
+      "event",
+      "finish",
+      "stop",
+      "message",
+      "envelope",
+      "mail"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "error-end-event",
+     "display_name": "Error end event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "79F44A73-5C82-84C5-B204-E3368113B85F",
+     "slug": "error-end-event",
+     "description": "This path of the process ends and raises an error.",
+     "keywords": [
+      "bpmn",
+      "end",
+      "event",
+      "finish",
+      "stop",
+      "error",
+      "exception",
+      "fault",
+      "lightning"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "cancel-end-event",
+     "display_name": "Cancel end event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "59A32DBE-E9B9-8761-93EA-ABFAF47D116C",
+     "slug": "cancel-end-event",
+     "description": "This path of the process ends and cancels the transaction.",
+     "keywords": [
+      "bpmn",
+      "end",
+      "event",
+      "finish",
+      "stop",
+      "cancel",
+      "abort"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "compensation-end-event",
+     "display_name": "Compensation end event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "17D32414-ABC7-8DD4-9659-9E75A484E7E5",
+     "slug": "compensation-end-event",
+     "description": "This path of the process ends and asks for earlier work to be undone.",
+     "keywords": [
+      "bpmn",
+      "end",
+      "event",
+      "finish",
+      "stop",
+      "compensation",
+      "undo",
+      "rollback",
+      "rewind"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "signal-end-event",
+     "display_name": "Signal end event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "B91E2DF1-2D95-888C-84E9-7D80D944AB5C",
+     "slug": "signal-end-event",
+     "description": "This path of the process ends and broadcasts a signal.",
+     "keywords": [
+      "bpmn",
+      "end",
+      "event",
+      "finish",
+      "stop",
+      "signal",
+      "broadcast",
+      "triangle"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "terminate-end-event",
+     "display_name": "Terminate end event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "79C08739-80FE-8382-9D95-3BCBBE330DAA",
+     "slug": "terminate-end-event",
+     "description": "This path of the process ends and stops every other path of the process at once.",
+     "keywords": [
+      "bpmn",
+      "end",
+      "event",
+      "finish",
+      "stop",
+      "terminate",
+      "kill"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "multiple-end-event",
+     "display_name": "Multiple end event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "7C4B1FC1-3297-88DE-AC8C-815C52D0BA38",
+     "slug": "multiple-end-event",
+     "description": "This path of the process ends and sends several things at once.",
+     "keywords": [
+      "bpmn",
+      "end",
+      "event",
+      "finish",
+      "stop",
+      "multiple",
+      "pentagon",
+      "several"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "escalation-end-event",
+     "display_name": "Escalation end event",
+     "default_width": 40.625,
+     "default_height": 41.125,
+     "published_item_id": "7D33C137-98E8-8975-9703-907D52874CBE",
+     "slug": "escalation-end-event",
+     "description": "This path of the process ends and raises an escalation.",
+     "keywords": [
+      "bpmn",
+      "end",
+      "event",
+      "finish",
+      "stop",
+      "escalation",
+      "escalate"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "exclusive-gateway",
+     "display_name": "Exclusive gateway",
+     "default_width": 55,
+     "default_height": 55,
+     "published_item_id": "70D79B95-5659-8B72-A415-2D8C12FA2309",
+     "slug": "exclusive-gateway",
+     "description": "A decision: the flow takes exactly one of the paths leaving it.",
+     "keywords": [
+      "bpmn",
+      "gateway",
+      "exclusive",
+      "xor",
+      "decision",
+      "either",
+      "choice"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "event-based-gateway",
+     "display_name": "Event-based gateway",
+     "default_width": 55,
+     "default_height": 55,
+     "published_item_id": "1571192D-A95B-8D25-B8F1-E861AECF1325",
+     "slug": "event-based-gateway",
+     "description": "The flow takes whichever path's event happens first.",
+     "keywords": [
+      "bpmn",
+      "gateway",
+      "event-based",
+      "race",
+      "first event",
+      "wait"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "event-based-gateway-instantiate",
+     "display_name": "Event-based gateway, instantiating",
+     "default_width": 55,
+     "default_height": 55,
+     "published_item_id": "CBF42DDB-E65D-83F4-9CC6-B76A4E32540F",
+     "slug": "event-based-gateway-instantiate",
+     "description": "Starts a new process when the first of several events happens.",
+     "keywords": [
+      "bpmn",
+      "gateway",
+      "event-based",
+      "instantiate",
+      "start"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "inclusive-gateway",
+     "display_name": "Inclusive gateway",
+     "default_width": 55,
+     "default_height": 55,
+     "published_item_id": "D64A5C31-74D6-86EA-8CEF-E33EBAD41F2A",
+     "slug": "inclusive-gateway",
+     "description": "The flow takes every path whose condition is true, one or more.",
+     "keywords": [
+      "bpmn",
+      "gateway",
+      "inclusive",
+      "or",
+      "one or more"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "parallel-gateway",
+     "display_name": "Parallel gateway",
+     "default_width": 55,
+     "default_height": 55,
+     "published_item_id": "A9473EF5-7FEB-8E11-8888-A583503F475E",
+     "slug": "parallel-gateway",
+     "description": "The flow splits to follow every path at once, or waits for all of them to arrive.",
+     "keywords": [
+      "bpmn",
+      "gateway",
+      "parallel",
+      "and",
+      "fork",
+      "join",
+      "split"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "parallel-event-based-gateway-instantiate",
+     "display_name": "Parallel event-based gateway, instantiating",
+     "default_width": 55,
+     "default_height": 55,
+     "published_item_id": "6CD666FF-48A6-813C-86F8-94A48E6297AC",
+     "slug": "parallel-event-based-gateway-instantiate",
+     "description": "Starts a new process once all of several events have happened.",
+     "keywords": [
+      "bpmn",
+      "gateway",
+      "parallel",
+      "event-based",
+      "instantiate",
+      "start"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "complex-gateway",
+     "display_name": "Complex gateway",
+     "default_width": 55,
+     "default_height": 55,
+     "published_item_id": "10ED0D1F-2281-8F1E-A293-0950466F64A1",
+     "slug": "complex-gateway",
+     "description": "A split or join with a rule of its own, explained in a note.",
+     "keywords": [
+      "bpmn",
+      "gateway",
+      "complex",
+      "asterisk",
+      "custom rule"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "service-task",
+     "display_name": "Service task",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "01244910-6DE1-89CE-9C84-830C85D6C27A",
+     "slug": "service-task",
+     "description": "Work done by a system or service, with nobody involved.",
+     "keywords": [
+      "bpmn",
+      "task",
+      "service",
+      "system",
+      "automatic",
+      "gear",
+      "api"
+     ],
+     "text_region": {
+      "height": 0.52,
+      "width": 0.86,
+      "x": 0.07,
+      "y": 0.26
+     }
+    },
+    {
+     "item_id": "receive-task",
+     "display_name": "Receive task",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "70371251-12A5-8F4E-B267-E986CD9BE811",
+     "slug": "receive-task",
+     "description": "The process waits here for a message to arrive.",
+     "keywords": [
+      "bpmn",
+      "task",
+      "receive",
+      "message",
+      "wait",
+      "envelope"
+     ],
+     "text_region": {
+      "height": 0.52,
+      "width": 0.86,
+      "x": 0.07,
+      "y": 0.26
+     }
+    },
+    {
+     "item_id": "send-task",
+     "display_name": "Send task",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "BAB29B84-9C6A-8294-AE58-639D729B31E8",
+     "slug": "send-task",
+     "description": "The process sends a message.",
+     "keywords": [
+      "bpmn",
+      "task",
+      "send",
+      "message",
+      "notify",
+      "envelope"
+     ],
+     "text_region": {
+      "height": 0.52,
+      "width": 0.86,
+      "x": 0.07,
+      "y": 0.26
+     }
+    },
+    {
+     "item_id": "user-task",
+     "display_name": "User task",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "0267868F-DE43-8C1D-8353-207C935A22A1",
+     "slug": "user-task",
+     "description": "Work a person does with the help of software, such as filling in a form.",
+     "keywords": [
+      "bpmn",
+      "task",
+      "user",
+      "person",
+      "human",
+      "form"
+     ],
+     "text_region": {
+      "height": 0.52,
+      "width": 0.86,
+      "x": 0.07,
+      "y": 0.26
+     }
+    },
+    {
+     "item_id": "script-task",
+     "display_name": "Script task",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "A23D7F4E-8EA4-8861-84B0-5DC1BF1894FD",
+     "slug": "script-task",
+     "description": "A script the process engine runs itself.",
+     "keywords": [
+      "bpmn",
+      "task",
+      "script",
+      "code",
+      "automatic"
+     ],
+     "text_region": {
+      "height": 0.52,
+      "width": 0.86,
+      "x": 0.07,
+      "y": 0.26
+     }
+    },
+    {
+     "item_id": "manual-task",
+     "display_name": "Manual task",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "0DD6FA0B-FC07-80A6-8C60-2CA94E10BA86",
+     "slug": "manual-task",
+     "description": "Work a person does by hand, without any system.",
+     "keywords": [
+      "bpmn",
+      "task",
+      "manual",
+      "hand",
+      "person",
+      "offline"
+     ],
+     "text_region": {
+      "height": 0.52,
+      "width": 0.86,
+      "x": 0.07,
+      "y": 0.26
+     }
+    },
+    {
+     "item_id": "instantiating-receive-task",
+     "display_name": "Receive task, instantiating",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "CA14D941-DB28-899B-A7B0-F655B7F931F1",
+     "slug": "instantiating-receive-task",
+     "description": "A message arriving here starts a new process.",
+     "keywords": [
+      "bpmn",
+      "task",
+      "receive",
+      "instantiate",
+      "start",
+      "message"
+     ],
+     "text_region": {
+      "height": 0.52,
+      "width": 0.86,
+      "x": 0.07,
+      "y": 0.26
+     }
+    },
+    {
+     "item_id": "business-rule-task",
+     "display_name": "Business rule task",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "BDECE620-4122-899F-9975-94210988775F",
+     "slug": "business-rule-task",
+     "description": "A decision worked out from a set of business rules.",
+     "keywords": [
+      "bpmn",
+      "task",
+      "business rule",
+      "decision",
+      "rules",
+      "table",
+      "dmn"
+     ],
+     "text_region": {
+      "height": 0.52,
+      "width": 0.86,
+      "x": 0.07,
+      "y": 0.26
+     }
+    },
+    {
+     "item_id": "collapsed-sub-process",
+     "display_name": "Collapsed sub-process",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "ACE4C4B7-E4B5-8EEC-889E-95F35980D143",
+     "slug": "collapsed-sub-process",
+     "description": "A step that is a whole process in itself, folded shut. Its detail is drawn elsewhere.",
+     "keywords": [
+      "bpmn",
+      "sub-process",
+      "subprocess",
+      "collapsed",
+      "plus",
+      "nested"
+     ],
+     "text_region": {
+      "height": 0.58,
+      "width": 0.86,
+      "x": 0.07,
+      "y": 0.1
+     }
+    },
+    {
+     "item_id": "call-activity",
+     "display_name": "Call activity",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "E45198F4-7451-8813-875C-78495319CC5B",
+     "slug": "call-activity",
+     "description": "A step that calls a process defined somewhere else, so it can be reused.",
+     "keywords": [
+      "bpmn",
+      "call activity",
+      "reusable",
+      "global",
+      "thick border",
+      "sub-process"
+     ],
+     "text_region": {
+      "height": 0.76,
+      "width": 0.84,
+      "x": 0.08,
+      "y": 0.12
+     }
+    },
+    {
+     "item_id": "event-sub-process",
+     "display_name": "Event sub-process",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "85D0B98C-0455-830C-A871-52CBD111CB3A",
+     "slug": "event-sub-process",
+     "description": "A sub-process that is started by an event and not by the flow reaching it.",
+     "keywords": [
+      "bpmn",
+      "event sub-process",
+      "dotted",
+      "handler",
+      "sub-process"
+     ],
+     "text_region": {
+      "height": 0.8,
+      "width": 0.88,
+      "x": 0.06,
+      "y": 0.1
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "transaction",
+     "display_name": "Transaction",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "DD402FAB-9EFC-8FB6-9BC5-75893E95305F",
+     "slug": "transaction",
+     "description": "A sub-process that either finishes as a whole or is undone as a whole.",
+     "keywords": [
+      "bpmn",
+      "transaction",
+      "double border",
+      "all or nothing",
+      "sub-process"
+     ],
+     "text_region": {
+      "height": 0.72,
+      "width": 0.82,
+      "x": 0.09,
+      "y": 0.14
+     }
+    },
+    {
+     "item_id": "loop-mark",
+     "display_name": "Loop",
+     "default_width": 15,
+     "default_height": 16,
+     "published_item_id": "A492077E-24F1-8B5C-9265-ECD3D86ABD7D",
+     "slug": "loop-mark",
+     "description": "Placed at the bottom of a task: the task repeats until a condition is met.",
+     "keywords": [
+      "bpmn",
+      "loop",
+      "repeat",
+      "mark",
+      "marker",
+      "standard loop"
+     ],
+     "connection_points": []
+    },
+    {
+     "item_id": "multi-instance-parallel-mark",
+     "display_name": "Multi-instance, parallel",
+     "default_width": 14,
+     "default_height": 17,
+     "published_item_id": "AD8FCC95-246B-896C-8289-72DDC984B736",
+     "slug": "multi-instance-parallel-mark",
+     "description": "Placed at the bottom of a task: the task is done several times at once, once for each item.",
+     "keywords": [
+      "bpmn",
+      "multi-instance",
+      "parallel",
+      "mark",
+      "marker",
+      "three bars",
+      "for each"
+     ],
+     "connection_points": []
+    },
+    {
+     "item_id": "multi-instance-sequential-mark",
+     "display_name": "Multi-instance, sequential",
+     "default_width": 17,
+     "default_height": 14,
+     "published_item_id": "479713D8-C2CC-8702-B0FB-8A52BAFE733E",
+     "slug": "multi-instance-sequential-mark",
+     "description": "Placed at the bottom of a task: the task is done several times, one after another, once for each item.",
+     "keywords": [
+      "bpmn",
+      "multi-instance",
+      "sequential",
+      "mark",
+      "marker",
+      "three bars",
+      "for each"
+     ],
+     "connection_points": []
+    },
+    {
+     "item_id": "compensation-mark",
+     "display_name": "Compensation",
+     "default_width": 16.875,
+     "default_height": 13.25,
+     "published_item_id": "8C8ABDC7-90F5-80EA-859B-E065B5D59112",
+     "slug": "compensation-mark",
+     "description": "Placed at the bottom of a task: the task undoes work done earlier.",
+     "keywords": [
+      "bpmn",
+      "compensation",
+      "undo",
+      "mark",
+      "marker",
+      "rewind"
+     ],
+     "connection_points": []
+    },
+    {
+     "item_id": "ad-hoc-mark",
+     "display_name": "Ad hoc",
+     "default_width": 18,
+     "default_height": 10,
+     "published_item_id": "ECF6A62C-72CF-8C28-AB92-FAAE88599C8C",
+     "slug": "ad-hoc-mark",
+     "description": "Placed at the bottom of a sub-process: its steps can be done in any order.",
+     "keywords": [
+      "bpmn",
+      "ad hoc",
+      "tilde",
+      "mark",
+      "marker",
+      "any order"
+     ],
+     "connection_points": []
+    },
+    {
+     "item_id": "sub-process-mark",
+     "display_name": "Sub-process",
+     "default_width": 17.125,
+     "default_height": 17.125,
+     "published_item_id": "65BB9A8B-9E56-86B2-B463-C7E1EC3865C9",
+     "slug": "sub-process-mark",
+     "description": "Placed at the bottom of a task to show it is a sub-process folded shut.",
+     "keywords": [
+      "bpmn",
+      "sub-process",
+      "plus",
+      "mark",
+      "marker",
+      "collapsed"
+     ],
+     "connection_points": []
+    },
+    {
+     "item_id": "data-object",
+     "display_name": "Data object",
+     "default_width": 39.75,
+     "default_height": 49.375,
+     "published_item_id": "5BFFF0FE-A682-8846-98B6-2A3F78C70F69",
+     "slug": "data-object",
+     "description": "A piece of information the process uses or produces, such as an order or a report.",
+     "keywords": [
+      "bpmn",
+      "data object",
+      "document",
+      "information",
+      "file",
+      "page"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "data-object-collection",
+     "display_name": "Data object, collection",
+     "default_width": 39.75,
+     "default_height": 49.375,
+     "published_item_id": "F765A9E1-6D33-8554-83D9-D662C35EC12A",
+     "slug": "data-object-collection",
+     "description": "A set of the same kind of information, such as a list of orders.",
+     "keywords": [
+      "bpmn",
+      "data object",
+      "collection",
+      "list",
+      "set",
+      "several"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "data-store",
+     "display_name": "Data store",
+     "default_width": 49.25,
+     "default_height": 50.875,
+     "published_item_id": "B2BD69AC-B70C-8B46-806B-8F4B04173846",
+     "slug": "data-store",
+     "description": "Somewhere information is kept beyond the life of the process, such as a database.",
+     "keywords": [
+      "bpmn",
+      "data store",
+      "database",
+      "storage",
+      "repository",
+      "drum"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "message",
+     "display_name": "Message",
+     "default_width": 45.25,
+     "default_height": 32.5,
+     "published_item_id": "12CFB33C-B817-8FFF-817B-DA65F5DD99BA",
+     "slug": "message",
+     "description": "A message passed between two participants. This one starts the conversation.",
+     "keywords": [
+      "bpmn",
+      "message",
+      "envelope",
+      "initiating",
+      "communication"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "message-non-initiating",
+     "display_name": "Message, non-initiating",
+     "default_width": 45.25,
+     "default_height": 32.5,
+     "published_item_id": "26412F3E-3C69-82F4-BDF4-DC899082D722",
+     "slug": "message-non-initiating",
+     "description": "A message sent in reply to an earlier one.",
+     "keywords": [
+      "bpmn",
+      "message",
+      "envelope",
+      "reply",
+      "non-initiating",
+      "response",
+      "shaded"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1,
+      "x": 0,
+      "y": 0
+     },
+     "text_position": "below"
+    },
+    {
+     "item_id": "text-annotation",
+     "display_name": "Text annotation",
+     "default_width": 100,
+     "default_height": 54,
+     "published_item_id": "AE05760C-6D7D-85F4-9910-C876C2473346",
+     "slug": "text-annotation",
+     "description": "A note for the reader. Its text sits to the right of the bracket.",
+     "keywords": [
+      "bpmn",
+      "annotation",
+      "note",
+      "comment",
+      "bracket",
+      "text"
+     ],
+     "text_region": {
+      "height": 0.88,
+      "width": 0.83,
+      "x": 0.15,
+      "y": 0.06
+     }
+    },
+    {
+     "item_id": "group",
+     "display_name": "Group",
+     "default_width": 101.75,
+     "default_height": 67.25,
+     "published_item_id": "5D841F2F-ACCE-848B-A669-55F08281D47D",
+     "slug": "group",
+     "description": "A frame that gathers shapes for the reader. It changes nothing about how the process runs.",
+     "keywords": [
+      "bpmn",
+      "group",
+      "frame",
+      "category",
+      "dash dot",
+      "box"
+     ],
+     "text_region": {
+      "height": 0.24,
+      "width": 0.9,
+      "x": 0.05,
+      "y": 0.04
+     }
     }
    ]
   }

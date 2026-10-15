@@ -92,6 +92,22 @@ class CatalogueConnectionPoint(CatalogueModel):
     y: float = Field(ge=0, le=1)
 
 
+class CatalogueTextRegion(CatalogueModel):
+    """Where a shape's label is laid out, as fractions of its frame, inside it."""
+
+    x: float = Field(ge=0, le=1)
+    y: float = Field(ge=0, le=1)
+    width: float = Field(gt=0, le=1)
+    height: float = Field(gt=0, le=1)
+
+    @model_validator(mode="after")
+    def inside_the_frame(self) -> CatalogueTextRegion:
+        """The app refuses a label region that leaves its shape."""
+        if self.x + self.width > 1 or self.y + self.height > 1:
+            raise ValueError("the text region extends beyond the shape")
+        return self
+
+
 class CatalogueShape(CatalogueModel):
     """Search and placement facts for one shape, excluding its artwork."""
 
@@ -114,6 +130,11 @@ class CatalogueShape(CatalogueModel):
         | Annotated[tuple[CatalogueConnectionPoint, ...], Field(max_length=128)]
     )
     reference: CatalogueShapeReference
+    # Where the library puts the label (desktop ADR 0042). Absent means the app's own inset
+    # and the middle. The bundled list carries them for packaged shapes; the website
+    # catalogue may add them later, and is read the same way when it does.
+    text_region: CatalogueTextRegion | None = None
+    text_position: Literal["above", "top", "middle", "bottom", "below"] | None = None
 
     @model_validator(mode="after")
     def unique_connection_points(self) -> CatalogueShape:
@@ -369,6 +390,11 @@ def _bundled_catalogue() -> ShapeLibraryCatalogue:
                     "default_width": shape["default_width"],
                     "default_height": shape["default_height"],
                     "connection_points": shape.get("connection_points", "standard"),
+                    **{
+                        key: shape[key]
+                        for key in ("text_region", "text_position")
+                        if shape.get(key) is not None
+                    },
                     "reference": {
                         "library_id": library["library_id"],
                         "item_id": shape["item_id"],

@@ -23,7 +23,15 @@ libraries share a short name, use the full readable library ID.
 Use `placeable: true` results for generated documents. Packaged shapes keep
 the API's reference unchanged, including case and asset version; the public
 matching UUID is not their placement identifier. The offline fallback records
-427 packaged shapes from desktop 5.0.16, including 83 Biz shapes.
+510 packaged shapes in seven libraries, including 83 Biz shapes and the 83
+shapes of BPMN, which the desktop bundles from the first release after 5.0.16.
+
+The desktop app is the source of truth for the libraries it packages, and the
+website copies them, sometimes later. So a packaged shape's connection points
+and label placement always come from the bundled list made from the app, and a
+packaged library the website does not list yet is still offered from it. Some
+packaged shapes have no connection points at all (BPMN's task marks, which sit
+on a task); the builder refuses a connector to one, naming the shape.
 
 Downloaded shapes are marked discovery only. Desktop 5.0.16 cannot yet resolve
 their UUID references in a document, even if the library is installed. Normal

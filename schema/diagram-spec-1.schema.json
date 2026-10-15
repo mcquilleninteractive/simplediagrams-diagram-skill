@@ -92,7 +92,10 @@
       "oneOrMany",
       "zeroOrMany",
       "filledArrow",
-      "slash"
+      "slash",
+      "circlePlus",
+      "cross",
+      "halfArrow"
      ],
      "title": "Start Ending",
      "type": "string"
@@ -116,7 +119,10 @@
       "oneOrMany",
       "zeroOrMany",
       "filledArrow",
-      "slash"
+      "slash",
+      "circlePlus",
+      "cross",
+      "halfArrow"
      ],
      "title": "End Ending",
      "type": "string"
@@ -307,17 +313,24 @@
      "type": "number"
     },
     "label_position": {
-     "default": "middle",
-     "description": "Use 'below' or 'above' for icons whose artwork would hide a label. A label wider than its shape is then written as a separate caption grouped with the shape.",
-     "enum": [
-      "above",
-      "top",
-      "middle",
-      "bottom",
-      "below"
+     "anyOf": [
+      {
+       "enum": [
+        "above",
+        "top",
+        "middle",
+        "bottom",
+        "below"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
      ],
-     "title": "Label Position",
-     "type": "string"
+     "default": null,
+     "description": "Use 'below' or 'above' for icons whose artwork would hide a label. A label wider than its shape is then written as a separate caption grouped with the shape. Leave it out to use the library's own placement, such as below a BPMN event; a shape whose library says nothing puts its label in the middle.",
+     "title": "Label Position"
     },
     "fill": {
      "anyOf": [

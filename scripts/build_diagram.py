@@ -22,7 +22,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 from sd_package import PackageError, check_package, write_package
-from sd_spec import Catalog, SpecError, compile_spec, lint, load_spec
+from sd_spec import Catalog, SpecError, app_requirements, compile_spec, lint, load_spec
 
 
 def main() -> int:
@@ -67,6 +67,8 @@ def main() -> int:
 
     for finding in findings:
         print(f"{finding.severity:8}{finding.code}: {finding.message}")
+    for need in app_requirements(document):
+        print(f"needs   {need}")
     elements = sum(len(page.elements) for page in document.pages)
     connectors = sum(len(page.connections) for page in document.pages)
     summary = (

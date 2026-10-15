@@ -2,6 +2,8 @@
 
 This describes what the skill writes. The exact statement of it is `scripts/sd_format.py` (Pydantic models) and the generated `schema/simplediagram-document-15.schema.json`; if this page and the models ever disagree, the models are right.
 
+The app itself writes package 17 / schema 16 and reads every version from 1. The skill keeps writing 15 / 14 so its documents open in 5.0.8 and later. The complete structure of a diagram file in every version, including what the skill leaves out, is described in SimpleDiagrams' project documentation (`desktop/diagram-document-structure.md`); this page covers only what the skill writes.
+
 Write a diagram spec and let `build_diagram.py` produce the document. This reference explains the generated package and build diagnostics.
 
 ## What this covers
@@ -108,6 +110,8 @@ A library shape:
 
 All three values must match `assets/built-in-shapes.json` exactly. A reference the app cannot resolve does not stop the document opening: the shape is drawn as a dashed placeholder showing the item name. Nothing reports this at open time, which is why the skill's validator treats it as an error.
 
+A library shape's `connection_points` and `text_layout` are written as its library gives them, which is what the app gives a copy dragged from the Library panel. Most shapes have the standard eight anchors and no layout. A few differ: BPMN's task marks have `"connection_points": []`, its events have a `text_layout` with position `below`, and its tasks have a text area that keeps clear of the picture in their corner.
+
 The app does not size a shape for you. `frame` is always required and the artwork is stretched to it; the natural size in the catalogue is only a starting point.
 
 Text, with every key shown required:
@@ -149,7 +153,7 @@ The eight standard anchors, as fractions of the frame:
 }
 ```
 
-- `points` is the entire route, at least two. There is no routing mode: a right-angled connector is simply points that form right angles. A point of kind `curve` between two others makes a smooth bend through it.
+- `points` is the entire route, at least two. A right-angled connector here is simply points that form right angles. A point of kind `curve` between two others makes a smooth bend through it. Package 16 added connectors that route themselves (`routing: right_angle`); the skill does not write them, because a package 16 document does not open in 5.0.8 to 5.0.14.
 - An attachment binds an end to an anchor on an element of the same page. The app then draws that end at the anchor wherever the shape moves. Still store the anchor's position as the end point.
 - An attachment to an element or anchor that does not exist stops the document opening.
 - Optional: `label` (`{"content": text, "position": 0 to 1, "normal_offset": points}`) and `stroke_texture`.
@@ -170,9 +174,9 @@ The eight standard anchors, as fractions of the frame:
 
 ## Enumerated values
 
-- **Endings**: `none`, `stop`, `arrow`, `solidArrow`, `filledArrow`, `circle`, `solidCircle`, `openDiamond`, `diamond`, `halfCircle`, `slash`, and for data models `crowFoot`, `one`, `oneAndOnlyOne`, `zeroOrOne`, `oneOrMany`, `zeroOrMany`.
+- **Endings**: `none`, `stop`, `arrow`, `solidArrow`, `filledArrow`, `circle`, `solidCircle`, `openDiamond`, `diamond`, `halfCircle`, `slash`, and for data models `crowFoot`, `one`, `oneAndOnlyOne`, `zeroOrOne`, `oneOrMany`, `zeroOrMany`. Since 5.0.11 also `circlePlus`, `cross` and `halfArrow`, with no format change: an earlier app refuses a document that uses one, and the builder says so.
 - **Stroke pattern**: `solid`, `dashed`, `dotted`.
 - **Font weight**: `regular`, `medium`, `bold`. **Alignment**: `leading`, `center`, `trailing`, `justified`.
 - **Label position**: `above`, `top`, `middle`, `bottom`, `below`.
 - **Note style**: `stickyNote`, `indexCard`.
-- **Textures**: `Horizontal`, `Vertical`, `Grid`, `SingleHatch`, `TripleHatch`, `PencilFill`, `PencilThinHoriztonalHatch` (spelt this way in the app), `PencilThinSquareHatch`, `PencilThinCrossHatch`, `PencilThinDiagonalHatch`, `WatercolorFill`, `Grain`, `PencilVerticalHatch`, `PencilTriangleHatch`.
+- **Textures**: `Horizontal`, `Vertical`, `Grid`, `SingleHatch`, `TripleHatch`, `PencilFill`, `PencilThinHoriztonalHatch` (spelt this way in the app), `PencilThinSquareHatch`, `PencilThinCrossHatch`, `PencilThinDiagonalHatch`, `WatercolorFill`, `Grain`, `PencilVerticalHatch`, `PencilTriangleHatch`, `PencilRandomHatch`, `PencilHorizontal`, `Chalk`.
