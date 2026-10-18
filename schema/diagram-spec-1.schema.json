@@ -13,7 +13,7 @@
      "type": "string"
     },
     "target": {
-     "description": "Key of the node the connector arrives at.",
+     "description": "Key of the node the connector arrives at. It may be the source node when source_point and target_point name two different points of it; the connector is then routed around the shape.",
      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
      "title": "Target",
      "type": "string"
@@ -438,6 +438,18 @@
      "minimum": -360,
      "title": "Rotation",
      "type": "number"
+    },
+    "flip_horizontal": {
+     "default": false,
+     "description": "Mirrors the shape's artwork left to right, as a flip in the app does. Its connection points move with the artwork and keep their ids; its label stays readable. A connector attached to a flipped shape needs SimpleDiagrams 5.1.0 or later.",
+     "title": "Flip Horizontal",
+     "type": "boolean"
+    },
+    "flip_vertical": {
+     "default": false,
+     "description": "Mirrors the shape's artwork top to bottom, as flip_horizontal does across.",
+     "title": "Flip Vertical",
+     "type": "boolean"
     }
    },
    "required": [

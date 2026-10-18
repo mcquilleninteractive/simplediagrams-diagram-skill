@@ -1,7 +1,7 @@
 {
  "catalog": "com.simplediagrams.skill.built-in-shapes",
  "catalog_version": 1,
- "source_app_version": "after 5.0.16 (unreleased)",
+ "source_app_version": "5.1.0",
  "note": "Shapes that SimpleDiagrams resolves by reference. A symbol_reference uses library_id, item_id and the library's asset_version exactly as listed.",
  "libraries": [
   {
@@ -20,6 +20,46 @@
      "slug": "square",
      "description": "",
      "keywords": []
+    },
+    {
+     "item_id": "rounded-rectangle",
+     "display_name": "Rounded Rectangle",
+     "default_width": 52,
+     "default_height": 37,
+     "published_item_id": "CD42B241-E873-8961-9047-CA57385FBB11",
+     "slug": "rounded-rectangle",
+     "description": "A box with rounded corners that stay round at any size.",
+     "keywords": [
+      "rounded rectangle",
+      "rounded square",
+      "box",
+      "task",
+      "card",
+      "flowchart",
+      "state",
+      "action",
+      "uml"
+     ],
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "pill",
+     "display_name": "Pill",
+     "default_width": 52.25,
+     "default_height": 27.75,
+     "published_item_id": "7036EB95-F503-8F42-935D-A80A8281CC11",
+     "slug": "pill",
+     "description": "A box with fully rounded ends: the start or end of a flowchart.",
+     "keywords": [
+      "pill",
+      "start",
+      "end",
+      "terminator",
+      "start/end",
+      "stadium",
+      "flowchart"
+     ],
+     "first_release": "5.1.0"
     },
     {
      "item_id": "BoxWithDiagonalCross",
@@ -122,6 +162,39 @@
      "keywords": []
     },
     {
+     "item_id": "subprocess",
+     "display_name": "Subprocess",
+     "default_width": 53,
+     "default_height": 37.25,
+     "published_item_id": "A0814A2E-F06D-8FCD-B70E-32FED116E8C8",
+     "slug": "subprocess",
+     "description": "A box with a bar inside each side: a step described elsewhere.",
+     "keywords": [
+      "subprocess",
+      "predefined process",
+      "subroutine",
+      "box with side bars",
+      "flowchart"
+     ],
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "off-page-reference",
+     "display_name": "Off-Page Reference",
+     "default_width": 42.875,
+     "default_height": 44.75,
+     "published_item_id": "FDCAD310-15F3-8829-B544-28A6E8602E58",
+     "slug": "off-page-reference",
+     "description": "A box with a pointed bottom: the flow continues on another page.",
+     "keywords": [
+      "off-page reference",
+      "off-page connector",
+      "home plate",
+      "flowchart"
+     ],
+     "first_release": "5.1.0"
+    },
+    {
      "item_id": "Triangle",
      "display_name": "Triangle",
      "default_width": 50,
@@ -149,7 +222,10 @@
      "published_item_id": "6ABA6A5F-C1CF-8293-86E1-734F1F2412E9",
      "slug": "circle",
      "description": "",
-     "keywords": []
+     "keywords": [
+      "use case",
+      "uml"
+     ]
     },
     {
      "item_id": "DashCircle",
@@ -179,7 +255,10 @@
      "published_item_id": "28C1924A-033B-8B86-8030-8DD055E4825F",
      "slug": "diamond",
      "description": "",
-     "keywords": []
+     "keywords": [
+      "decision",
+      "uml"
+     ]
     },
     {
      "item_id": "Trapezoid",
@@ -190,6 +269,71 @@
      "slug": "trapezoid",
      "description": "",
      "keywords": []
+    },
+    {
+     "item_id": "parallelogram",
+     "display_name": "Parallelogram",
+     "default_width": 52.875,
+     "default_height": 34.875,
+     "published_item_id": "83506D7A-5574-8718-9D9E-0562FCCDCB7B",
+     "slug": "parallelogram",
+     "description": "A slanted box: data going in or out of a flowchart.",
+     "keywords": [
+      "parallelogram",
+      "data",
+      "input",
+      "output",
+      "i/o",
+      "flowchart"
+     ],
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "pentagon",
+     "display_name": "Pentagon",
+     "default_width": 50.75,
+     "default_height": 49,
+     "published_item_id": "5472866C-33C6-8A51-98D9-353B276C40C4",
+     "slug": "pentagon",
+     "description": "A five-sided shape with a point at the top.",
+     "keywords": [
+      "pentagon",
+      "five sides",
+      "polygon"
+     ],
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "hexagon",
+     "display_name": "Hexagon",
+     "default_width": 51.875,
+     "default_height": 46.25,
+     "published_item_id": "0D471F6C-207F-8249-88AB-FA53AF99B40E",
+     "slug": "hexagon",
+     "description": "A six-sided shape, flat at the top and bottom: preparation in a flowchart.",
+     "keywords": [
+      "hexagon",
+      "six sides",
+      "polygon",
+      "preparation",
+      "flowchart"
+     ],
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "heptagon",
+     "display_name": "Heptagon",
+     "default_width": 51.125,
+     "default_height": 50.5,
+     "published_item_id": "EC8195B3-C582-8E78-B4B7-BA866BFE9700",
+     "slug": "heptagon",
+     "description": "A seven-sided shape with a point at the top.",
+     "keywords": [
+      "heptagon",
+      "seven sides",
+      "polygon"
+     ],
+     "first_release": "5.1.0"
     },
     {
      "item_id": "Octagon",
@@ -209,7 +353,10 @@
      "published_item_id": "350A170B-C2C3-8403-97B3-940868EB327E",
      "slug": "cube",
      "description": "",
-     "keywords": []
+     "keywords": [
+      "node",
+      "uml"
+     ]
     },
     {
      "item_id": "Pyramid",
@@ -229,7 +376,10 @@
      "published_item_id": "D80A971E-FE62-8B0F-8714-8BECF88B1120",
      "slug": "cylinder",
      "description": "",
-     "keywords": []
+     "keywords": [
+      "database",
+      "uml"
+     ]
     },
     {
      "item_id": "OpenSquare",
@@ -510,6 +660,39 @@
      "slug": "star",
      "description": "",
      "keywords": []
+    },
+    {
+     "item_id": "six-point-star",
+     "display_name": "Six-Point Star",
+     "default_width": 46.5,
+     "default_height": 54.25,
+     "published_item_id": "9A6A56E0-2A60-8DC9-8605-E239FE8C2162",
+     "slug": "six-point-star",
+     "description": "A star with six points.",
+     "keywords": [
+      "star",
+      "six-point star",
+      "6-point star",
+      "star 6",
+      "hexagram"
+     ],
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "seven-point-star",
+     "display_name": "Seven-Point Star",
+     "default_width": 49.625,
+     "default_height": 50.625,
+     "published_item_id": "A57C94FA-3407-835A-B6A7-4DD0B65A2A8B",
+     "slug": "seven-point-star",
+     "description": "A star with seven points.",
+     "keywords": [
+      "star",
+      "seven-point star",
+      "7-point star",
+      "star 7"
+     ],
+     "first_release": "5.1.0"
     },
     {
      "item_id": "Insignia",
@@ -6191,12 +6374,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "message-start-event",
@@ -6217,12 +6400,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "timer-start-event",
@@ -6245,12 +6428,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "conditional-start-event",
@@ -6271,12 +6454,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "signal-start-event",
@@ -6297,12 +6480,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "multiple-start-event",
@@ -6323,12 +6506,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "error-start-event",
@@ -6350,12 +6533,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "compensation-start-event",
@@ -6377,12 +6560,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "escalation-start-event",
@@ -6402,12 +6585,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "parallel-multiple-start-event",
@@ -6428,12 +6611,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "message-start-event-non-interrupting",
@@ -6455,12 +6638,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "timer-start-event-non-interrupting",
@@ -6484,12 +6667,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "conditional-start-event-non-interrupting",
@@ -6511,12 +6694,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "signal-start-event-non-interrupting",
@@ -6538,12 +6721,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "multiple-start-event-non-interrupting",
@@ -6565,12 +6748,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "escalation-start-event-non-interrupting",
@@ -6591,12 +6774,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "parallel-multiple-start-event-non-interrupting",
@@ -6618,12 +6801,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "intermediate-event",
@@ -6643,12 +6826,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "message-intermediate-catch-event",
@@ -6671,12 +6854,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "timer-intermediate-catch-event",
@@ -6701,12 +6884,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "error-intermediate-catch-event",
@@ -6730,12 +6913,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "cancel-intermediate-catch-event",
@@ -6757,12 +6940,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "compensation-intermediate-catch-event",
@@ -6786,12 +6969,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "conditional-intermediate-catch-event",
@@ -6814,12 +6997,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "link-intermediate-catch-event",
@@ -6843,12 +7026,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "signal-intermediate-catch-event",
@@ -6871,12 +7054,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "multiple-intermediate-catch-event",
@@ -6899,12 +7082,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "escalation-intermediate-catch-event",
@@ -6926,12 +7109,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "parallel-multiple-intermediate-catch-event",
@@ -6954,12 +7137,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "message-intermediate-catch-event-non-interrupting",
@@ -6982,12 +7165,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "timer-intermediate-catch-event-non-interrupting",
@@ -7012,12 +7195,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "conditional-intermediate-catch-event-non-interrupting",
@@ -7040,12 +7223,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "signal-intermediate-catch-event-non-interrupting",
@@ -7068,12 +7251,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "multiple-intermediate-catch-event-non-interrupting",
@@ -7096,12 +7279,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "escalation-intermediate-catch-event-non-interrupting",
@@ -7123,12 +7306,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "parallel-multiple-intermediate-catch-event-non-interrupting",
@@ -7151,12 +7334,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "message-intermediate-throw-event",
@@ -7178,12 +7361,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "compensation-intermediate-throw-event",
@@ -7206,12 +7389,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "link-intermediate-throw-event",
@@ -7234,12 +7417,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "signal-intermediate-throw-event",
@@ -7261,12 +7444,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "multiple-intermediate-throw-event",
@@ -7288,12 +7471,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "escalation-intermediate-throw-event",
@@ -7314,12 +7497,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "end-event",
@@ -7338,12 +7521,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "message-end-event",
@@ -7365,12 +7548,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "error-end-event",
@@ -7393,12 +7576,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "cancel-end-event",
@@ -7419,12 +7602,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "compensation-end-event",
@@ -7447,12 +7630,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "signal-end-event",
@@ -7474,12 +7657,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "terminate-end-event",
@@ -7500,12 +7683,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "multiple-end-event",
@@ -7527,12 +7710,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "escalation-end-event",
@@ -7553,12 +7736,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.954,
+      "x": -0.977,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "exclusive-gateway",
@@ -7579,12 +7762,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.182,
+      "x": -0.591,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "event-based-gateway",
@@ -7604,12 +7787,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.182,
+      "x": -0.591,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "event-based-gateway-instantiate",
@@ -7628,12 +7811,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.182,
+      "x": -0.591,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "inclusive-gateway",
@@ -7652,12 +7835,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.182,
+      "x": -0.591,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "parallel-gateway",
@@ -7678,12 +7861,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.182,
+      "x": -0.591,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "parallel-event-based-gateway-instantiate",
@@ -7703,12 +7886,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.182,
+      "x": -0.591,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "complex-gateway",
@@ -7727,12 +7910,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.182,
+      "x": -0.591,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "service-task",
@@ -7757,7 +7940,7 @@
       "x": 0.07,
       "y": 0.26
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "receive-task",
@@ -7781,7 +7964,7 @@
       "x": 0.07,
       "y": 0.26
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "send-task",
@@ -7805,7 +7988,7 @@
       "x": 0.07,
       "y": 0.26
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "user-task",
@@ -7829,7 +8012,7 @@
       "x": 0.07,
       "y": 0.26
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "script-task",
@@ -7852,7 +8035,7 @@
       "x": 0.07,
       "y": 0.26
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "manual-task",
@@ -7876,7 +8059,7 @@
       "x": 0.07,
       "y": 0.26
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "instantiating-receive-task",
@@ -7900,7 +8083,7 @@
       "x": 0.07,
       "y": 0.26
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "business-rule-task",
@@ -7925,7 +8108,7 @@
       "x": 0.07,
       "y": 0.26
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "collapsed-sub-process",
@@ -7949,7 +8132,7 @@
       "x": 0.07,
       "y": 0.1
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "call-activity",
@@ -7973,7 +8156,7 @@
       "x": 0.08,
       "y": 0.12
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "event-sub-process",
@@ -7996,8 +8179,7 @@
       "x": 0.06,
       "y": 0.1
      },
-     "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "transaction",
@@ -8020,7 +8202,7 @@
       "x": 0.09,
       "y": 0.14
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "loop-mark",
@@ -8039,7 +8221,7 @@
       "standard loop"
      ],
      "connection_points": [],
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "multi-instance-parallel-mark",
@@ -8059,7 +8241,7 @@
       "for each"
      ],
      "connection_points": [],
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "multi-instance-sequential-mark",
@@ -8079,7 +8261,7 @@
       "for each"
      ],
      "connection_points": [],
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "compensation-mark",
@@ -8098,7 +8280,7 @@
       "rewind"
      ],
      "connection_points": [],
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "ad-hoc-mark",
@@ -8117,7 +8299,7 @@
       "any order"
      ],
      "connection_points": [],
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "sub-process-mark",
@@ -8136,7 +8318,7 @@
       "collapsed"
      ],
      "connection_points": [],
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "data-object",
@@ -8156,12 +8338,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 3.018,
+      "x": -1.009,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "data-object-collection",
@@ -8181,12 +8363,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 3.018,
+      "x": -1.009,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "data-input",
@@ -8206,12 +8388,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 3.018,
+      "x": -1.009,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "data-input-collection",
@@ -8231,12 +8413,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 3.018,
+      "x": -1.009,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "data-output",
@@ -8256,12 +8438,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 3.018,
+      "x": -1.009,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "data-output-collection",
@@ -8281,12 +8463,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 3.018,
+      "x": -1.009,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "data-store",
@@ -8306,12 +8488,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.436,
+      "x": -0.718,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "message",
@@ -8330,12 +8512,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.652,
+      "x": -0.826,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "message-non-initiating",
@@ -8356,12 +8538,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.652,
+      "x": -0.826,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "conversation",
@@ -8381,12 +8563,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.666,
+      "x": -0.833,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "call-conversation",
@@ -8406,12 +8588,12 @@
      ],
      "text_region": {
       "height": 1,
-      "width": 1,
-      "x": 0,
+      "width": 2.666,
+      "x": -0.833,
       "y": 0
      },
      "text_position": "below",
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "text-annotation",
@@ -8435,7 +8617,7 @@
       "x": 0.15,
       "y": 0.06
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
     },
     {
      "item_id": "group",
@@ -8459,7 +8641,432 @@
       "x": 0.05,
       "y": 0.04
      },
-     "first_release": "after 5.0.16 (unreleased)"
+     "first_release": "5.1.0"
+    }
+   ]
+  },
+  {
+   "library_id": "com.simplediagrams.shapeLibrary.uml",
+   "short_name": "uml",
+   "display_name": "UML",
+   "asset_version": 1,
+   "published_library_id": "760C7825-B829-8C82-B2A1-61F366A41E72",
+   "shapes": [
+    {
+     "item_id": "actor",
+     "display_name": "Actor",
+     "default_width": 29,
+     "default_height": 53,
+     "published_item_id": "EF442003-BBA6-8A7B-B12B-6192977CD176",
+     "slug": "actor",
+     "description": "Someone or something outside the system that uses it: a person, another system or a device. Lines join it to the use cases it takes part in. Its name goes under the figure.",
+     "keywords": [
+      "uml",
+      "actor",
+      "user",
+      "person",
+      "role",
+      "stick figure",
+      "use case"
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 4.138,
+      "x": -1.569,
+      "y": 0
+     },
+     "text_position": "below",
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "initial-node",
+     "display_name": "Initial node",
+     "default_width": 27.25,
+     "default_height": 26.875,
+     "published_item_id": "08245384-598B-8080-BE51-9A1FE2BBD3AA",
+     "slug": "initial-node",
+     "description": "Where an activity or a state machine starts, with one arrow leaving it.",
+     "keywords": [
+      "uml",
+      "initial node",
+      "initial state",
+      "start",
+      "begin",
+      "dot",
+      "activity",
+      "state machine"
+     ],
+     "connection_points": [
+      {
+       "id": 0,
+       "x": 0.095766,
+       "y": 0.497149
+      },
+      {
+       "id": 1,
+       "x": 0.906073,
+       "y": 0.497149
+      },
+      {
+       "id": 2,
+       "x": 0.501844,
+       "y": 0.092958
+      },
+      {
+       "id": 3,
+       "x": 0.501844,
+       "y": 0.903606
+      },
+      {
+       "id": 4,
+       "x": 0.216254,
+       "y": 0.207573
+      },
+      {
+       "id": 5,
+       "x": 0.216737,
+       "y": 0.786234
+      },
+      {
+       "id": 6,
+       "x": 0.787372,
+       "y": 0.207637
+      },
+      {
+       "id": 7,
+       "x": 0.788026,
+       "y": 0.787323
+      }
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 4.404,
+      "x": -1.702,
+      "y": 0
+     },
+     "text_position": "below",
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "final-node",
+     "display_name": "Final node",
+     "default_width": 32.75,
+     "default_height": 33.125,
+     "published_item_id": "7A7539DA-F5B3-89F1-ADAE-D719162A5342",
+     "slug": "final-node",
+     "description": "Where the whole activity ends: when the flow reaches it, every other path stops too. In a state machine, the final state.",
+     "keywords": [
+      "uml",
+      "final node",
+      "activity final",
+      "final state",
+      "end",
+      "stop",
+      "bullseye"
+     ],
+     "connection_points": [
+      {
+       "id": 0,
+       "x": 0.07757,
+       "y": 0.498167
+      },
+      {
+       "id": 1,
+       "x": 0.921008,
+       "y": 0.498167
+      },
+      {
+       "id": 2,
+       "x": 0.500773,
+       "y": 0.075879
+      },
+      {
+       "id": 3,
+       "x": 0.500773,
+       "y": 0.922438
+      },
+      {
+       "id": 4,
+       "x": 0.197722,
+       "y": 0.198547
+      },
+      {
+       "id": 5,
+       "x": 0.197033,
+       "y": 0.798469
+      },
+      {
+       "id": 6,
+       "x": 0.80631,
+       "y": 0.196089
+      },
+      {
+       "id": 7,
+       "x": 0.806981,
+       "y": 0.800908
+      }
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 3.664,
+      "x": -1.332,
+      "y": 0
+     },
+     "text_position": "below",
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "flow-final",
+     "display_name": "Flow final",
+     "default_width": 32.75,
+     "default_height": 33.125,
+     "published_item_id": "1D33AE7B-DEBD-8995-BFA3-39F141060B8C",
+     "slug": "flow-final",
+     "description": "Where one path of an activity ends while the other paths carry on.",
+     "keywords": [
+      "uml",
+      "flow final",
+      "end",
+      "path ends",
+      "cross",
+      "activity"
+     ],
+     "connection_points": [
+      {
+       "id": 0,
+       "x": 0.07757,
+       "y": 0.498167
+      },
+      {
+       "id": 1,
+       "x": 0.921008,
+       "y": 0.498167
+      },
+      {
+       "id": 2,
+       "x": 0.500773,
+       "y": 0.075879
+      },
+      {
+       "id": 3,
+       "x": 0.500773,
+       "y": 0.922438
+      },
+      {
+       "id": 4,
+       "x": 0.197722,
+       "y": 0.198547
+      },
+      {
+       "id": 5,
+       "x": 0.197033,
+       "y": 0.798469
+      },
+      {
+       "id": 6,
+       "x": 0.80631,
+       "y": 0.196089
+      },
+      {
+       "id": 7,
+       "x": 0.806981,
+       "y": 0.800908
+      }
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 3.664,
+      "x": -1.332,
+      "y": 0
+     },
+     "text_position": "below",
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "terminate",
+     "display_name": "Terminate",
+     "default_width": 29,
+     "default_height": 29,
+     "published_item_id": "E3F852EB-3395-8983-B56C-988BA073235B",
+     "slug": "terminate",
+     "description": "Terminate: ends the whole state machine. To end a lifeline in a sequence diagram, right-click the lifeline and choose Ends in Destroy Mark.",
+     "keywords": [
+      "uml",
+      "terminate",
+      "state machine",
+      "state",
+      "x",
+      "cross",
+      "end"
+     ],
+     "connection_points": [
+      {
+       "id": 0,
+       "x": 0.086207,
+       "y": 0.086207
+      },
+      {
+       "id": 1,
+       "x": 0.086207,
+       "y": 0.913793
+      },
+      {
+       "id": 2,
+       "x": 0.913793,
+       "y": 0.086207
+      },
+      {
+       "id": 3,
+       "x": 0.913793,
+       "y": 0.913793
+      }
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 4.138,
+      "x": -1.569,
+      "y": 0
+     },
+     "text_position": "below",
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "fork-join-bar",
+     "display_name": "Fork / join bar",
+     "default_width": 64.125,
+     "default_height": 5.25,
+     "published_item_id": "F25B9C71-BC0C-81D6-96EF-197666AB0CB3",
+     "slug": "fork-join-bar",
+     "description": "A fork splits one flow into several that run at the same time; a join waits for all of them and joins them into one again. Turn it upright for a flow that runs across the page.",
+     "keywords": [
+      "uml",
+      "fork",
+      "join",
+      "bar",
+      "parallel",
+      "split",
+      "synchronise",
+      "synchronize",
+      "concurrent"
+     ],
+     "connection_points": [
+      {
+       "id": 0,
+       "x": 0,
+       "y": 0.5
+      },
+      {
+       "id": 1,
+       "x": 1,
+       "y": 0.5
+      },
+      {
+       "id": 2,
+       "x": 0.5,
+       "y": 0
+      },
+      {
+       "id": 3,
+       "x": 0.5,
+       "y": 1
+      },
+      {
+       "id": 4,
+       "x": 0,
+       "y": 0
+      },
+      {
+       "id": 5,
+       "x": 0,
+       "y": 1
+      },
+      {
+       "id": 6,
+       "x": 1,
+       "y": 0
+      },
+      {
+       "id": 7,
+       "x": 1,
+       "y": 1
+      },
+      {
+       "id": 8,
+       "x": 0.25,
+       "y": 0
+      },
+      {
+       "id": 9,
+       "x": 0.75,
+       "y": 0
+      },
+      {
+       "id": 10,
+       "x": 0.25,
+       "y": 1
+      },
+      {
+       "id": 11,
+       "x": 0.75,
+       "y": 1
+      }
+     ],
+     "text_region": {
+      "height": 1,
+      "width": 1.872,
+      "x": -0.436,
+      "y": 0
+     },
+     "text_position": "below",
+     "resizing": "width_only",
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "note",
+     "display_name": "Note",
+     "default_width": 77.5,
+     "default_height": 51.75,
+     "published_item_id": "7FFA58A9-6DC9-8EEE-A11F-C9EFC65F635F",
+     "slug": "note",
+     "description": "A comment for the reader. Join it to the shape it is about with a dashed line.",
+     "keywords": [
+      "uml",
+      "note",
+      "comment",
+      "annotation",
+      "folded corner"
+     ],
+     "text_region": {
+      "height": 0.696,
+      "width": 0.697,
+      "x": 0.102,
+      "y": 0.152
+     },
+     "first_release": "5.1.0"
+    },
+    {
+     "item_id": "package",
+     "display_name": "Package",
+     "default_width": 81.5,
+     "default_height": 59.5,
+     "published_item_id": "E450ACEC-45A3-82A0-BD7D-FF4B46947401",
+     "slug": "package",
+     "description": "A group of related classes or other parts of a system, drawn as a folder. Its name goes in the middle; the shapes it holds can be placed on it instead.",
+     "keywords": [
+      "uml",
+      "package",
+      "folder",
+      "namespace",
+      "module",
+      "group"
+     ],
+     "text_region": {
+      "height": 0.571,
+      "width": 0.81,
+      "x": 0.094,
+      "y": 0.298
+     },
+     "first_release": "5.1.0"
     }
    ]
   }

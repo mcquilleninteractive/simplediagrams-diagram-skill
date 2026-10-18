@@ -209,6 +209,36 @@ def test_invalid_dimensions_are_not_coerced(value: object) -> None:
 
 
 @pytest.mark.parametrize(
+    ("region", "accepted"),
+    [
+        ({"x": 0.1, "y": 0.2, "width": 0.8, "height": 0.6}, True),
+        # Centred and wider, as a shipped library gives the UML Actor's name.
+        ({"x": -1.569, "y": 0, "width": 4.138, "height": 1}, True),
+        ({"x": -0.5, "y": 0, "width": 1.5, "height": 1}, False),
+        ({"x": 0.5, "y": 0, "width": 0.8, "height": 1}, False),
+        ({"x": 0, "y": 0.5, "width": 1, "height": 0.8}, False),
+        ({"x": -4, "y": 0, "width": 9, "height": 1}, False),
+        # The widest centred region the app allows, and one that runs below the shape.
+        ({"x": -3.5, "y": 0, "width": 8, "height": 1}, True),
+        ({"x": -1, "y": 0.5, "width": 3, "height": 0.8}, False),
+    ],
+)
+def test_label_regions_take_the_apps_two_forms(region: dict[str, float], accepted: bool) -> None:
+    """The app accepts a label region inside its shape, or one centred on it and wider for
+    a name below a narrow shape. Refusing that second form would
+    reject the whole catalogue once the website lists the 5.1.0 libraries, and accepting any
+    other form would let a region through that the app refuses."""
+    document = _document()
+    document["libraries"][0]["shapes"][0] |= {"text_region": region, "text_position": "below"}
+    payload = json.dumps(document)
+    if accepted:
+        catalog.ShapeLibraryCatalogue.model_validate_json(payload)
+    else:
+        with pytest.raises(ValidationError):
+            catalog.ShapeLibraryCatalogue.model_validate_json(payload)
+
+
+@pytest.mark.parametrize(
     "mutation",
     [
         "library_uuid",

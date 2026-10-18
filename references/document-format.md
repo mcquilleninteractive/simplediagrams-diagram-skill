@@ -2,7 +2,7 @@
 
 This describes what the skill writes. The exact statement of it is `scripts/sd_format.py` (Pydantic models) and the generated `schema/simplediagram-document-15.schema.json`; if this page and the models ever disagree, the models are right.
 
-Released SimpleDiagrams 5.0.16 writes package 17 / schema 16, and development builds after it write 18 / 17; the app reads every version from 1. The skill keeps writing 15 / 14 so its documents open in 5.0.8 and later. A document that uses a shape from a downloadable library is written at 16 / 15 instead, because only that format can name the library (see [Package 16](#package-16-the-libraries-a-document-needs)); it opens in 5.0.16 and later. This page covers only what the skill writes.
+SimpleDiagrams 5.0.16 writes package 17 / schema 16, and 5.1.0 writes 18 / 17; the app reads every version from 1. The skill keeps writing 15 / 14 so its documents open in 5.0.8 and later. A document that uses a shape from a downloadable library is written at 16 / 15 instead, because only that format can name the library (see [Package 16](#package-16-the-libraries-a-document-needs)); it opens in 5.0.16 and later. This page covers only what the skill writes.
 
 Write a diagram spec and let `build_diagram.py` produce the document. This reference explains the generated package and build diagnostics.
 
@@ -51,7 +51,7 @@ A shape from a downloadable library is a `symbol` whose `symbol_reference` holds
 - `minimum_revision` is optional (1 to 1,000,000). The skill leaves it out: the catalogue gives a library's current revision, which is not necessarily the lowest that holds the shapes.
 - At most 64 entries, no library twice (ignoring case).
 
-The list is advisory to the app: it names the library to a person who lacks it, and nothing is drawn or refused because of it. These are the app's own rules, so a list written here is never trimmed when it is read (desktop ADR 0039).
+The list is advisory to the app: from 5.1.0 it names the library to a person who lacks it (5.0.16 reads the list but shows nothing), and nothing is drawn or refused because of it. These are the app's own rules, so a list written here is never trimmed when it is read.
 
 ## Shape of `document.json`
 
@@ -126,7 +126,7 @@ A library shape:
 "symbol_reference": {"library_id": "com.simplediagrams.shapeLibrary.basic", "item_id": "Cylinder", "asset_version": 1}
 ```
 
-All three values must match a catalogue shape exactly: a packaged shape's are the app's own names, as in `assets/built-in-shapes.json`, and a downloadable shape's are its published UUIDs, as in the API. A reference the app cannot resolve does not stop the document opening: the shape is drawn as a dashed placeholder showing the item name. For a downloadable library named in `required_libraries`, the app says which library is missing and links to its page. Nothing reports a mistyped reference, which is why the skill's validator treats a reference in neither catalogue as an error.
+All three values must match a catalogue shape exactly: a packaged shape's are the app's own names, as in `assets/built-in-shapes.json`, and a downloadable shape's are its published UUIDs, as in the API. A reference the app cannot resolve does not stop the document opening: the shape is drawn as a dashed placeholder showing the item name. For a downloadable library named in `required_libraries`, SimpleDiagrams 5.1.0 and later say which library is missing and link to its page. Nothing reports a mistyped reference, which is why the skill's validator treats a reference in neither catalogue as an error.
 
 A library shape's `connection_points` and `text_layout` are written as its library gives them, which is what the app gives a copy dragged from the Library panel. Most shapes have the standard eight anchors and no layout. A few differ: BPMN's task marks have `"connection_points": []`, its events have a `text_layout` with position `below`, and its tasks have a text area that keeps clear of the picture in their corner.
 
@@ -187,6 +187,7 @@ The eight standard anchors, as fractions of the frame:
 - **A key must not appear twice** in one object. The app and most other parsers disagree about which copy wins.
 - **Font family and Quick Style names** may not contain Unicode control or format characters, which includes invisible ones such as the soft hyphen and zero-width space. JSON Schema cannot express this rule, nor the ones about identifiers, attachments, groups and runs; the Pydantic models check them.
 - **A label placed `above` or `below`** is confined to the width of its shape's label region and wraps inside it. For a caption wider than the shape, use a separate `text` element grouped with the shape, which is what the builder does.
+- **A label region starts inside its shape**: `text_layout.frame`'s `x` and `y` lie between 0 and 1. Package 18 lets a region start outside its shape, and SimpleDiagrams refuses a file below package 18 that has one, so the builder narrows a library's wider, centred name region (BPMN events, the UML Actor) to the shape.
 - **Drawing order**: without `drawableOrder`, connectors draw behind shapes and shapes stack by `z_index`. If you write `drawableOrder` it must list every shape and connector on the page exactly once, back to front.
 - **Groups** need at least two members on the same page, each member in only one group, no cycles.
 

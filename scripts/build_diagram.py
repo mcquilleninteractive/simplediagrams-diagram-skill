@@ -48,13 +48,14 @@ def main(argv: list[str] | None = None) -> int:
     if catalog.warning:
         echo(catalog.warning, file=sys.stderr)
     try:
-        document = compile_spec(load_spec(arguments.spec), catalog)
+        spec = load_spec(arguments.spec)
+        document = compile_spec(spec, catalog)
     except (SpecError, ValidationError) as failure:
         for line in str(failure).splitlines():
             echo(f"error   {line}")
         return 1
 
-    findings = lint(document, catalog)
+    findings = lint(document, catalog, spec)
     errors = [finding for finding in findings if finding.severity == "error"]
     written: Path | None = None
     if arguments.output is not None and not errors:

@@ -294,7 +294,7 @@ def test_committed_schemas_match_the_models() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Package 16: the libraries a document needs (desktop ADR 0039)
+# Package 16: the libraries a document needs
 # ---------------------------------------------------------------------------
 
 NOTEBOOK = "79FFE4B7-EA0D-87C3-AE89-D4CD62AF5202"

@@ -89,18 +89,34 @@ class CatalogueConnectionPoint(CatalogueModel):
 
 
 class CatalogueTextRegion(CatalogueModel):
-    """Where a shape's label is laid out, as fractions of its frame, inside it."""
+    """Where a shape's label is laid out, as fractions of its frame.
 
-    x: float = Field(ge=0, le=1)
+    The region lies inside the shape, or is centred on it and wider, starting to its left
+    (`x < 0`, `width = 1 - 2x`): the area a shipped library gives a name below a narrow
+    shape, such as a BPMN event or the UML Actor, since from 5.1.0 the app lets a shipped
+    library centre a name wider than its shape. These are the only two forms the app
+    accepts for a library's label region; the compiler narrows the wider one, because the
+    package the skill writes cannot hold it.
+    """
+
+    # -3.5 is the leftmost start a centred region within the app's widest label (8) can have.
+    x: float = Field(ge=-3.5, le=1)
     y: float = Field(ge=0, le=1)
-    width: float = Field(gt=0, le=1)
+    width: float = Field(gt=0, le=8)
     height: float = Field(gt=0, le=1)
 
     @model_validator(mode="after")
-    def inside_the_frame(self) -> CatalogueTextRegion:
-        """The app refuses a label region that leaves its shape."""
-        if self.x + self.width > 1 or self.y + self.height > 1:
-            raise ValueError("the text region extends beyond the shape")
+    def inside_or_centred_and_wider(self) -> CatalogueTextRegion:
+        """The app refuses a label region of any other form. It allows the wider form only
+        for a name above or below a shape in a library shipped inside the app; that limit
+        is not repeated here, because the compiler narrows every wider region it uses."""
+        if self.y + self.height > 1:
+            raise ValueError("the text region extends below the shape")
+        if self.x >= 0:
+            if self.x + self.width > 1:
+                raise ValueError("the text region extends beyond the shape")
+        elif abs(self.width - (1 - 2 * self.x)) > 1e-9 * max(1, self.width):
+            raise ValueError("a text region left of the shape must be centred on it")
         return self
 
 
@@ -126,9 +142,10 @@ class CatalogueShape(CatalogueModel):
         | Annotated[tuple[CatalogueConnectionPoint, ...], Field(max_length=128)]
     )
     reference: CatalogueShapeReference
-    # Where the library puts the label (desktop ADR 0042). Absent means the app's own inset
-    # and the middle. The bundled list carries them for packaged shapes; the website
-    # catalogue may add them later, and is read the same way when it does.
+    # Where the library puts the label, which the app gives every copy placed from it.
+    # Absent means the app's own inset and the middle. The bundled list carries them for
+    # packaged shapes; the website catalogue may add them later, and is read the same way
+    # when it does.
     text_region: CatalogueTextRegion | None = None
     text_position: Literal["above", "top", "middle", "bottom", "below"] | None = None
 

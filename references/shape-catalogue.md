@@ -31,25 +31,30 @@ case and asset version.
 
 **Packaged shapes** (`packaged: true`) ship inside SimpleDiagrams. Their
 reference uses the app's own names; the public matching UUID is not their
-placement identifier. The offline fallback records 516 packaged shapes in seven
-libraries, including 83 Biz shapes and the 89 shapes of BPMN, which the desktop
-bundles from the first release after 5.0.16.
+placement identifier. The offline fallback records 534 packaged shapes in eight
+libraries, including 83 Biz shapes. The desktop bundles the 89 shapes of BPMN, the
+8 of UML and ten newer Basic shapes from SimpleDiagrams 5.1.0 (not yet released).
 
 The desktop app is the source of truth for the libraries it packages, and the
 website copies them, sometimes later. So a packaged shape's connection points
 and label placement always come from the bundled list made from the app, and a
 packaged library the website does not list yet is still offered from it. Some
 packaged shapes have no connection points at all (BPMN's task marks, which sit
-on a task); the builder refuses a connector to one, naming the shape.
+on a task); the builder refuses a connector to one, naming the shape. A name the
+app centres below a narrow shape, wider than it (a BPMN event, the UML Actor), is
+kept to the shape's width in the package the skill writes, and a longer name
+becomes a caption grouped with the shape. The UML Fork / Join Bar keeps its
+thickness: give it a `width` or `scale`, never a `height`.
 
 **Downloadable shapes** (`packaged: false`) come from a library a person
 downloads from simplediagrams.com. Their reference is the library's and
 shape's published UUIDs, and a document that uses one names the library in
-`required_libraries`, which makes it package format 16 (desktop ADR 0039).
-From the first SimpleDiagrams release after 5.0.16, opening the document with
-the library installed puts the artwork in place; without it, the shapes are
-dashed boxes and the app names the library and links to its page. An app
-before 5.0.16 cannot open a package-16 document at all. The skill does not
+`required_libraries`, which makes it package format 16.
+From SimpleDiagrams 5.1.0, opening the document with the library installed
+puts the artwork in place; without it, the shapes are placeholder boxes and the
+app names the library and links to its page. SimpleDiagrams 5.0.16 opens the
+document but shows only the boxes, and an app before 5.0.16 cannot open a
+package-16 document at all. The skill does not
 embed downloaded artwork.
 
 The app draws a downloaded shape as its library defines it, in the library's

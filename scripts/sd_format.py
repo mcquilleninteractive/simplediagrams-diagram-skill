@@ -2,8 +2,9 @@
 
 Format 15 is what the skill writes by default; it opens in SimpleDiagrams 5.0.8 and
 later. Format 16 adds one optional key, `required_libraries`, which names the
-downloaded libraries a document's shapes come from (desktop ADR 0039). The skill writes
-16 only for a document that places such a shape; every other record is the same.
+downloaded libraries a document's shapes come from; the app reads it from 5.0.16. The
+skill writes 16 only for a document that places such a shape; every other record is the
+same.
 
 A `.simplediagram` document is a folder holding `manifest.json`,
 `document.json` and an `assets/` directory. These Pydantic models describe the
@@ -364,9 +365,9 @@ class SymbolReference(WireModel):
 
     A built-in shape is named by the app's own library and item names. A downloaded
     shape is named by its library's and item's published UUIDs; the app puts its
-    artwork in place when the document opens with that library installed (desktop
-    ADR 0039), and the document lists the library in `required_libraries`. A reference
-    the app cannot resolve still opens, but draws a dashed placeholder.
+    artwork in place when the document opens with that library installed (from
+    SimpleDiagrams 5.1.0), and the document lists the library in `required_libraries`. A
+    reference the app cannot resolve still opens, but draws a dashed placeholder.
     """
 
     library_id: Annotated[str, Field(min_length=1)]

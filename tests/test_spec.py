@@ -73,7 +73,7 @@ def test_catalog_matches_what_the_compiler_writes() -> None:
     """Every catalogue shape must compile to a reference the catalogue itself
     resolves, or the app would draw placeholders."""
     catalog = Catalog.load()
-    assert len(catalog.shapes) == 516
+    assert len(catalog.shapes) == 534
     # One library per page: a page holds at most 300 shapes and the catalogue has more.
     by_library: dict[str, list] = {}
     for shape in catalog.shapes:
@@ -81,12 +81,17 @@ def test_catalog_matches_what_the_compiler_writes() -> None:
     placed = 0
     for library, shapes in by_library.items():
         nodes = [
-            {"key": f"n{i}", "shape": f"{library}/{shape.item_id}", "x": i * 300.0, "y": 0.0}
+            {"key": f"n{i}", "shape": f"{library}/{shape.item_id}", "label": "Name",
+             "x": i * 300.0, "y": 0.0}
             for i, shape in enumerate(shapes)
         ]
         document = compile_spec(_spec(nodes), catalog)
         assert [f for f in lint(document, catalog) if f.severity == "error"] == [], library
-        placed += len(document.pages[0].elements)
+        # The app refuses a file below package 18 whose label region starts outside its
+        # shape, so every region the skill writes starts inside.
+        layouts = [e.content.text_layout for e in document.pages[0].elements if e.content.text_layout]
+        assert all(0 <= t.frame.x <= 1 and 0 <= t.frame.y <= 1 for t in layouts), library
+        placed += sum(1 for e in document.pages[0].elements if e.core.symbol_reference)
     assert placed == len(catalog.shapes)
     document = compile_spec(
         _spec([{"key": "n0", "shape": "basic/Square", "x": 0.0, "y": 0.0}]), catalog
@@ -225,7 +230,7 @@ def test_wide_outside_label_becomes_a_grouped_caption() -> None:
 def test_library_shapes_get_the_points_and_label_their_library_gives_them() -> None:
     """A shape placed by the skill must match one placed by hand in the app: a BPMN
     event's name sits below it, a task's text keeps clear of its picture, and a task
-    mark offers connectors nothing to attach to (desktop ADR 0042)."""
+    mark offers connectors nothing to attach to."""
     document = compile_spec(
         _spec([
             {"key": "start", "shape": "bpmn/start-event", "label": "Go", "col": 0, "row": 0},
@@ -258,6 +263,55 @@ def test_the_spec_can_still_choose_the_label_position() -> None:
     )
     layout = document.pages[0].elements[0].content.text_layout
     assert (layout.position, layout.frame.width, layout.frame.height) == ("middle", 1, 1)
+
+
+def test_a_name_wider_than_its_shape_stays_on_the_shape_in_the_package_written() -> None:
+    """From 5.1.0 a shipped library may centre a name wider than its shape, such as the
+    UML Actor's, starting left of the shape. Only package 18 holds such a region, and the
+    app refuses an older file that has one, so the skill keeps a short name to the shape's
+    width and turns a longer one into a caption grouped with the shape."""
+    actor = Catalog.load().resolve("uml", "actor")
+    assert actor is not None and actor.text_region is not None and actor.text_region[0] < 0
+
+    document = compile_spec(
+        _spec([
+            {"key": "short", "shape": "uml/actor", "label": "A", "col": 0, "row": 0},
+            {"key": "long", "shape": "uml/actor", "label": "Customer service agent", "col": 1, "row": 0},
+        ])
+    )
+    assert document.schema_version == wire.SCHEMA_VERSION
+    short, long_actor, caption = (element for element in document.pages[0].elements)
+    layout = short.content.text_layout
+    assert layout is not None
+    assert (layout.position, layout.frame.x, layout.frame.width) == ("below", 0, 1)
+    assert long_actor.core.text_content.string == ""
+    assert (caption.core.kind, caption.core.text_content.string) == ("text", "Customer service agent")
+    assert [{m.id for m in g.members} for g in document.pages[0].content.groups] == [
+        {long_actor.core.id, caption.core.id}
+    ]
+
+
+def test_a_fork_join_bar_keeps_its_thickness() -> None:
+    """The app keeps a Fork / Join Bar's height, its thickness, whatever a person does, so
+    a spec's width or scale lengthens it and never thickens it, and a height for it is
+    refused rather than silently dropped."""
+    bar = Catalog.load().resolve("uml", "fork-join-bar")
+    assert bar is not None and bar.resizing == "width_only"
+
+    document = compile_spec(
+        _spec([
+            {"key": "wide", "shape": "uml/fork-join-bar", "width": 200, "col": 0, "row": 0},
+            {"key": "scaled", "shape": "uml/fork-join-bar", "scale": 2, "col": 0, "row": 1},
+        ])
+    )
+    wide, scaled = (element.core.frame for element in document.pages[0].elements)
+    assert (wide.width, wide.height) == (200, bar.default_height)
+    assert (scaled.width, scaled.height) == (bar.default_width * 2, bar.default_height)
+
+    with pytest.raises(SpecError, match="keeps its own thickness"):
+        compile_spec(
+            _spec([{"key": "b", "shape": "uml/fork-join-bar", "width": 200, "height": 40, "col": 0, "row": 0}])
+        )
 
 
 def test_an_edge_to_a_shape_without_connection_points_is_refused() -> None:
@@ -296,6 +350,9 @@ def test_packaged_facts_come_from_the_apps_own_list() -> None:
     mark = merged.resolve("bpmn", "loop-mark")
     assert mark is not None and mark.connection_points == ()
     assert merged.resolve("bpmn", "start-event").text_position == "below"
+    merged_bar, plain_bar = merged.resolve("uml", "fork-join-bar"), plain.resolve("uml", "fork-join-bar")
+    assert merged_bar is not None and merged_bar.resizing == "width_only"
+    assert plain_bar is not None and plain_bar.resizing == "free", "The website has no rule."
     assert merged.resolve("biz", "coin-yen") is not None, "A newer shape in a listed library."
     assert plain.resolve("biz", "coin-yen") is None
     assert len(merged.shapes) == len(Catalog.load().shapes)
@@ -316,9 +373,34 @@ def test_the_build_names_what_needs_a_newer_app() -> None:
     needs = app_requirements(newer)
     assert len(needs) == 2
     assert needs[0].startswith("SimpleDiagrams 5.0.11 or later") and "cross" in needs[0]
-    assert needs[1].startswith("the first SimpleDiagrams release after 5.0.16 or a later one")
+    assert needs[1].startswith("SimpleDiagrams 5.1.0 or later")
     assert needs[1].endswith("1 BPMN shape added in that release; an earlier app draws it as a dashed placeholder")
     assert lint(newer) == [], "Needing a newer app is reported, never as a warning."
+
+
+def test_a_shape_from_an_undecided_release_is_named_after_the_last_one() -> None:
+    """Before the next release has a number, the bundled catalogue, which the maintainers
+    regenerate from the app's own library bundle, records its new shapes as
+    "after X (unreleased)", and the build must still say something a person can act on:
+    the first release after X, listed after every numbered release."""
+    catalog = Catalog.load()
+    later = [
+        shape.model_copy(update={"first_release": "after 5.1.0 (unreleased)"})
+        if (shape.library_short_name, shape.item_id) == ("uml", "actor") else shape
+        for shape in catalog.shapes
+    ]
+    document = compile_spec(
+        _spec([
+            {"key": "a", "shape": "uml/actor", "label": "A", "col": 0, "row": 0},
+            {"key": "yen", "shape": "biz/coin-yen", "col": 1, "row": 0},
+        ]),
+        catalog,
+    )
+    needs = app_requirements(document, Catalog(later, "test"))
+    assert [need.split(",")[0] for need in needs] == [
+        "SimpleDiagrams 5.0.16 or later",
+        "the first SimpleDiagrams release after 5.1.0 or a later one",
+    ]
 
 
 def test_each_newer_packaged_shape_names_the_release_that_added_it() -> None:
@@ -565,7 +647,7 @@ def test_versions_are_stated_consistently() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Shapes from downloaded libraries (desktop ADR 0039)
+# Shapes from downloaded libraries, placed by their published references
 # ---------------------------------------------------------------------------
 
 NOTEBOOK_ID = "79FFE4B7-EA0D-87C3-AE89-D4CD62AF5202"
@@ -665,7 +747,7 @@ def test_the_build_says_which_library_and_app_a_document_needs() -> None:
 
     assert any(
         "Hobby Electronics Notebook library installed" in need
-        and "first SimpleDiagrams release after 5.0.16" in need
+        and "SimpleDiagrams 5.1.0 or later" in need
         for need in needs
     )
     assert any("5.0.16 or later to open the file" in need for need in needs)
@@ -911,6 +993,240 @@ def test_a_corner_point_leaves_by_the_side_facing_the_other_end() -> None:
     )
     points = compile_spec(spec).pages[0].connections[0].content.points
     assert points[0].y == points[1].y and points[1].x > points[0].x
+
+
+@pytest.mark.parametrize(
+    ("flip_horizontal", "flip_vertical"), [(True, False), (False, True), (True, True)],
+    ids=["across", "down", "both"],
+)
+def test_a_flipped_shape_draws_its_points_mirrored_and_keeps_their_ids(
+    flip_horizontal: bool, flip_vertical: bool
+) -> None:
+    """The app mirrors a flipped shape's connection points with its artwork, in the shape's
+    own axes, and keeps each point's id and stored position. A connector naming a lead end
+    must meet that end where the mirrored artwork draws it."""
+    catalog = _parts_catalog(_part("block", LEADS))
+    spec = _wired(
+        [{"key": "b", "shape": "parts/block", "x": 300, "y": 300, "scale": 2,
+          "flip_horizontal": flip_horizontal, "flip_vertical": flip_vertical},
+         {"key": "far", "shape": "rectangle", "x": 700, "y": 600}],
+        [{"source": "b", "target": "far", "source_point": 8, "end_ending": "none"}],
+    )
+    document = compile_spec(spec, catalog)
+
+    element = document.pages[0].elements[0]
+    assert (element.content.flip_horizontal, element.content.flip_vertical) == (flip_horizontal, flip_vertical)
+    stored = {anchor.id: (anchor.x, anchor.y) for anchor in element.core.connection_points}
+    assert stored[8] == (0.0082, 0.0736)
+    fx = 1 - 0.0082 if flip_horizontal else 0.0082
+    fy = 1 - 0.0736 if flip_vertical else 0.0736
+    frame = element.core.frame
+    point_id, x, y = _end_points(document)[0]
+    assert point_id == 8
+    assert (x, y) == pytest.approx((frame.x + fx * frame.width, frame.y + fy * frame.height), abs=0.001)
+    assert _axis_aligned(document)
+    assert "connector-through-shape" not in {f.code for f in lint(document, catalog)}
+
+
+def test_a_side_of_a_flipped_shape_is_the_side_it_is_drawn_on() -> None:
+    """After a flip across, the anchor numbered for the left is drawn on the right. A side
+    in the spec names where the connector meets the shape on the page, so it must use the
+    anchor drawn there, chosen automatically or not."""
+    for edge in ({"source": "a", "target": "b"}, {"source": "a", "target": "b", "source_side": "right"}):
+        spec = _wired(
+            [{"key": "a", "shape": "rectangle", "x": 0, "y": 100, "flip_horizontal": True},
+             {"key": "b", "shape": "rectangle", "x": 300, "y": 100}],
+            [edge],
+        )
+        document = compile_spec(spec)
+        frame = document.pages[0].elements[0].core.frame
+        assert _end_points(document)[0] == (0, frame.x + frame.width, pytest.approx(frame.y + frame.height / 2))
+        assert _axis_aligned(document)
+
+
+def test_a_connector_on_a_flipped_shape_names_the_release_that_mirrors_points() -> None:
+    """Apps before 5.1.0 draw a flipped shape's points unmirrored, so a connector attached
+    to one meets the wrong place there. A flipped shape with nothing attached draws the
+    same in every version and needs nothing."""
+    nodes = [{"key": "a", "shape": "rectangle", "x": 0, "y": 100, "flip_vertical": True},
+             {"key": "b", "shape": "rectangle", "x": 300, "y": 100}]
+    assert app_requirements(compile_spec(_wired(nodes, []))) == []
+    needs = app_requirements(compile_spec(_wired(nodes, [{"source": "a", "target": "b"}])))
+    assert needs == [
+        (
+            "SimpleDiagrams 5.1.0 or later, for the connectors attached to 1 flipped shape; an "
+            "earlier app attaches them where the points would be on the unflipped shape"
+        )
+    ]
+
+
+def test_text_cannot_be_flipped() -> None:
+    """The app never flips text, which has no artwork to mirror; the spec says so rather
+    than write a flip the app would not make."""
+    with pytest.raises(ValidationError, match="no artwork to flip"):
+        _wired([{"key": "t", "shape": "text", "label": "Note", "x": 0, "y": 0, "flip_horizontal": True}], [])
+
+
+# ---------------------------------------------------------------------------
+# Edges within one node, and naming shapes in findings
+# ---------------------------------------------------------------------------
+
+
+def _strictly_inside(x: float, y: float, frame: wire.Rect) -> bool:
+    """Whether a point lies inside a frame, not on or beyond its edge."""
+    return frame.x < x < frame.x + frame.width and frame.y < y < frame.y + frame.height
+
+
+@pytest.mark.parametrize(
+    ("source_point", "target_point"),
+    [(8, 11), (8, 9), (0, 1), (2, 3), (4, 7)],
+    ids=["opposite-leads", "same-side-leads", "left-to-right", "top-to-bottom", "corners"],
+)
+def test_an_edge_joins_two_points_of_one_node_around_the_shape(
+    source_point: int, target_point: int
+) -> None:
+    """Two points of one shape may be joined directly. The connector must attach at both,
+    stay square, and go around the shape: the usual run midway between the ends would
+    cross the shape's own middle."""
+    catalog = _parts_catalog(_part("block", LEADS))
+    spec = _wired(
+        [{"key": "b", "shape": "parts/block", "x": 300, "y": 300, "scale": 2}],
+        [{"source": "b", "target": "b", "source_point": source_point,
+          "target_point": target_point, "end_ending": "none"}],
+    )
+    document = compile_spec(spec, catalog)
+
+    frame = document.pages[0].elements[0].core.frame
+    anchors = {point_id: (fx, fy) for point_id, fx, fy in LEADS}
+    for point_id, x, y in _end_points(document):
+        fx, fy = anchors[point_id]
+        assert (x, y) == pytest.approx((frame.x + fx * frame.width, frame.y + fy * frame.height), abs=0.001)
+    assert [end[0] for end in _end_points(document)] == [source_point, target_point]
+    assert _axis_aligned(document)
+    route = document.pages[0].connections[0].content.points
+    assert not any(_strictly_inside(point.x, point.y, frame) for point in route[1:-1])
+    assert "connector-through-shape" not in {f.code for f in lint(document, catalog)}
+
+
+def test_an_edge_within_one_node_goes_around_on_the_clearer_side() -> None:
+    """With a neighbour close above, the loop must go below rather than through it."""
+    spec = _wired(
+        [{"key": "a", "shape": "rectangle", "x": 300, "y": 300},
+         {"key": "cap", "shape": "rectangle", "x": 300, "y": 235, "height": 40}],
+        [{"source": "a", "target": "a", "source_point": 0, "target_point": 1}],
+    )
+    document = compile_spec(spec)
+
+    frame = document.pages[0].elements[0].core.frame
+    route = document.pages[0].connections[0].content.points
+    assert max(point.y for point in route) > frame.y + frame.height
+    assert "connector-through-shape" not in {f.code for f in lint(document)}
+
+
+def test_an_edge_within_one_node_keeps_off_a_run_another_connector_takes() -> None:
+    """A connector arriving at a neighbouring point turns in at the same distance outside
+    the shape as a loop's run. With both sides clear of shapes, the loop must take the side
+    no connector runs along, or the two lines lie on top of each other and read as joined.
+    The loop comes first in the spec, so it is routed after the other connector but stays
+    first in the document."""
+    edge_points = tuple(
+        [(0, 0.0, 0.5), (1, 1.0, 0.5), (2, 0.5, 0.0), (3, 0.5, 1.0)]
+        + [(10 + i, 0.2 * (i + 1), 0.0) for i in range(4)]
+        + [(20 + i, 0.2 * (i + 1), 1.0) for i in range(4)]
+    )
+    panel = _part("panel", edge_points).model_copy(update={"default_width": 400, "default_height": 80})
+    catalog = _parts_catalog(panel)
+    spec = _wired(
+        [{"key": "p", "shape": "parts/panel", "x": 400, "y": 300},
+         {"key": "feed", "shape": "rectangle", "x": 0, "y": 300}],
+        [{"source": "p", "target": "p", "source_point": 11, "target_point": 21, "end_ending": "none"},
+         {"source": "feed", "target": "p", "target_point": 10, "end_ending": "none"}],
+    )
+    document = compile_spec(spec, catalog)
+
+    loop, feed = document.pages[0].connections
+    panel_id = document.pages[0].elements[0].core.id
+    assert loop.content.start_attachment.element_id == loop.content.end_attachment.element_id == panel_id
+    assert feed.content.end_attachment.connection_point_id == 10
+    frame = document.pages[0].elements[0].core.frame
+    assert max(point.x for point in loop.content.points) > frame.x + frame.width
+    assert "connectors-overlap" not in {f.code for f in lint(document, catalog)}
+
+
+@pytest.mark.parametrize(
+    "ends",
+    [{}, {"source_point": 1}, {"target_point": 1}, {"source_point": 1, "target_point": 1}],
+    ids=["no-points", "source-point-only", "target-point-only", "same-point"],
+)
+def test_an_edge_within_one_node_needs_two_different_points(ends: dict) -> None:
+    """Without two different named points there is nothing to join on one shape, so the
+    spec is refused, saying what to give."""
+    with pytest.raises(ValidationError, match="two different points with source_point and target_point"):
+        _wired([{"key": "a", "shape": "rectangle", "x": 0, "y": 0}],
+               [{"source": "a", "target": "a", **ends}])
+
+
+def test_a_shape_without_a_label_is_named_by_its_node_key() -> None:
+    """A finding must name something the spec's author can find in the spec. An element
+    id cannot be traced back to a node; a node key can. Without the spec, the old naming
+    by kind and id remains."""
+    spec = _spec([_box("north", 0, 0, label=""), _box("south", 0.2, 0, label="")])
+    document = compile_spec(spec)
+
+    def overlap(found: list) -> list[str]:
+        return [finding.message for finding in found if finding.code == "shapes-overlap"]
+
+    assert overlap(lint(document, spec=spec)) == ["Page 1: node 'north' and node 'south' overlap."]
+    assert overlap(lint(document)) == [
+        f"Page 1: rectangle {element.core.id[:8]} and rectangle {other.core.id[:8]} overlap."
+        for element, other in [document.pages[0].elements]
+    ]
+
+
+@pytest.mark.parametrize(
+    ("nodes", "edges", "flagged"),
+    [
+        (
+            [_box("hub", 0, 0), _box("a", 1, -1), _box("b", 1, 1)],
+            [{"source": "a", "target": "hub", "target_point": 1},
+             {"source": "hub", "target": "b", "source_point": 1}],
+            False,
+        ),
+        (
+            [_box("a", 0, 0), _box("b", 1, 0)],
+            [{"source": "a", "target": "a", "source_point": 0, "target_point": 1, "end_ending": "none"},
+             {"source": "a", "target": "b", "source_point": 1}],
+            False,
+        ),
+        (
+            [_box("a", 0, 1), _box("b", 1, 0), _box("c", 1, 2)],
+            [{"source": "a", "target": "b"}, {"source": "a", "target": "c"}],
+            False,
+        ),
+        ([_box("a", 0, 0), _box("b", 1, 0)], [{"source": "a", "target": "b"}, {"source": "b", "target": "a"}], True),
+        ([_box("a", 0, 0), _box("b", 1, 0)], [{"source": "a", "target": "b"}] * 2, True),
+    ],
+    ids=["pass-through-point", "loop-and-outside-connector", "branches", "two-way-pair", "duplicate"],
+)
+def test_connectors_meeting_at_one_point_are_not_an_overlap(
+    nodes: list[dict], edges: list[dict], flagged: bool
+) -> None:
+    """Connectors that meet at one point join there, whichever way each runs, so sharing
+    its stub is a junction, not an overlap. Two that join the same two points lie on top of
+    each other along their whole length, and must still be reported."""
+    codes = {finding.code for finding in lint(compile_spec(_spec(nodes, edges)))}
+    assert ("connectors-overlap" in codes) is flagged
+
+
+def test_the_build_names_shapes_without_labels_by_their_node_keys(tmp_path: Path) -> None:
+    """The build is where an agent reads the warnings, so it must check with the spec."""
+    spec = tmp_path / "overlap.json"
+    spec.write_text(json.dumps({"name": "Overlap", "pages": [{"nodes": [
+        {"key": "north", "shape": "rectangle", "col": 0, "row": 0},
+        {"key": "south", "shape": "rectangle", "col": 0.2, "row": 0},
+    ]}]}))
+    result = _run("build_diagram.py", spec)
+    assert result.returncode == 0 and "node 'north' and node 'south' overlap" in result.stdout, result.stdout
 
 
 # ---------------------------------------------------------------------------

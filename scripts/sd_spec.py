@@ -60,6 +60,7 @@ DEFAULT_SIZE: dict[str, tuple[float, float]] = {
 # Mid-side anchors of the eight every shape carries.
 SIDE_ANCHOR = {"left": 0, "right": 1, "top": 2, "bottom": 3}
 SIDE_VECTOR = {"left": (-1, 0), "right": (1, 0), "top": (0, -1), "bottom": (0, 1)}
+OPPOSITE_SIDE = {"left": "right", "right": "left", "top": "bottom", "bottom": "top"}
 # The app's standard eight anchors, as fractions of the frame, for a shape that names none.
 STANDARD_POINTS = {anchor.id: (anchor.x, anchor.y) for anchor in wire.standard_connection_points()}
 
@@ -186,6 +187,17 @@ class NodeSpec(SpecModel):
     font_size: float = Field(default=15, ge=1, le=720, allow_inf_nan=False)
     bold: bool = False
     rotation: float = Field(default=0, ge=-360, le=360, allow_inf_nan=False)
+    flip_horizontal: bool = Field(
+        default=False,
+        description=(
+            "Mirrors the shape's artwork left to right, as a flip in the app does. Its "
+            "connection points move with the artwork and keep their ids; its label stays "
+            "readable. A connector attached to a flipped shape needs SimpleDiagrams 5.1.0 or later."
+        ),
+    )
+    flip_vertical: bool = Field(
+        default=False, description="Mirrors the shape's artwork top to bottom, as flip_horizontal does across."
+    )
 
     @model_validator(mode="after")
     def _check_position(self) -> NodeSpec:
@@ -194,6 +206,8 @@ class NodeSpec(SpecModel):
         partial = (self.col is None) != (self.row is None) or (self.x is None) != (self.y is None)
         if partial or grid == absolute:
             raise ValueError(f"node '{self.key}' needs either col and row, or x and y")
+        if self.shape == "text" and (self.flip_horizontal or self.flip_vertical):
+            raise ValueError(f"node '{self.key}' is text, which has no artwork to flip; remove its flip")
         return self
 
 
@@ -201,7 +215,11 @@ class EdgeSpec(SpecModel):
     """A connector between two nodes."""
 
     source: Key = Field(description="Key of the node the connector leaves.")
-    target: Key = Field(description="Key of the node the connector arrives at.")
+    target: Key = Field(
+        description="Key of the node the connector arrives at. It may be the source node when "
+        "source_point and target_point name two different points of it; the connector is then "
+        "routed around the shape."
+    )
     label: Label = ""
     route: Literal["orthogonal", "straight", "curved"] = Field(
         default="orthogonal",
@@ -267,8 +285,14 @@ class PageSpec(SpecModel):
             for end in (edge.source, edge.target):
                 if end not in known:
                     raise ValueError(f"page '{self.name}' has an edge to unknown node '{end}'")
-            if edge.source == edge.target:
-                raise ValueError(f"page '{self.name}' has an edge from '{edge.source}' to itself")
+            if edge.source == edge.target and (
+                None in (edge.source_point, edge.target_point) or edge.source_point == edge.target_point
+            ):
+                raise ValueError(
+                    f"page '{self.name}' has an edge from '{edge.source}' to itself; an edge "
+                    "within one node must name two different points with source_point and "
+                    "target_point"
+                )
         return self
 
 
@@ -311,10 +335,16 @@ class CatalogShape(BaseModel):
     # (id, x, y) for each anchor; None means the standard eight every shape has. An empty
     # tuple is a shape connectors may not attach to, such as a BPMN task mark.
     connection_points: tuple[tuple[int, float, float], ...] | None = None
-    # (x, y, width, height) as fractions of the frame; None means the app's own inset.
+    # (x, y, width, height) as fractions of the frame; None means the app's own inset. A shipped
+    # library may centre a name wider than its shape (x < 0), which the compiler narrows.
     text_region: tuple[float, float, float, float] | None = None
     # The library's label position; None means the middle unless the spec says otherwise.
     text_position: wire.TextPosition | None = None
+    # How the app lets a person resize the shape. "width_only" means its height is its
+    # thickness, as on a fork / join bar, and the compiler keeps it. The maintainers
+    # regenerate the bundled catalogue from the app's own library bundle, and that step
+    # refuses any other rule until the compiler is taught it.
+    resizing: Literal["free", "width_only"] = "free"
     # For a packaged shape added after 5.0.8, the app version it first shipped in, or
     # "after X (unreleased)" until that release is published. None: every app has it.
     first_release: str | None = None
@@ -367,7 +397,7 @@ class Catalog:
         ``packaged`` is the bundled list made from the desktop app's own catalogue. The
         app is the source of truth for the libraries it packages and the website copies
         them, sometimes later, so when it is given: a packaged shape's connection points,
-        label placement and first release come from it, and any packaged shape the website
+        label placement, resizing rule and first release come from it, and any packaged shape the website
         does not list yet, alone or with its whole library, is added from it.
         """
         known = (
@@ -385,6 +415,7 @@ class Catalog:
                     "connection_points": app.connection_points,
                     "text_region": app.text_region,
                     "text_position": app.text_position,
+                    "resizing": app.resizing,
                     "first_release": app.first_release,
                 }
             region = shape.text_region
@@ -453,6 +484,7 @@ class Catalog:
                 if item.get("text_region") is None
                 else tuple(item["text_region"][key] for key in ("x", "y", "width", "height")),
                 text_position=item.get("text_position"),
+                resizing=item.get("resizing", "free"),
                 first_release=item.get("first_release"),
             )
             for library in data["libraries"]
@@ -613,6 +645,12 @@ def _new_id(namespace: uuid.UUID, name: str) -> str:
     return str(uuid.uuid5(namespace, name)).upper()
 
 
+def _node_id(document_id: str, page_index: int, key: str) -> str:
+    """The element id a node gets: the same for a given document id, so a rebuild keeps it,
+    and so `lint` can name a shape by the key the spec gave it."""
+    return _new_id(uuid.UUID(document_id), f"page:{page_index}:node:{key}")
+
+
 def _snap(value: float) -> float:
     return float(round(value * 1000) / 1000)
 
@@ -637,9 +675,14 @@ class _Placed:
         self.spec = spec
         self.element_id = element_id
         self.x, self.y, self.w, self.h = x, y, w, h
-        # Each anchor's position as fractions of the frame: the library's for a library
-        # shape, else the app's standard eight. Connectors attach only to these.
-        self.points = STANDARD_POINTS if points is None else points
+        # Where each anchor is drawn, as fractions of the frame: the library's for a library
+        # shape, else the app's standard eight, mirrored as the app mirrors a flipped shape's
+        # points with its artwork (in the shape's own axes, before any turn). Connectors
+        # attach only to these. The element still stores the unmirrored positions.
+        self.points = {
+            point_id: (1 - x if spec.flip_horizontal else x, 1 - y if spec.flip_vertical else y)
+            for point_id, (x, y) in (STANDARD_POINTS if points is None else points).items()
+        }
         self.display_name = display_name or spec.key
 
     def anchor(self, point_id: int) -> _Anchor:
@@ -655,8 +698,10 @@ class _Placed:
 
     def side_anchor(self, side: str) -> _Anchor | None:
         """The anchor the app numbers for a side (0 left, 1 right, 2 top, 3 bottom), leaving
-        by that side, when the shape has it and it lies on that side."""
-        point_id = SIDE_ANCHOR[side]
+        by that side, when the shape has it and it lies on that side. A flip draws the
+        anchor numbered for the opposite side there."""
+        flipped = self.spec.flip_horizontal if side in ("left", "right") else self.spec.flip_vertical
+        point_id = SIDE_ANCHOR[OPPOSITE_SIDE[side] if flipped else side]
         if point_id not in self.points:
             return None
         anchor = self.anchor(point_id)
@@ -681,6 +726,11 @@ class _Placed:
 
 
 def _node_size(node: NodeSpec, catalog_shape: CatalogShape | None) -> tuple[float, float]:
+    if catalog_shape is not None and catalog_shape.resizing == "width_only":
+        # The height is the shape's thickness, which the app keeps whatever a person does, so
+        # width and scale change only its length. Its weight comes from the line width.
+        length = node.width or catalog_shape.default_width * node.scale
+        return (float(length), float(catalog_shape.default_height))
     if catalog_shape is not None:
         natural = (catalog_shape.default_width * node.scale, catalog_shape.default_height * node.scale)
     elif node.shape == "text":
@@ -733,9 +783,14 @@ def _named_point(end: _Placed, point_id: int, other: _Placed) -> list[_Anchor]:
 
 
 def _choose_route(
-    edge: EdgeSpec, source: _Placed, target: _Placed, obstacles: list[wire.Rect]
+    edge: EdgeSpec, source: _Placed, target: _Placed, obstacles: list[wire.Rect],
+    taken: list[tuple[float, float, float, float]],
 ) -> tuple[_Anchor, _Anchor, _Route]:
     """Picks the anchors and the route between them that keep off everything else.
+
+    A loop from a shape to itself, among its options that cross the fewest shapes, also
+    keeps the one that runs along fewest of the `taken` segments of connectors already
+    routed, so it is not read as joining a line it lies on.
 
     A named point is used as given. A named side, or a side chosen automatically, is the
     anchor the app numbers for that side, and only a side the shape has an anchor on is
@@ -765,20 +820,47 @@ def _choose_route(
             candidates += [(a, b) for a in starts for b in ends if (a, b) not in candidates]
         if candidates:
             break
-    best: tuple[int, _Anchor, _Anchor, _Route] | None = None
+    best: tuple[tuple[int, int], _Anchor, _Anchor, _Route] | None = None
     for start, end in candidates:
         route = _orthogonal((start.x, start.y), start.exits[0], (end.x, end.y), end.exits[0])
-        segments = [(p[0], p[1], q[0], q[1]) for p, q in pairwise(route.points)]
-        hits = sum(
-            any(_segment_hits_rect(segment, obstacle) for segment in segments)
-            for obstacle in [*obstacles, source.rect, target.rect]
-        )
-        if best is None or hits < best[0]:
-            best = (hits, start, end, route)
-        if hits == 0:
+        for option in (_around(route, source) if source is target else []) or [route]:
+            segments = [(p[0], p[1], q[0], q[1]) for p, q in pairwise(option.points)]
+            hits = sum(
+                any(_segment_hits_rect(segment, obstacle) for segment in segments)
+                for obstacle in [*obstacles, source.rect, target.rect]
+            )
+            shared = (
+                sum(any(_collinear_overlap(segment, run) for run in taken) for segment in segments)
+                if source is target
+                else 0
+            )
+            if best is None or (hits, shared) < best[0]:
+                best = ((hits, shared), start, end, option)
+        if best is not None and best[0] == (0, 0):
             break
     assert best is not None, "the caller checks that each end has an anchor to use"
     return best[1], best[2], best[3]
+
+
+def _around(route: _Route, shape: _Placed) -> list[_Route]:
+    """For a connector from a shape to itself, the route with its free run moved just
+    outside the shape, once on each side; empty when the run is already outside it.
+
+    The run is otherwise midway between the two ends, which on one shape is through its
+    middle. The caller keeps whichever of the two crosses least.
+    """
+    if route.channel is None:
+        return []
+    axis = route.channel[0]
+    low, high = (shape.x, shape.x + shape.w) if axis == "x" else (shape.y, shape.y + shape.h)
+    if not low < route.channel_value < high:
+        return []
+    options = []
+    for value in (low - STUB, high + STUB):
+        option = _Route(list(route.points), route.channel)
+        option.move_channel(value)
+        options.append(option)
+    return options
 
 
 class _Route:
@@ -927,8 +1009,9 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
     A shape from a downloaded library is placed by reference, and its library is named in
     the document's `required_libraries`, so the document is written at package format 16.
     SimpleDiagrams puts the artwork in place when the document opens with that library
-    installed (desktop ADR 0039); without it, the shape is a dashed box and the app names
-    the library. A document without such shapes stays at format 15.
+    installed (from 5.1.0); without it, the shape is a placeholder box,
+    and from 5.1.0 the app names the library. A document without such shapes stays at
+    format 15.
 
     Raises:
         SpecError: A node names a shape the catalogue does not have, the shapes come from
@@ -974,6 +1057,11 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                             else ""
                         )
                     )
+                if catalog_shape.resizing == "width_only" and node.height is not None:
+                    raise SpecError(
+                        f"node '{node.key}': '{node.shape}' keeps its own thickness and takes "
+                        "only a width; remove its height."
+                    )
                 if not catalog_shape.built_in:
                     downloaded_libraries.setdefault(catalog_shape.library_id, catalog_shape)
                 kind = "symbol"
@@ -984,7 +1072,7 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                 centre_y = page.grid.origin_y + node.row * page.grid.row_pitch
             else:
                 centre_x, centre_y = node.x, node.y
-            element_id = _new_id(namespace, f"page:{page_index}:node:{node.key}")
+            element_id = _node_id(document_id, page_index, node.key)
             item_placed = _Placed(
                 node, element_id, _snap(centre_x - width / 2), _snap(centre_y - height / 2), width, height,
                 points=(
@@ -1008,6 +1096,13 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                 catalog_shape.text_position if catalog_shape else None
             ) or "middle"
             region = catalog_shape.text_region if catalog_shape else None
+            if region is not None and region[0] < 0:
+                # From 5.1.0 the app lets a shipped library centre a name wider than its
+                # shape, but only package 18 can hold a label region that starts outside its
+                # shape, and the app refuses an older file that has one. The package this
+                # skill writes keeps the name to the shape's width; a longer one becomes a
+                # caption grouped with the shape, as for any shape.
+                region = (0.0, region[1], 1.0, region[3])
             outside = position in ("above", "below") and bool(node.label) and kind != "text"
             label_width, label_height = estimate_text_size(node.label, node.font_size, node.bold)
             # A label outside its shape is confined to the shape's width. One
@@ -1041,6 +1136,8 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                     kind=kind,
                     frame=item_placed.rect,
                     rotation_degrees=float(node.rotation % 360),
+                    flip_horizontal=node.flip_horizontal,
+                    flip_vertical=node.flip_vertical,
                     z_index=len(elements),
                     text=text,
                     style=wire.ElementStyle(
@@ -1105,8 +1202,12 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
                 if area is not None:
                     label_areas.append(area)
 
-        routed: list[tuple[EdgeSpec, _Placed, _Placed, _Anchor, _Anchor, _Route | None]] = []
-        for edge in page.edges:
+        # Loops from a shape to itself are routed after every other connector, so each can
+        # keep off the runs the others take; the document still lists them in spec order.
+        by_index: dict[int, tuple[EdgeSpec, _Placed, _Placed, _Anchor, _Anchor, _Route | None]] = {}
+        taken: list[tuple[float, float, float, float]] = []
+        for index in sorted(range(len(page.edges)), key=lambda i: page.edges[i].source == page.edges[i].target):
+            edge = page.edges[index]
             source, target = placed[edge.source], placed[edge.target]
             for end, role, side, point in (
                 (source, "source", edge.source_side, edge.source_point),
@@ -1139,11 +1240,14 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
             obstacles = [
                 other.rect for other in placed.values() if other is not source and other is not target
             ] + label_areas
-            start_anchor, end_anchor, route = _choose_route(edge, source, target, obstacles)
-            routed.append(
-                (edge, source, target, start_anchor, end_anchor,
-                 route if edge.route == "orthogonal" else None)
+            start_anchor, end_anchor, route = _choose_route(edge, source, target, obstacles, taken)
+            if edge.route == "orthogonal":
+                taken += [(p[0], p[1], q[0], q[1]) for p, q in pairwise(route.points)]
+            by_index[index] = (
+                edge, source, target, start_anchor, end_anchor,
+                route if edge.route == "orthogonal" else None,
             )
+        routed = [by_index[index] for index in range(len(page.edges))]
 
         # Connectors leaving or reaching the same anchor share a run, as one branching line.
         _spread_channels(
@@ -1240,15 +1344,12 @@ def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Docu
 # ---------------------------------------------------------------------------
 
 
-# The unreleased desktop version that brings the BPMN library and puts a downloaded
-# library's shapes in place (desktop ADR 0039). Replace the wording with "SimpleDiagrams"
-# and its version number when that release is published, here and in the docs.
-NEXT_RELEASE = "the first SimpleDiagrams release after 5.0.16"
-
 # The first app that reads package format 16, and the first that puts a downloaded
 # library's shapes in place when such a document opens.
 FORMAT_16_FIRST_RELEASE = "5.0.16"
-DOWNLOADED_SHAPES_FIRST_RELEASE = NEXT_RELEASE
+DOWNLOADED_SHAPES_FIRST_RELEASE = "5.1.0"
+# The first app that mirrors a flipped shape's connection points with its artwork.
+MIRRORED_POINTS_FIRST_RELEASE = "5.1.0"
 
 
 def _release_order(release: str) -> tuple[int, ...]:
@@ -1278,10 +1379,20 @@ def app_requirements(document: wire.Document, catalog: Catalog | None = None) ->
     endings: set[str] = set()
     # Release -> library name -> how many of the document's shapes first shipped then.
     newer: dict[str, dict[str, int]] = {}
+    # Flipped shapes with a connector attached: an earlier app attaches it where the point
+    # would be on the unflipped shape. A flipped shape with none draws the same anywhere.
+    flipped_ends = 0
     for page in document.pages:
+        attached: set[str] = set()
         for connection in page.connections:
             content = connection.content
             endings |= {content.start_ending, content.end_ending} & wire.ENDINGS_FROM_5_0_11
+            attached |= {end.element_id.upper() for end in (content.start_attachment, content.end_attachment) if end}
+        flipped_ends += sum(
+            1 for element in page.elements
+            if (element.content.flip_horizontal or element.content.flip_vertical)
+            and element.core.id.upper() in attached
+        )
         for element in page.elements:
             reference = element.core.symbol_reference
             shape = (
@@ -1317,11 +1428,19 @@ def app_requirements(document: wire.Document, catalog: Catalog | None = None) ->
             f"{_release_wording(release)}, for {shapes} added in that release; an earlier "
             f"app draws {drawn}"
         )
+    if flipped_ends:
+        noun = "shape" if flipped_ends == 1 else "shapes"
+        needs.append(
+            f"{_release_wording(MIRRORED_POINTS_FIRST_RELEASE)}, for the connectors attached to "
+            f"{flipped_ends} flipped {noun}; an earlier app attaches them where the points would "
+            "be on the unflipped shape"
+        )
     for required in document.required_libraries or []:
         needs.append(
             f"the {required.display_name} library installed, with "
-            f"{DOWNLOADED_SHAPES_FIRST_RELEASE} or a later one, to show its shapes; without "
-            "the library they are dashed boxes, and the app names it and links to its page"
+            f"{_release_wording(DOWNLOADED_SHAPES_FIRST_RELEASE)}, to show its shapes; without "
+            f"the library they are placeholder boxes, and from {DOWNLOADED_SHAPES_FIRST_RELEASE} "
+            "the app names it and links to its page"
         )
     return needs
 
@@ -1375,10 +1494,15 @@ def _segments_cross(a: tuple[float, float, float, float], b: tuple[float, float,
     return (d1 * d2 < -1e-9) and (d3 * d4 < -1e-9)
 
 
-def _name(element: wire.Element) -> str:
+def _name(element: wire.Element, keys: dict[str, str]) -> str:
+    """How a finding names a shape: by its label, else by its spec node key, else (for a
+    document checked without its spec) by its kind and the start of its id."""
     core = element.core
     text = core.text_content.string.replace("\n", " ").strip()
-    return f"'{text}'" if text else f"{core.kind} {core.id[:8]}"
+    if text:
+        return f"'{text}'"
+    key = keys.get(core.id.upper())
+    return f"node '{key}'" if key else f"{core.kind} {core.id[:8]}"
 
 
 def _collinear_overlap(a: tuple[float, float, float, float], b: tuple[float, float, float, float]) -> bool:
@@ -1419,7 +1543,9 @@ def _default_symbol_paint(style: wire.ElementStyle) -> bool:
     )
 
 
-def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Finding]:
+def lint(
+    document: wire.Document, catalog: Catalog | None = None, spec: DiagramSpec | None = None
+) -> list[Finding]:
     """Checks a document for things the app accepts but a reader would not.
 
     Errors are certain defects, such as a library shape the app will draw as a
@@ -1427,10 +1553,20 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
     shapes or labels, crossings, connectors drawn over each other and labels
     that do not fit. Sizes of text are estimates, so label warnings are advice.
     Paint set on a downloaded library's shape is also a warning, because the app
-    draws such a shape in its library's own colours.
+    draws such a shape in its library's own colours. Given the spec the document
+    was compiled from, a finding names a shape without a label by its node key.
     """
     catalog = catalog or Catalog.load()
     findings: list[Finding] = []
+    keys = (
+        {
+            _node_id(document.id, page_index, node.key): node.key
+            for page_index, page in enumerate(spec.pages)
+            for node in page.nodes
+        }
+        if spec is not None
+        else {}
+    )
 
     def warn(code: str, message: str) -> None:
         findings.append(Finding(severity="warning", code=code, message=message))
@@ -1453,7 +1589,7 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
             if shape is not None and not shape.built_in and not _default_symbol_paint(core.style):
                 warn(
                     "downloaded-shape-paint",
-                    f"{page_name}: {_name(element)} is a {shape.library_display_name} shape, "
+                    f"{page_name}: {_name(element, keys)} is a {shape.library_display_name} shape, "
                     "which SimpleDiagrams draws in its library's own colours, so the fill, "
                     "stroke and line width set for it are not used. Leave them out; the "
                     "colours can be changed in the app once the shape is in place.",
@@ -1488,7 +1624,7 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
                 if word_width > max(1.0, layout.frame.width * core.frame.width):
                     warn(
                         "label-overflow",
-                        f"{page_name}: the label {_name(element)} is wider than its "
+                        f"{page_name}: the label {_name(element, keys)} is wider than its "
                         f"{core.frame.width:g}-point shape and will break mid-word. Widen the shape or "
                         "put the label in a separate text node.",
                     )
@@ -1500,7 +1636,7 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
             if word_width > inner_width or wrapped_lines * line_height > inner_height:
                 warn(
                     "label-overflow",
-                    f"{page_name}: the label {_name(element)} probably does not fit its "
+                    f"{page_name}: the label {_name(element, keys)} probably does not fit its "
                     f"{core.frame.width:g} x {core.frame.height:g} shape. Widen the shape, "
                     "shorten the label, or set label_position to 'below'.",
                 )
@@ -1513,7 +1649,7 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
                 overlap_x = min(a.x + a.width, b.x + b.width) - max(a.x, b.x)
                 overlap_y = min(a.y + a.height, b.y + b.height) - max(a.y, b.y)
                 if overlap_x > 1 and overlap_y > 1:
-                    warn("shapes-overlap", f"{page_name}: {_name(first)} and {_name(second)} overlap.")
+                    warn("shapes-overlap", f"{page_name}: {_name(first, keys)} and {_name(second, keys)} overlap.")
 
         by_id = {element.core.id.upper(): element for element in page.elements}
         connectors: list[tuple[wire.ConnectionCore, list[tuple[float, float, float, float]], str]] = []
@@ -1523,7 +1659,7 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
             attached = {attachment.element_id.upper() for attachment in attachments if attachment}
             segments = _segments(core.points)
             ends = " to ".join(
-                _name(by_id[attachment.element_id.upper()]) if attachment else "a free end"
+                _name(by_id[attachment.element_id.upper()], keys) if attachment else "a free end"
                 for attachment in attachments
             )
             connectors.append((core, segments, ends))
@@ -1532,7 +1668,7 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
                 if is_end and element.core.rotation_degrees % 360 != 0:
                     warn(
                         "rotated-end",
-                        f"{page_name}: {_name(element)} is rotated and has a connector. The app "
+                        f"{page_name}: {_name(element, keys)} is rotated and has a connector. The app "
                         "moves the attached end with the rotation, so the stored route will not "
                         "match. Leave connected shapes unrotated.",
                     )
@@ -1541,19 +1677,20 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
                     route = connection.content.points
                     for attachment, point in zip(attachments, (route[0], route[-1]), strict=True):
                         if attachment and attachment.element_id.upper() == element.core.id.upper():
-                            inset = _own_end_inset(element.core.frame, point)
+                            # Both ends may be on this shape; each one's stub is its own.
+                            inset = max(inset, _own_end_inset(element.core.frame, point))
                 if not any(_segment_hits_rect(segment, element.core.frame, inset) for segment in segments):
                     continue
                 if is_end:
                     warn(
                         "connector-through-shape",
-                        f"{page_name}: the connector from {ends} runs back through {_name(element)}, "
+                        f"{page_name}: the connector from {ends} runs back through {_name(element, keys)}, "
                         "one of its own ends. Change or remove its sides or points.",
                     )
                 else:
                     warn(
                         "connector-through-shape",
-                        f"{page_name}: the connector from {ends} passes through {_name(element)}. "
+                        f"{page_name}: the connector from {ends} passes through {_name(element, keys)}. "
                         "Move a node, or set source_side and target_side.",
                     )
             for element, area in label_areas:
@@ -1561,19 +1698,23 @@ def lint(document: wire.Document, catalog: Catalog | None = None) -> list[Findin
                     warn(
                         "connector-through-label",
                         f"{page_name}: the connector from {ends} runs through the label of "
-                        f"{_name(element)}. Put the label on the other side of the shape, or set "
+                        f"{_name(element, keys)}. Put the label on the other side of the shape, or set "
                         "source_side and target_side.",
                     )
 
         crossings = 0
-        for index, (first, first_segments, first_ends) in enumerate(connectors):
-            for second, second_segments, second_ends in connectors[index + 1 :]:
+        for index, (first_core, first_segments, first_ends) in enumerate(connectors):
+            for second_core, second_segments, second_ends in connectors[index + 1 :]:
                 if any(_segments_cross(a, b) for a in first_segments for b in second_segments):
                     crossings += 1
-                shares_end = (
-                    first.start_attachment is not None and first.start_attachment == second.start_attachment
-                ) or (first.end_attachment is not None and first.end_attachment == second.end_attachment)
-                if not shares_end and any(
+                # Connectors meeting at one point, whichever way each runs, join there and share
+                # its stub; two joining the same two points are drawn on top of each other.
+                second_points = (second_core.start_attachment, second_core.end_attachment)
+                shared = [
+                    point for point in (first_core.start_attachment, first_core.end_attachment)
+                    if point is not None and point in second_points
+                ]
+                if len(shared) != 1 and any(
                     _collinear_overlap(a, b) for a in first_segments for b in second_segments
                 ):
                     warn(

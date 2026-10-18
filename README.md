@@ -2,7 +2,7 @@
 
 This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It searches the public shape catalogue and uses a small JSON spec for nodes, labels, positions and connectors. The builder writes the document package and checks its structure and layout.
 
-It writes document format 15, which opens in SimpleDiagrams for macOS 5.0.8 and later. A document that uses a shape from a downloadable library is written at format 16, which names that library and opens in 5.0.16 and later; its shapes appear in the first release after 5.0.16 with the library installed. The skill retains an offline catalogue from SimpleDiagrams after 5.0.16 (unreleased) with 516 packaged shapes in seven libraries. The 89 BPMN shapes need the first release after 5.0.16; the 58 newer Biz shapes need 5.0.16; the 89 added UI Flow shapes need 5.0.12. Earlier apps show placeholders for shapes they do not contain. The builder says when a document needs a newer app or a library. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
+It writes document format 15, which opens in SimpleDiagrams for macOS 5.0.8 and later. A document that uses a shape from a downloadable library is written at format 16, which names that library and opens in 5.0.16 and later; its shapes appear in 5.1.0 and later with the library installed. The skill retains an offline catalogue from SimpleDiagrams 5.1.0 (not yet released) with 534 packaged shapes in eight libraries. The 89 BPMN shapes, the 8 UML shapes and the 10 newer Basic shapes need 5.1.0; the 58 newer Biz shapes need 5.0.16; the 89 added UI Flow shapes need 5.0.12. Earlier apps show placeholders for shapes they do not contain. The builder says when a document needs a newer app or a library. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
 
 ## Install
 
@@ -30,7 +30,7 @@ To install by copying, keep the folder name `simplediagrams-diagram-skill`.
 
 ## Scope
 
-- Creates new documents using native rectangles, ellipses, notes, text, connectors, and the seven bundled shape libraries, BPMN included. A library shape gets the connection points and label placement its library gives it, as in the app.
+- Creates new documents using native rectangles, ellipses, notes, text, connectors, and the eight bundled shape libraries, BPMN and UML included. A library shape gets the connection points and label placement its library gives it, as in the app, except that a name the app centres below a narrow shape, wider than it, is kept to the shape's width or written as a caption.
 - Searches all published libraries through `https://simplediagrams.com/shape-libraries/catalog.json`, with one request per command, nothing stored, and the bundled packaged list offline.
 - Places every catalogued shape by its exact API reference: packaged shapes by the app's own names, downloadable ones by their published UUIDs. A document with downloadable shapes names their libraries, so SimpleDiagrams puts the artwork in place when the library is installed and otherwise names the library and links to its page. Personal libraries, embedded images and shape data remain outside this authoring profile.
 - Redraws a pictured diagram as boxes and connectors. It does not trace artwork or handwriting or embed the picture. A connector can attach to any connection point a shape has, so pin-level wiring is drawn where the parts' library shapes give their pins or leads as connection points.
@@ -55,7 +55,7 @@ The first command checks without writing. The second creates the package at a ne
 | `references/from-an-image.md` | Redrawing a photo, scan, or screenshot of a diagram |
 | `references/shape-catalogue.md` | API search, requests and offline behavior |
 | `references/document-format.md` | Generated package structure |
-| `assets/built-in-shapes.json` | 516 packaged shapes, with their connection points and label placement, for offline fallback |
+| `assets/built-in-shapes.json` | 534 packaged shapes, with their connection points and label placement, for offline fallback |
 | `assets/example-spec.json` | Example input |
 | `scripts/find_shapes.py` | Search names, descriptions and keywords across published libraries |
 | `scripts/sd_catalog.py` | One bounded, validated catalogue request, with the packaged fallback |

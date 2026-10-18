@@ -1565,7 +1565,7 @@
   },
   "SymbolReference": {
    "additionalProperties": false,
-   "description": "Names one shape in a library: one built into SimpleDiagrams, or a downloaded one.\n\nA built-in shape is named by the app's own library and item names. A downloaded\nshape is named by its library's and item's published UUIDs; the app puts its\nartwork in place when the document opens with that library installed (desktop\nADR 0039), and the document lists the library in `required_libraries`. A reference\nthe app cannot resolve still opens, but draws a dashed placeholder.",
+   "description": "Names one shape in a library: one built into SimpleDiagrams, or a downloaded one.\n\nA built-in shape is named by the app's own library and item names. A downloaded\nshape is named by its library's and item's published UUIDs; the app puts its\nartwork in place when the document opens with that library installed (from\nSimpleDiagrams 5.1.0), and the document lists the library in `required_libraries`. A\nreference the app cannot resolve still opens, but draws a dashed placeholder.",
    "properties": {
     "library_id": {
      "minLength": 1,
