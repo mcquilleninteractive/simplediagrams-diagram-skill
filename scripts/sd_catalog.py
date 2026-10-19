@@ -30,12 +30,20 @@ from pydantic import (
 )
 
 CATALOGUE_URL = "https://simplediagrams.com/shape-libraries/catalog.json"
+# A library's page is shown to the user and may be opened, so only a page on the
+# SimpleDiagrams website is kept; any other address is dropped.
+PAGE_URL_PREFIX = "https://simplediagrams.com/"
 BUNDLED_PATH = (
     Path(__file__).resolve().parent.parent / "assets" / "built-in-shapes.json"
 )
 MAX_CATALOGUE_BYTES = 8 * 1024 * 1024
 REQUEST_TIMEOUT_SECONDS = 10
 _MAX_NUMBER = 2_147_483_647
+
+
+def _own_site_page(value: str) -> str:
+    """A library page on the SimpleDiagrams website, or nothing for any other address."""
+    return value if value.startswith(PAGE_URL_PREFIX) else ""
 
 
 def _plain_text(value: str) -> str:
@@ -93,10 +101,8 @@ class CatalogueTextRegion(CatalogueModel):
 
     The region lies inside the shape, or is centred on it and wider, starting to its left
     (`x < 0`, `width = 1 - 2x`): the area a shipped library gives a name below a narrow
-    shape, such as a BPMN event or the UML Actor, since from 5.1.0 the app lets a shipped
-    library centre a name wider than its shape. These are the only two forms the app
-    accepts for a library's label region; the compiler narrows the wider one, because the
-    package the skill writes cannot hold it.
+    shape, such as a BPMN event or the UML Actor. These are the only two forms the app
+    accepts for a library's label region, and the compiler writes either as it is.
     """
 
     # -3.5 is the leftmost start a centred region within the app's widest label (8) can have.
@@ -109,7 +115,7 @@ class CatalogueTextRegion(CatalogueModel):
     def inside_or_centred_and_wider(self) -> CatalogueTextRegion:
         """The app refuses a label region of any other form. It allows the wider form only
         for a name above or below a shape in a library shipped inside the app; that limit
-        is not repeated here, because the compiler narrows every wider region it uses."""
+        is on libraries, and a document may hold either form, so it is not repeated here."""
         if self.y + self.height > 1:
             raise ValueError("the text region extends below the shape")
         if self.x >= 0:
@@ -169,7 +175,10 @@ class CatalogueLibrary(CatalogueModel):
     built_in: bool
     revision: Revision
     page_url: Annotated[
-        str, Field(min_length=1, max_length=2048), AfterValidator(_plain_text)
+        str,
+        Field(min_length=1, max_length=2048),
+        AfterValidator(_plain_text),
+        AfterValidator(_own_site_page),
     ]
     shapes: tuple[CatalogueShape, ...] = Field(min_length=1, max_length=10_000)
 

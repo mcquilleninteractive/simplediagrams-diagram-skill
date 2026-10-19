@@ -11,6 +11,7 @@ from __future__ import annotations
 import io
 import json
 import os
+import shutil
 import subprocess
 import sys
 from itertools import pairwise
@@ -31,8 +32,8 @@ from sd_spec import (
     CatalogShape,
     DiagramSpec,
     SpecError,
-    app_requirements,
     compile_spec,
+    library_needs,
     lint,
     load_spec,
     terminal_safe,
@@ -87,10 +88,13 @@ def test_catalog_matches_what_the_compiler_writes() -> None:
         ]
         document = compile_spec(_spec(nodes), catalog)
         assert [f for f in lint(document, catalog) if f.severity == "error"] == [], library
-        # The app refuses a file below package 18 whose label region starts outside its
-        # shape, so every region the skill writes starts inside.
-        layouts = [e.content.text_layout for e in document.pages[0].elements if e.content.text_layout]
-        assert all(0 <= t.frame.x <= 1 and 0 <= t.frame.y <= 1 for t in layouts), library
+        # A library's own label region is written exactly as the app gives a placed copy.
+        for element, shape in zip(document.pages[0].elements, shapes, strict=True):
+            layout = element.content.text_layout
+            if shape.text_region is not None:
+                assert layout is not None, shape.item_id
+                frame = layout.frame
+                assert (frame.x, frame.y, frame.width, frame.height) == shape.text_region, shape.item_id
         placed += sum(1 for e in document.pages[0].elements if e.core.symbol_reference)
     assert placed == len(catalog.shapes)
     document = compile_spec(
@@ -212,19 +216,28 @@ def test_short_outside_label_uses_the_shapes_own_label() -> None:
     assert document.pages[0].content.groups == []
 
 
-def test_wide_outside_label_becomes_a_grouped_caption() -> None:
-    """The app confines an outside label to its shape's width, so a label
-    wider than a small icon is written as its own text, centred under the
-    icon and grouped with it so the two move together."""
+def test_wide_outside_label_gets_a_wider_region_centred_on_its_shape() -> None:
+    """An outside label wraps at its region's width, so a label wider than a small icon
+    keeps to the icon but in a region as wide as it needs, centred on the icon, as the
+    app's own libraries centre a long name; the region still touches the shape."""
     document = compile_spec(
         _spec([{"key": "a", "shape": "biz/Database", "label": "Order database", "col": 0, "row": 0, "label_position": "below"}])
     )
-    icon, caption = (element.core for element in document.pages[0].elements)
-    assert (icon.text_content.string, caption.kind, caption.text_content.string) == ("", "text", "Order database")
-    assert caption.frame.x + caption.frame.width / 2 == icon.frame.x + icon.frame.width / 2
-    assert caption.frame.y >= icon.frame.y + icon.frame.height
-    assert [{m.id for m in g.members} for g in document.pages[0].content.groups] == [{icon.id, caption.id}]
+    (icon,) = document.pages[0].elements
+    layout = icon.content.text_layout
+    assert icon.core.text_content.string == "Order database" and layout is not None
+    assert layout.position == "below" and layout.frame.width > 1
+    assert layout.frame.x == pytest.approx((1 - layout.frame.width) / 2, abs=0.001)
+    assert document.pages[0].content.groups == []
     assert lint(document) == []
+
+
+def test_an_outside_region_is_at_most_eight_times_its_shape() -> None:
+    """Eight times the shape is the widest region the app keeps; past it the label wraps."""
+    document = compile_spec(_spec([{"key": "a", "shape": "rectangle", "label": "x" * 400, "col": 0, "row": 0,
+                                    "width": 10, "height": 10, "label_position": "above"}]))
+    layout = document.pages[0].elements[0].content.text_layout
+    assert layout is not None and layout.frame.width == 8 and layout.frame.x == -3.5
 
 
 def test_library_shapes_get_the_points_and_label_their_library_gives_them() -> None:
@@ -241,7 +254,7 @@ def test_library_shapes_get_the_points_and_label_their_library_gives_them() -> N
     )
     start, task, loop, plain = (element for element in document.pages[0].elements)
     layout = start.content.text_layout
-    assert (layout.position, layout.frame.x, layout.frame.width) == ("below", 0, 1)
+    assert (layout.position, layout.frame.x, layout.frame.width) == ("below", -0.977, 2.954)
     region = task.content.text_layout
     assert region.position == "middle"
     assert (region.frame.x, region.frame.y, region.frame.width, region.frame.height) == (
@@ -262,14 +275,13 @@ def test_the_spec_can_still_choose_the_label_position() -> None:
                 "label_position": "middle"}])
     )
     layout = document.pages[0].elements[0].content.text_layout
-    assert (layout.position, layout.frame.width, layout.frame.height) == ("middle", 1, 1)
+    assert (layout.position, layout.frame.width, layout.frame.height) == ("middle", 2.954, 1)
 
 
-def test_a_name_wider_than_its_shape_stays_on_the_shape_in_the_package_written() -> None:
-    """From 5.1.0 a shipped library may centre a name wider than its shape, such as the
-    UML Actor's, starting left of the shape. Only package 18 holds such a region, and the
-    app refuses an older file that has one, so the skill keeps a short name to the shape's
-    width and turns a longer one into a caption grouped with the shape."""
+def test_a_name_wider_than_its_shape_is_written_as_its_library_centres_it() -> None:
+    """A shipped library may centre a name wider than its shape, such as the UML Actor's,
+    starting left of the shape. The skill writes that region exactly as the app gives a copy
+    placed by hand, whatever the name's length; a long name wraps in it."""
     actor = Catalog.load().resolve("uml", "actor")
     assert actor is not None and actor.text_region is not None and actor.text_region[0] < 0
 
@@ -279,16 +291,11 @@ def test_a_name_wider_than_its_shape_stays_on_the_shape_in_the_package_written()
             {"key": "long", "shape": "uml/actor", "label": "Customer service agent", "col": 1, "row": 0},
         ])
     )
-    assert document.schema_version == wire.SCHEMA_VERSION
-    short, long_actor, caption = (element for element in document.pages[0].elements)
-    layout = short.content.text_layout
-    assert layout is not None
-    assert (layout.position, layout.frame.x, layout.frame.width) == ("below", 0, 1)
-    assert long_actor.core.text_content.string == ""
-    assert (caption.core.kind, caption.core.text_content.string) == ("text", "Customer service agent")
-    assert [{m.id for m in g.members} for g in document.pages[0].content.groups] == [
-        {long_actor.core.id, caption.core.id}
-    ]
+    assert len(document.pages[0].elements) == 2 and document.pages[0].content.groups == []
+    for element in document.pages[0].elements:
+        layout = element.content.text_layout
+        assert layout is not None and element.core.text_content.string in ("A", "Customer service agent")
+        assert (layout.frame.x, layout.frame.y, layout.frame.width, layout.frame.height) == actor.text_region
 
 
 def test_a_fork_join_bar_keeps_its_thickness() -> None:
@@ -358,76 +365,17 @@ def test_packaged_facts_come_from_the_apps_own_list() -> None:
     assert len(merged.shapes) == len(Catalog.load().shapes)
 
 
-def test_the_build_names_what_needs_a_newer_app() -> None:
-    """A document is not wrong for needing a newer app, but whoever sends it must be
-    able to say which version opens it: 5.0.11 for the newer line endings, and the
-    release that first ships BPMN for its shapes."""
-    plain = compile_spec(_spec([_box("a", 0, 0), _box("b", 1, 0)], [{"source": "a", "target": "b"}]))
-    assert app_requirements(plain) == []
-    newer = compile_spec(
+def test_a_document_of_packaged_shapes_needs_nothing_more() -> None:
+    """Every packaged shape and line ending is in the SimpleDiagrams that opens the file,
+    so only a downloaded library is ever named; nothing is a warning."""
+    document = compile_spec(
         _spec(
             [_box("a", 0, 0), {"key": "e", "shape": "bpmn/end-event", "label": "Done", "col": 1, "row": 0}],
             [{"source": "a", "target": "e", "end_ending": "cross"}],
         )
     )
-    needs = app_requirements(newer)
-    assert len(needs) == 2
-    assert needs[0].startswith("SimpleDiagrams 5.0.11 or later") and "cross" in needs[0]
-    assert needs[1].startswith("SimpleDiagrams 5.1.0 or later")
-    assert needs[1].endswith("1 BPMN shape added in that release; an earlier app draws it as a dashed placeholder")
-    assert lint(newer) == [], "Needing a newer app is reported, never as a warning."
-
-
-def test_a_shape_from_an_undecided_release_is_named_after_the_last_one() -> None:
-    """Before the next release has a number, the bundled catalogue, which the maintainers
-    regenerate from the app's own library bundle, records its new shapes as
-    "after X (unreleased)", and the build must still say something a person can act on:
-    the first release after X, listed after every numbered release."""
-    catalog = Catalog.load()
-    later = [
-        shape.model_copy(update={"first_release": "after 5.1.0 (unreleased)"})
-        if (shape.library_short_name, shape.item_id) == ("uml", "actor") else shape
-        for shape in catalog.shapes
-    ]
-    document = compile_spec(
-        _spec([
-            {"key": "a", "shape": "uml/actor", "label": "A", "col": 0, "row": 0},
-            {"key": "yen", "shape": "biz/coin-yen", "col": 1, "row": 0},
-        ]),
-        catalog,
-    )
-    needs = app_requirements(document, Catalog(later, "test"))
-    assert [need.split(",")[0] for need in needs] == [
-        "SimpleDiagrams 5.0.16 or later",
-        "the first SimpleDiagrams release after 5.1.0 or a later one",
-    ]
-
-
-def test_each_newer_packaged_shape_names_the_release_that_added_it() -> None:
-    """Biz and UI Flow grew after the format began; a document using a newer shape must
-    say which release shows it, one line per release, oldest first, and a shape every
-    app has must add nothing."""
-    original = compile_spec(_spec([{"key": "m", "shape": "biz/Man", "col": 0, "row": 0}]))
-    assert app_requirements(original) == []
-
-    newer = compile_spec(
-        _spec([
-            {"key": "yen", "shape": "biz/coin-yen", "col": 0, "row": 0},
-            {"key": "prompt", "shape": "uiFlow/ai-prompt-field", "col": 1, "row": 0},
-            {"key": "yuan", "shape": "biz/coin-yuan", "col": 2, "row": 0},
-            {"key": "m", "shape": "biz/Man", "col": 3, "row": 0},
-        ])
-    )
-    assert app_requirements(newer) == [
-        (
-            "SimpleDiagrams 5.0.12 or later, for 1 UI Flow shape added in that release; an "
-            "earlier app draws it as a dashed placeholder"
-        ),
-        (
-            "SimpleDiagrams 5.0.16 or later, for 2 Biz shapes added in that release; an "
-            "earlier app draws them as dashed placeholders"
-        ),
-    ]
+    assert library_needs(document) == []
+    assert lint(document) == []
 
 
 def test_routes_do_not_run_through_labels_under_icons() -> None:
@@ -638,8 +586,11 @@ def test_versions_are_stated_consistently() -> None:
     assert f"| Skill | {plugin['version']} |" in versions
     assert f"| Package format | {wire.FORMAT_VERSION} |" in versions
     assert f"| Document schema | {wire.SCHEMA_VERSION} |" in versions
-    assert f"| Package format, downloadable shapes | {wire.REQUIRED_LIBRARIES_FORMAT_VERSION} |" in versions
-    assert f"| Document schema, downloadable shapes | {wire.REQUIRED_LIBRARIES_SCHEMA_VERSION} |" in versions
+    # Every document needs the SimpleDiagrams the catalogue comes from, which has shipped.
+    for path in ("VERSIONS.md", "README.md", "SKILL.md", "references/document-format.md"):
+        text = (ROOT / path).read_text()
+        assert f"SimpleDiagrams {catalog['source_app_version']} or later" in text, path
+        assert "not yet released" not in text, path
     assert f"from SimpleDiagrams {catalog['source_app_version']}" in versions
     assert catalog["source_app_version"] in (ROOT / "README.md").read_text()
     for name in (f"simplediagram-document-{wire.FORMAT_VERSION}", f"simplediagram-manifest-{wire.FORMAT_VERSION}", "diagram-spec-1"):
@@ -718,7 +669,6 @@ def test_each_downloaded_library_is_named_once_in_the_order_first_used() -> None
         _catalog_with_downloads(),
     )
 
-    assert document.schema_version == 15
     assert [(lib.library_id, lib.display_name) for lib in document.required_libraries or []] == [
         (NOTEBOOK_ID, "Hobby Electronics Notebook"), (GARDEN_ID, "Green Walls"),
     ]
@@ -726,10 +676,10 @@ def test_each_downloaded_library_is_named_once_in_the_order_first_used() -> None
 
 
 def test_a_document_of_packaged_shapes_names_no_library() -> None:
-    """Only a downloaded shape makes a document format 16."""
+    """Only a downloaded shape adds a library to the document's list."""
     document = compile_spec(_downloaded_spec("basic/Square"), _catalog_with_downloads())
 
-    assert document.schema_version == 14 and document.required_libraries is None
+    assert document.required_libraries is None
 
 
 def test_lint_accepts_downloaded_shapes_and_still_flags_unknown_ones() -> None:
@@ -741,16 +691,16 @@ def test_lint_accepts_downloaded_shapes_and_still_flags_unknown_ones() -> None:
     assert [f.code for f in lint(document) if f.severity == "error"] == ["unresolved-shape"]
 
 
-def test_the_build_says_which_library_and_app_a_document_needs() -> None:
-    """Whoever sends the file must be able to say what opens it and what shows its shapes."""
-    needs = app_requirements(compile_spec(_downloaded_spec("notebook/transformer"), _catalog_with_downloads()))
+def test_the_build_says_which_library_a_document_needs() -> None:
+    """Whoever sends the file must be able to say which library shows its shapes."""
+    needs = library_needs(compile_spec(_downloaded_spec("notebook/transformer"), _catalog_with_downloads()))
 
-    assert any(
-        "Hobby Electronics Notebook library installed" in need
-        and "SimpleDiagrams 5.1.0 or later" in need
-        for need in needs
-    )
-    assert any("5.0.16 or later to open the file" in need for need in needs)
+    assert needs == [
+        (
+            "the Hobby Electronics Notebook library installed, to show its shapes; without it "
+            "they are placeholder boxes, and SimpleDiagrams names the library and links to its page"
+        )
+    ]
 
 
 def test_paint_on_a_downloaded_shape_is_reported_as_unused() -> None:
@@ -792,18 +742,18 @@ def test_more_libraries_than_a_document_can_name_stops_the_build_plainly() -> No
         compile_spec(_downloaded_spec(*selectors), catalog)
 
 
-def test_a_wide_label_on_a_downloaded_shape_becomes_a_grouped_caption() -> None:
-    """A downloaded shape's label follows the same caption rule as a packaged one's."""
+def test_a_wide_label_on_a_downloaded_shape_is_centred_on_it() -> None:
+    """A downloaded shape's label follows the same rule as a packaged one's."""
     spec = _downloaded_spec("notebook/transformer")
     node = spec.pages[0].nodes[0]
     node.label, node.label_position = "A label far wider than the shape", "below"
     page = compile_spec(spec, _catalog_with_downloads()).pages[0]
 
-    shape, caption = page.elements
-    assert shape.core.symbol_reference is not None and shape.core.text_content.string == ""
-    assert caption.core.kind == "text"
-    assert caption.core.text_content.string == "A label far wider than the shape"
-    assert [{m.id for m in g.members} for g in page.content.groups] == [{shape.core.id, caption.core.id}]
+    (shape,) = page.elements
+    layout = shape.content.text_layout
+    assert shape.core.symbol_reference is not None
+    assert shape.core.text_content.string == "A label far wider than the shape"
+    assert layout is not None and layout.frame.width > 1 and layout.frame.x < 0
 
 
 def test_a_shared_short_name_gets_a_selector_that_still_builds() -> None:
@@ -862,7 +812,7 @@ def _end_points(document: wire.Document) -> list[tuple[int, float, float]]:
     for connection in document.pages[0].connections:
         core = connection.content
         for attachment, point in ((core.start_attachment, core.points[0]), (core.end_attachment, core.points[-1])):
-            assert attachment is not None
+            assert attachment is not None and attachment.connection_point_id is not None
             ends.append((attachment.connection_point_id, point.x, point.y))
     return ends
 
@@ -1042,22 +992,6 @@ def test_a_side_of_a_flipped_shape_is_the_side_it_is_drawn_on() -> None:
         frame = document.pages[0].elements[0].core.frame
         assert _end_points(document)[0] == (0, frame.x + frame.width, pytest.approx(frame.y + frame.height / 2))
         assert _axis_aligned(document)
-
-
-def test_a_connector_on_a_flipped_shape_names_the_release_that_mirrors_points() -> None:
-    """Apps before 5.1.0 draw a flipped shape's points unmirrored, so a connector attached
-    to one meets the wrong place there. A flipped shape with nothing attached draws the
-    same in every version and needs nothing."""
-    nodes = [{"key": "a", "shape": "rectangle", "x": 0, "y": 100, "flip_vertical": True},
-             {"key": "b", "shape": "rectangle", "x": 300, "y": 100}]
-    assert app_requirements(compile_spec(_wired(nodes, []))) == []
-    needs = app_requirements(compile_spec(_wired(nodes, [{"source": "a", "target": "b"}])))
-    assert needs == [
-        (
-            "SimpleDiagrams 5.1.0 or later, for the connectors attached to 1 flipped shape; an "
-            "earlier app attaches them where the points would be on the unflipped shape"
-        )
-    ]
 
 
 def test_text_cannot_be_flipped() -> None:
@@ -1277,7 +1211,8 @@ def test_building_and_previewing_store_nothing_but_the_named_output(tmp_path: Pa
     home.mkdir()
     work.mkdir()
     spec = ROOT / "assets" / "example-spec.json"
-    environment = {"HOME": str(home), "PATH": os.environ.get("PATH", "")}
+    environment = {"HOME": str(home), "PATH": os.environ.get("PATH", ""), "PYTHONDONTWRITEBYTECODE": "1"}
+    before = _bytecode(ROOT)
     for script, output in (("build_diagram.py", "Out.simplediagram"), ("preview_diagram.py", "out.svg")):
         result = subprocess.run(
             [sys.executable, str(ROOT / "scripts" / script), "--offline", str(spec), output],
@@ -1286,6 +1221,52 @@ def test_building_and_previewing_store_nothing_but_the_named_output(tmp_path: Pa
         assert result.returncode == 0, result.stdout + result.stderr
     assert list(home.iterdir()) == []
     assert sorted(path.name for path in work.iterdir()) == ["Out.simplediagram", "out.svg"]
+    assert _bytecode(ROOT) == before, "a script left Python bytecode in the skill folder"
+
+
+def _bytecode(folder: Path) -> dict[str, int]:
+    """Every compiled Python file under `folder`, with when it was written."""
+    return {str(path): path.stat().st_mtime_ns for path in folder.rglob("__pycache__/*")}
+
+
+def test_the_scripts_write_no_bytecode_even_when_python_would(tmp_path: Path) -> None:
+    """An installed skill must stay as it was installed: each command turns off Python's
+    bytecode itself, so no cache folder appears beside the scripts whatever the
+    environment says. Run in a copy, so a failure leaves nothing in the skill."""
+    copy = tmp_path / "skill"
+    shutil.copytree(ROOT / "scripts", copy / "scripts", ignore=shutil.ignore_patterns("__pycache__"))
+    shutil.copytree(ROOT / "assets", copy / "assets")
+    environment = {key: value for key, value in os.environ.items() if key != "PYTHONDONTWRITEBYTECODE"}
+    spec = copy / "assets" / "example-spec.json"
+    for command in (
+        ["build_diagram.py", str(spec), str(tmp_path / "Out.simplediagram")],
+        ["preview_diagram.py", str(spec), str(tmp_path / "out.svg")],
+        ["find_shapes.py", "database"],
+    ):
+        result = subprocess.run(
+            [sys.executable, str(copy / "scripts" / command[0]), "--offline", *command[1:]],
+            capture_output=True, text=True, check=False, cwd=tmp_path, env=environment,
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
+    assert list(copy.rglob("__pycache__")) == []
+
+
+def test_the_build_prints_a_bounded_number_of_findings_of_one_kind(tmp_path: Path) -> None:
+    """A large diagram can repeat one problem hundreds of times; the build shows the first
+    of each kind and counts the rest, so the output stays readable and bounded."""
+    nodes = [
+        {"key": f"n{index}", "shape": "rectangle", "label": "x", "x": 100 + index, "y": 100}
+        for index in range(30)
+    ]
+    spec = tmp_path / "crowded.json"
+    spec.write_text(json.dumps({"name": "Crowded", "pages": [{"nodes": nodes}]}), encoding="utf-8")
+    result = _run("build_diagram.py", spec)
+    assert result.returncode == 0, result.stdout + result.stderr
+    pairs = 30 * 29 // 2
+    overlaps = [line for line in result.stdout.splitlines() if line.startswith("warning shapes-overlap")]
+    assert len(overlaps) == 21
+    assert overlaps[-1] == f"warning shapes-overlap: {pairs - 20} more like these, not shown"
+    assert f"{pairs} warning(s)" in result.stdout
 
 
 def test_a_folder_is_refused_as_a_spec(tmp_path: Path) -> None:

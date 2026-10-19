@@ -1,6 +1,6 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://simplediagrams.com/schemas/simplediagram-manifest-15.schema.json",
+ "$id": "https://simplediagrams.com/schemas/simplediagram-manifest-18.schema.json",
  "additionalProperties": false,
  "description": "The whole of `manifest.json`. All three keys are required.",
  "properties": {
@@ -10,11 +10,8 @@
    "type": "string"
   },
   "format_version": {
-   "description": "Package format. document.json's schema_version is this minus one. 16 only for a document that names required libraries.",
-   "enum": [
-    15,
-    16
-   ],
+   "const": 18,
+   "description": "Package format, which SimpleDiagrams 5.1.0 and later read. document.json's schema_version is this minus one.",
    "title": "Format Version",
    "type": "integer"
   },

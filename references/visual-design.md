@@ -25,7 +25,8 @@ A diagram works when a reader can answer "what are the parts, and how do they re
 - **Put the main path on a straight line.** The sequence that matters most should run through the middle without a bend; branches and exceptions go above and below it.
 - **Keep spacing even.** Use whole `col` and `row` values. The default pitch (240 across, 160 down) leaves 100 points between 140-wide boxes, which is enough for an arrowhead and a short label. Raise `column_pitch` when connectors carry labels longer than two words.
 - **Use half steps sparingly.** `row: 1.5` centres a node between two rows, which suits a node fed by both. More than a couple of these and the grid stops being visible.
-- **Leave room around groups.** Separate two clusters with an empty row or column rather than a box drawn around each.
+- **Leave room around groups.** Separate two clusters with an empty row or column rather than a box drawn around each, unless the box itself means something: a subsystem, a boundary, a BPMN pool or lane. Then use a `container` or `swimlanes` holding the nodes, and let the builder fit it around them. Leave an empty row between two fitted containers or pools, and give each lane its own rows (columns for vertical lanes) so its members never share a row with the next lane's.
+- **Sequence diagrams run down the page.** Lifelines go side by side on one row, in the order the first messages reach them, usually 200 apart; the messages follow the edges' order downwards. Put the participant that starts the sequence on the left, so most messages run left to right and replies come back.
 
 ## Connectors
 
@@ -47,7 +48,7 @@ The build routes connectors for you: from side to side (or from a connection poi
 
 - **One shape per kind of thing.** If a cylinder is a database once, it is a database everywhere, and nothing else is a cylinder. Three or four kinds is usually the limit before a legend is needed.
 - **Boxes hold labels; icons carry them outside.** For a labelled box use `basic/Square` with an explicit `width` and `height`. For pictorial shapes (people, databases, documents, clouds) use `scale` to size them and `label_position: "below"`, because artwork under text is unreadable.
-- **Captions need room.** A caption wider than its icon is placed as its own centred text under the icon. Leave the row beneath clear, and bring connectors into the icon from the sides or the top so they do not cross the caption. In a top-to-bottom layout put captions `above`, or use labelled boxes instead of icons.
+- **Labels under icons need room.** A label wider than its icon is centred under it, as wide as it needs. Leave the row beneath clear, and bring connectors into the icon from the sides or the top so they do not cross the label. In a top-to-bottom layout put labels `above`, or use labelled boxes instead of icons.
 - **Do not rotate connected shapes.** The app moves an attached end with the rotation and the stored route no longer matches (`rotated-end`).
 - **Make same-rank shapes the same size.** Set one `width` and `height` for all the boxes in a row, sized to the longest label, rather than fitting each to its own text.
 - **Size to the text.** At the default 15-point font a 140-wide box holds roughly 14 characters a line. That figure is an estimate, not a measurement of the app's font, so leave slack. The build warns with `label-overflow`; widen the box or break the label with `\n` at a natural point rather than shrinking the font.

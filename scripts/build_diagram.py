@@ -16,8 +16,12 @@ written, and 2 with `--strict` when it is valid but has layout warnings.
 
 from __future__ import annotations
 
-import argparse
 import sys
+
+# The skill writes nothing but the output it is asked for, not even Python's bytecode.
+sys.dont_write_bytecode = True
+
+import argparse
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -25,12 +29,15 @@ from sd_package import PackageError, write_package
 from sd_spec import (
     Catalog,
     SpecError,
-    app_requirements,
     compile_spec,
     echo,
+    library_needs,
     lint,
     load_spec,
 )
+
+# The most findings of one code the build prints; the rest are counted.
+MAX_FINDINGS_PER_CODE = 20
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -65,9 +72,18 @@ def main(argv: list[str] | None = None) -> int:
             echo(f"error   {failure}")
             return 1
 
+    # A large diagram can repeat one problem many times; the first few of each kind say
+    # what to fix, and the rest are counted.
+    shown: dict[str, int] = {}
     for finding in findings:
-        echo(f"{finding.severity:8}{finding.code}: {finding.message}")
-    for need in app_requirements(document, catalog):
+        shown[finding.code] = shown.get(finding.code, 0) + 1
+        if shown[finding.code] <= MAX_FINDINGS_PER_CODE:
+            echo(f"{finding.severity:8}{finding.code}: {finding.message}")
+    for finding in {finding.code: finding for finding in findings}.values():
+        hidden = shown[finding.code] - MAX_FINDINGS_PER_CODE
+        if hidden > 0:
+            echo(f"{finding.severity:8}{finding.code}: {hidden} more like these, not shown")
+    for need in library_needs(document):
         echo(f"needs   {need}")
     elements = sum(len(page.elements) for page in document.pages)
     connectors = sum(len(page.connections) for page in document.pages)

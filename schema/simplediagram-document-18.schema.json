@@ -1,10 +1,10 @@
 {
  "$schema": "https://json-schema.org/draft/2020-12/schema",
- "$id": "https://simplediagrams.com/schemas/simplediagram-document-15.schema.json",
+ "$id": "https://simplediagrams.com/schemas/simplediagram-document-18.schema.json",
  "$defs": {
   "Attachment": {
    "additionalProperties": false,
-   "description": "Binds a connector end to an anchor on an element of the same page.",
+   "description": "Binds a connector end, or a callout's tail, to a place on an element of the same page.\n\nThe place is one of the element's numbered anchors (`connection_point_id`) or a point\n`distance` points along one of its attach lines from the line's start\n(`attach_line_id`): a UML lifeline's dashed line, whose id is 0, is the only one.\nA record holds exactly one of the two forms. A callout's tail uses an anchor only.",
    "properties": {
     "element_id": {
      "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
@@ -13,15 +13,51 @@
      "type": "string"
     },
     "connection_point_id": {
-     "maximum": 9223372036854775807,
-     "minimum": 0,
-     "title": "Connection Point Id",
-     "type": "integer"
+     "anyOf": [
+      {
+       "maximum": 9223372036854775807,
+       "minimum": 0,
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Connection Point Id"
+    },
+    "attach_line_id": {
+     "anyOf": [
+      {
+       "maximum": 9223372036854775807,
+       "minimum": 0,
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Attach Line Id"
+    },
+    "distance": {
+     "anyOf": [
+      {
+       "maximum": 10000000.0,
+       "minimum": 0,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Points along the attach line from its start; with attach_line_id only.",
+     "title": "Distance"
     }
    },
    "required": [
-    "element_id",
-    "connection_point_id"
+    "element_id"
    ],
    "title": "Attachment",
    "type": "object"
@@ -132,6 +168,252 @@
     "color_hex"
    ],
    "title": "CharacterStyle",
+   "type": "object"
+  },
+  "ComplexShape": {
+   "additionalProperties": false,
+   "description": "The `complex_shape` record of an element of kind `complex_shape`.\n\nIt holds only the keys its `type` uses. Each optional key is written only when it\ndiffers from the default the app reads in its place: `hand_drawn` only as false,\n`title_style` only as `corner_tag` (the default is the band), `header_row` only as\nfalse, `head_style` only as `actor` (the default is a box) and `ends_in_destroy_mark`\nonly as true. A container's members and a table's sizes and cells are always written.\n\n- container: `members`, in order; `title_style`.\n- swimlanes: `direction`; `lanes`, each with an id unique in the shape, a title, a\n  size as a share of the whole, and members; the title strip's and band's thickness\n  when wider than 28.\n- table: `row_sizes` and `column_sizes` as shares; `cells`, row by row, one text per\n  column; `header_row`.\n- callout: `tail_tip`, the tail's tip in points from the frame's centre, along the\n  bubble's own axes before flipping; no tip means no tail. `tail_attachment` locks\n  the tail to another shape's anchor and needs a tip, saved where it is drawn.\n- lifeline: `head_style`; `ends_in_destroy_mark`.",
+   "properties": {
+    "type": {
+     "enum": [
+      "container",
+      "swimlanes",
+      "table",
+      "callout",
+      "lifeline"
+     ],
+     "title": "Type",
+     "type": "string"
+    },
+    "hand_drawn": {
+     "anyOf": [
+      {
+       "const": false,
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Hand Drawn"
+    },
+    "members": {
+     "anyOf": [
+      {
+       "items": {
+        "$ref": "#/$defs/HolderMember"
+       },
+       "maxItems": 100000,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Members"
+    },
+    "title_style": {
+     "anyOf": [
+      {
+       "const": "corner_tag",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title Style"
+    },
+    "direction": {
+     "anyOf": [
+      {
+       "enum": [
+        "horizontal",
+        "vertical"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Direction"
+    },
+    "lanes": {
+     "anyOf": [
+      {
+       "items": {
+        "$ref": "#/$defs/Lane"
+       },
+       "maxItems": 50,
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Lanes"
+    },
+    "title_strip_size": {
+     "anyOf": [
+      {
+       "maximum": 10000.0,
+       "minimum": 28.0,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title Strip Size"
+    },
+    "title_band_size": {
+     "anyOf": [
+      {
+       "maximum": 10000.0,
+       "minimum": 28.0,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Title Band Size"
+    },
+    "row_sizes": {
+     "anyOf": [
+      {
+       "items": {
+        "description": "A lane's, row's or column's part of the whole: any positive number.",
+        "maximum": 1000000.0,
+        "minimum": 1e-06,
+        "type": "number"
+       },
+       "maxItems": 200,
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Row Sizes"
+    },
+    "column_sizes": {
+     "anyOf": [
+      {
+       "items": {
+        "description": "A lane's, row's or column's part of the whole: any positive number.",
+        "maximum": 1000000.0,
+        "minimum": 1e-06,
+        "type": "number"
+       },
+       "maxItems": 50,
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Column Sizes"
+    },
+    "cells": {
+     "anyOf": [
+      {
+       "items": {
+        "items": {
+         "$ref": "#/$defs/TextContent"
+        },
+        "maxItems": 50,
+        "type": "array"
+       },
+       "maxItems": 200,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Cells"
+    },
+    "header_row": {
+     "anyOf": [
+      {
+       "const": false,
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Header Row"
+    },
+    "tail_tip": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Point"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "tail_attachment": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/Attachment"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
+    },
+    "head_style": {
+     "anyOf": [
+      {
+       "const": "actor",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Head Style"
+    },
+    "ends_in_destroy_mark": {
+     "anyOf": [
+      {
+       "const": true,
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Ends In Destroy Mark"
+    }
+   },
+   "required": [
+    "type"
+   ],
+   "title": "ComplexShape",
    "type": "object"
   },
   "Connection": {
@@ -442,7 +724,7 @@
   },
   "Element": {
    "additionalProperties": false,
-   "description": "One entry in a page's `elements` array.\n\nExactly three keys, and the app rejects any other. Both shape-data keys\nmust be present; in this profile they are always `null` and `[]`.",
+   "description": "One entry in a page's `elements` array.\n\nThree keys, and a fourth, `complex_shape`, on an element of that kind and no other;\nthe app rejects any other key. Both shape-data keys must be\npresent; in this profile they are always `null` and `[]`.",
    "properties": {
     "content": {
      "$ref": "#/$defs/ElementPresentation"
@@ -456,6 +738,17 @@
      "maxItems": 0,
      "title": "Shape Data Values",
      "type": "array"
+    },
+    "complex_shape": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/ComplexShape"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null
     }
    },
    "required": [
@@ -483,7 +776,8 @@
       "note",
       "text",
       "symbol",
-      "path"
+      "path",
+      "complex_shape"
      ],
      "title": "Kind",
      "type": "string"
@@ -971,6 +1265,70 @@
     "position"
    ],
    "title": "Guide",
+   "type": "object"
+  },
+  "HolderMember": {
+   "additionalProperties": false,
+   "description": "One thing a container or a lane holds: a shape, or a whole group that is in no\nother group. Never a connector, never swimlanes, and never a piece of a group.",
+   "properties": {
+    "kind": {
+     "enum": [
+      "element",
+      "group"
+     ],
+     "title": "Kind",
+     "type": "string"
+    },
+    "id": {
+     "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+     "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+     "title": "Id",
+     "type": "string"
+    }
+   },
+   "required": [
+    "kind",
+    "id"
+   ],
+   "title": "HolderMember",
+   "type": "object"
+  },
+  "Lane": {
+   "additionalProperties": false,
+   "description": "One lane of a swimlanes shape. Its id is unique within its shape.",
+   "properties": {
+    "id": {
+     "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
+     "pattern": "^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+     "title": "Id",
+     "type": "string"
+    },
+    "title": {
+     "$ref": "#/$defs/TextContent"
+    },
+    "size": {
+     "description": "A lane's, row's or column's part of the whole: any positive number.",
+     "maximum": 1000000.0,
+     "minimum": 1e-06,
+     "title": "Size",
+     "type": "number"
+    },
+    "members": {
+     "items": {
+      "$ref": "#/$defs/HolderMember"
+     },
+     "maxItems": 100000,
+     "title": "Members",
+     "type": "array"
+    }
+   },
+   "required": [
+    "id",
+    "title",
+    "size",
+    "members"
+   ],
+   "title": "Lane",
    "type": "object"
   },
   "Page": {
@@ -1565,7 +1923,7 @@
   },
   "SymbolReference": {
    "additionalProperties": false,
-   "description": "Names one shape in a library: one built into SimpleDiagrams, or a downloaded one.\n\nA built-in shape is named by the app's own library and item names. A downloaded\nshape is named by its library's and item's published UUIDs; the app puts its\nartwork in place when the document opens with that library installed (from\nSimpleDiagrams 5.1.0), and the document lists the library in `required_libraries`. A\nreference the app cannot resolve still opens, but draws a dashed placeholder.",
+   "description": "Names one shape in a library: one built into SimpleDiagrams, or a downloaded one.\n\nA built-in shape is named by the app's own library and item names. A downloaded\nshape is named by its library's and item's published UUIDs; the app puts its\nartwork in place when the document opens with that library installed, and the\ndocument lists the library in `required_libraries`. A\nreference the app cannot resolve still opens, but draws a dashed placeholder.",
    "properties": {
     "library_id": {
      "minLength": 1,
@@ -1654,7 +2012,7 @@
   },
   "TextLayout": {
    "additionalProperties": false,
-   "description": "Where a label sits, relative to its own shape.\n\n`frame` is in fractions of the shape: x and y are the region's top left\ncorner and stay inside the shape; width and height may run past it. With\nposition `above` or `below` the label sits just outside the shape and the\nframe's y is ignored.",
+   "description": "Where a label sits, relative to its own shape.\n\n`frame` is in fractions of the shape: x and y are the region's top left\ncorner; width and height may run past the shape. The region may start outside\nit, as a name SimpleDiagrams centres below a narrow shape does, while some of it\nstill touches the shape. With position `above` or `below` the label sits just\noutside the shape, wrapping at the region's width, and the frame's y is ignored.",
    "properties": {
     "frame": {
      "$ref": "#/$defs/TextLayoutFrame"
@@ -1694,17 +2052,17 @@
   },
   "TextLayoutFrame": {
    "additionalProperties": false,
-   "description": "A label region in fractions of the owning shape's width and height.",
+   "description": "A label region in fractions of the owning shape's width and height.\n\nIts corner may lie as far before the shape as the region is long, so the region\nstill touches the shape.",
    "properties": {
     "x": {
      "maximum": 1,
-     "minimum": 0,
+     "minimum": -8,
      "title": "X",
      "type": "number"
     },
     "y": {
      "maximum": 1,
-     "minimum": 0,
+     "minimum": -8,
      "title": "Y",
      "type": "number"
     },
@@ -1756,7 +2114,7 @@
   }
  },
  "additionalProperties": false,
- "description": "The whole of `document.json`: these nine keys, all required, and from schema 15\n`required_libraries` when the document names any.",
+ "description": "The whole of `document.json`: these nine keys, all required, and\n`required_libraries` when the document names any.",
  "properties": {
   "id": {
    "description": "A UUID in 8-4-4-4-12 form. The app writes upper case; either case opens.",
@@ -1765,11 +2123,8 @@
    "type": "string"
   },
   "schema_version": {
-   "description": "14 for package format 15, 15 for package format 16. Schema 15 is written only with required_libraries.",
-   "enum": [
-    14,
-    15
-   ],
+   "const": 17,
+   "description": "17, for package format 18.",
    "title": "Schema Version",
    "type": "integer"
   },
@@ -1820,7 +2175,7 @@
    "type": "array"
   },
   "required_libraries": {
-   "description": "The downloaded libraries the document's shapes come from. Schema 15 only, and only when not empty; left out otherwise, never null.",
+   "description": "The downloaded libraries the document's shapes come from, only when there are any; left out otherwise, never null.",
    "items": {
     "$ref": "#/$defs/RequiredLibrary"
    },

@@ -21,9 +21,17 @@ id_ed25519*
 .netrc
 .npmrc
 .pypirc
+.envs/
+*.p8
+AuthKey_*
+*service-account*.json
+*.mobileprovision
+*.jks
+*.keystore
 
 # Local tool and editor state, which can hold your user name and folder paths
 .claude/
+CLAUDE.local.md
 .DS_Store
 ._*
 __MACOSX/

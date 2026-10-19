@@ -44,16 +44,21 @@ def _rejects(document: dict) -> str:
 
 def test_versions_are_the_pinned_pair() -> None:
     """The package and document counters differ by one; mixing them up is the
-    commonest reason the app refuses a hand-written file."""
-    assert (wire.FORMAT_VERSION, wire.SCHEMA_VERSION) == (15, 14)
-    manifest = {"format": "com.simplediagrams.document", "format_version": 15, "contains_legacy_source": False}
+    commonest reason the app refuses a hand-written file. Every document is the
+    package SimpleDiagrams 5.1.0 writes."""
+    assert (wire.FORMAT_VERSION, wire.SCHEMA_VERSION) == (18, 17)
+    manifest = {"format": "com.simplediagrams.document", "format_version": 18, "contains_legacy_source": False}
     assert wire.dump(wire.manifest()) == manifest
+    assert wire.dump(wire.manifest(fixtures.full_profile_document())) == manifest
     for missing in manifest:
         with pytest.raises(ValidationError):
             wire.Manifest.model_validate({key: value for key, value in manifest.items() if key != missing})
-    document = _dumped()
-    document["schema_version"] = 15
-    assert "schema_version" in _rejects(document)
+    with pytest.raises(ValidationError):
+        wire.Manifest.model_validate(manifest | {"format_version": 15})
+    for older in (14, 15, 18):
+        document = _dumped()
+        document["schema_version"] = older
+        assert "schema_version" in _rejects(document)
 
 
 def test_full_profile_round_trips_unchanged() -> None:
@@ -294,7 +299,7 @@ def test_committed_schemas_match_the_models() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Package 16: the libraries a document needs
+# The libraries a document needs
 # ---------------------------------------------------------------------------
 
 NOTEBOOK = "79FFE4B7-EA0D-87C3-AE89-D4CD62AF5202"
@@ -302,33 +307,24 @@ NOTEBOOK = "79FFE4B7-EA0D-87C3-AE89-D4CD62AF5202"
 
 def _with_libraries(libraries: list[dict]) -> dict:
     document = _dumped()
-    document["schema_version"] = 15
     document["required_libraries"] = libraries
     return document
 
 
-def test_required_libraries_come_only_with_schema_15_and_package_16() -> None:
-    """The app refuses the list before package 16, and the skill bumps the format only for
-    a document that has one, so every other document still opens in 5.0.8."""
+def test_required_libraries_are_written_only_when_there_are_some() -> None:
+    """The list is left out of a document that names no library, and an empty list is
+    refused; a named library leaves out a revision it does not know."""
     libraries = [{"library_id": NOTEBOOK, "display_name": "Hobby Electronics Notebook"}]
     document = wire.Document.model_validate_json(json.dumps(_with_libraries(libraries)))
-    assert wire.dump(wire.manifest(document))["format_version"] == 16
-    at_14 = _with_libraries(libraries)
-    at_14["schema_version"] = 14
-    assert "required_libraries" in _rejects(at_14)
+    assert wire.dump(wire.manifest(document))["format_version"] == wire.FORMAT_VERSION
     assert "required_libraries" in _rejects(_with_libraries([]))
-
-
-def test_the_builder_picks_the_format_from_the_libraries() -> None:
-    """A plain document stays at 15; one naming a library is 16, and leaves out a revision
-    it does not know."""
     plain = fixtures.minimal_document()
-    assert (plain.schema_version, wire.manifest(plain).format_version) == (14, 15)
+    assert "required_libraries" not in wire.dump(plain)
     named = wire.document(
         id=plain.id, name=plain.name, pages=plain.pages,
         required_libraries=[wire.RequiredLibrary(library_id=NOTEBOOK, display_name="Notebook")],
     )
-    assert (named.schema_version, wire.manifest(named).format_version) == (15, 16)
+    assert named.schema_version == plain.schema_version == wire.SCHEMA_VERSION
     assert wire.dump(named)["required_libraries"] == [
         {"library_id": NOTEBOOK, "display_name": "Notebook"}
     ]
@@ -412,8 +408,7 @@ def test_the_largest_entries_the_app_keeps_are_accepted() -> None:
 
 
 def test_a_library_list_written_as_null_is_refused() -> None:
-    """The app takes a key that is present, even as null, to need schema 15, and would
-    refuse the whole file; a document without libraries leaves the key out."""
+    """A document without libraries leaves the key out; null is not a list."""
     document = _dumped()
     document["required_libraries"] = None
     assert "never written as null" in _rejects(document)

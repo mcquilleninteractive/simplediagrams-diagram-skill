@@ -149,7 +149,7 @@ def _circuit_spec(tmp_path: Path, shape: str) -> Path:
     return spec
 
 
-def test_downloaded_build_writes_format_16_naming_the_library(
+def test_downloaded_build_names_the_library(
     serve: Serve, capsys: pytest.CaptureFixture[str], tmp_path: Path
 ) -> None:
     """A downloaded shape is placed by its published reference, and the document names its
@@ -160,7 +160,7 @@ def test_downloaded_build_writes_format_16_naming_the_library(
     assert result.returncode == 0, result.stdout + result.stderr
     manifest = json.loads((target / "manifest.json").read_text())
     raw = json.loads((target / "document.json").read_text())
-    assert manifest["format_version"] == 16 and raw["schema_version"] == 15
+    assert manifest["format_version"] == 18 and raw["schema_version"] == 17
     library = catalogue.libraries[1]
     assert raw["required_libraries"] == [
         {"library_id": library.library_id, "display_name": "Electronics"}
@@ -171,21 +171,21 @@ def test_downloaded_build_writes_format_16_naming_the_library(
     actual = document.pages[0].elements[0].core.symbol_reference
     assert actual is not None
     assert actual.model_dump() == library.shapes[0].reference.model_dump()
-    assert "the Electronics library installed" in result.stdout
-    assert "5.0.16 or later to open the file" in result.stdout
+    assert "needs   the Electronics library installed" in result.stdout
 
 
-def test_packaged_build_stays_at_format_15(
+def test_packaged_build_names_no_library(
     serve: Serve, capsys: pytest.CaptureFixture[str], tmp_path: Path
 ) -> None:
-    """A document with only packaged shapes must keep opening in every app since 5.0.8."""
+    """A document with only packaged shapes needs nothing installed, and says nothing more."""
     serve()
     target = tmp_path / "Box.simplediagram"
     result = _run(capsys, "build_diagram.py", _circuit_spec(tmp_path, "basic/Square"), target)
     assert result.returncode == 0, result.stdout + result.stderr
-    assert json.loads((target / "manifest.json").read_text())["format_version"] == 15
+    assert json.loads((target / "manifest.json").read_text())["format_version"] == 18
     raw = json.loads((target / "document.json").read_text())
-    assert raw["schema_version"] == 14 and "required_libraries" not in raw
+    assert raw["schema_version"] == 17 and "required_libraries" not in raw
+    assert "needs" not in result.stdout
 
 
 def test_packaged_build_copies_reference_and_round_trips(

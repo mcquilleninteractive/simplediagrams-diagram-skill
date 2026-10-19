@@ -32,8 +32,8 @@ case and asset version.
 **Packaged shapes** (`packaged: true`) ship inside SimpleDiagrams. Their
 reference uses the app's own names; the public matching UUID is not their
 placement identifier. The offline fallback records 534 packaged shapes in eight
-libraries, including 83 Biz shapes. The desktop bundles the 89 shapes of BPMN, the
-8 of UML and ten newer Basic shapes from SimpleDiagrams 5.1.0 (not yet released).
+libraries, from SimpleDiagrams 5.1.0, including the 89 shapes of BPMN and the 8
+of UML.
 
 The desktop app is the source of truth for the libraries it packages, and the
 website copies them, sometimes later. So a packaged shape's connection points
@@ -42,31 +42,40 @@ packaged library the website does not list yet is still offered from it. Some
 packaged shapes have no connection points at all (BPMN's task marks, which sit
 on a task); the builder refuses a connector to one, naming the shape. A name the
 app centres below a narrow shape, wider than it (a BPMN event, the UML Actor), is
-kept to the shape's width in the package the skill writes, and a longer name
-becomes a caption grouped with the shape. The UML Fork / Join Bar keeps its
-thickness: give it a `width` or `scale`, never a `height`.
+written as the app writes it. The UML Fork / Join Bar keeps its thickness: give
+it a `width` or `scale`, never a `height`.
+
+BPMN's plain Task and Gateway are Basic shapes, as in the app's BPMN section:
+`basic/rounded-rectangle` at 98 by 64 and `basic/Diamond` at 50 by 50 with its
+name below. BPMN's flows and UML's relationships are connector settings, not
+shapes; SKILL.md lists them.
+
+## Shapes SimpleDiagrams draws itself
+
+Containers, swimlanes, tables, callouts and UML lifelines are not in the
+catalogue: SimpleDiagrams draws them from a few settings, and a spec names
+them by kind (`"shape": "table"`) with their own fields, as SKILL.md describes.
+They cover BPMN's Pool and Expanded Sub-Process and UML's Class, Interface,
+Enumeration, Database Entity, System Boundary, Lifeline, Actor Lifeline, Frame
+and Alt, Loop and Opt fragments. A search with a word such as `pool`, `lane`,
+`class`, `entity`, `lifeline` or `fragment` adds a line naming the kind to use
+(`complex_shapes` in `--json` output).
 
 **Downloadable shapes** (`packaged: false`) come from a library a person
 downloads from simplediagrams.com. Their reference is the library's and
 shape's published UUIDs, and a document that uses one names the library in
-`required_libraries`, which makes it package format 16.
-From SimpleDiagrams 5.1.0, opening the document with the library installed
-puts the artwork in place; without it, the shapes are placeholder boxes and the
-app names the library and links to its page. SimpleDiagrams 5.0.16 opens the
-document but shows only the boxes, and an app before 5.0.16 cannot open a
-package-16 document at all. The skill does not
-embed downloaded artwork.
+`required_libraries`. Opening the document with the library installed puts the
+artwork in place; without it, the shapes are placeholder boxes and the app names
+the library and links to its page. The skill does not embed downloaded artwork.
 
 The app draws a downloaded shape as its library defines it, in the library's
 own colours, so `fill`, `stroke` and `line_width` on such a node are not used;
 the builder warns when a spec sets them. Its label shows as on any shape: every
-published library is editable artwork, which carries a label. Once the app has
-put the shapes in place, it saves the document in its own current format, which
-earlier apps may not open.
+published library is editable artwork, which carries a label.
 
 Prefer a packaged shape when one fits as well; use a downloadable one when it
 is the right shape, and tell the user which library the diagram needs. The
-build's `needs` lines say it. Native rectangles, ellipses, notes and text are
+build's `needs` lines say which. Native rectangles, ellipses, notes and text are
 also available.
 
 ## Requests and offline use

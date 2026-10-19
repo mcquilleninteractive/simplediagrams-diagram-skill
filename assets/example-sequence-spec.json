@@ -1,0 +1,28 @@
+{
+ "spec_version": 1,
+ "name": "Checkout sequence",
+ "pages": [
+  {
+   "name": "Checkout",
+   "grid": {"origin_x": 160, "origin_y": 400, "column_pitch": 200},
+   "nodes": [
+    {"key": "frame", "shape": "container", "title_style": "corner_tag", "label": "sd Checkout", "members": ["customer", "shop", "orders", "payment"]},
+    {"key": "customer", "shape": "lifeline", "head": "actor", "label": "Customer", "col": 0, "row": 0},
+    {"key": "shop", "shape": "lifeline", "label": "Web shop", "col": 1, "row": 0},
+    {"key": "orders", "shape": "lifeline", "label": "Order service", "col": 2, "row": 0},
+    {"key": "payment", "shape": "lifeline", "label": "Payment", "col": 3, "row": 0, "ends_in_destroy_mark": true},
+    {"key": "result", "shape": "container", "title_style": "corner_tag", "label": "alt [card accepted]", "messages": ["approved", "declined"], "dividers": [{"before": "declined", "label": "[else]"}]}
+   ],
+   "edges": [
+    {"source": "customer", "target": "shop", "label": "check out", "end_ending": "filledArrow"},
+    {"source": "shop", "target": "orders", "label": "place order", "end_ending": "filledArrow"},
+    {"source": "orders", "target": "orders", "label": "check stock", "end_ending": "filledArrow"},
+    {"source": "orders", "target": "payment", "label": "charge card", "end_ending": "filledArrow"},
+    {"key": "approved", "source": "payment", "target": "orders", "label": "approved", "pattern": "dashed", "end_ending": "arrow"},
+    {"key": "declined", "source": "payment", "target": "orders", "label": "declined", "pattern": "dashed", "end_ending": "arrow"},
+    {"source": "orders", "target": "shop", "label": "order status", "pattern": "dashed", "end_ending": "arrow"},
+    {"source": "shop", "target": "customer", "label": "confirmation", "pattern": "dashed", "end_ending": "arrow"}
+   ]
+  }
+ ]
+}

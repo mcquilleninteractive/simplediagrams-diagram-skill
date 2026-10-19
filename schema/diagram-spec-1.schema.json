@@ -2,10 +2,48 @@
  "$schema": "https://json-schema.org/draft/2020-12/schema",
  "$id": "https://simplediagrams.com/schemas/diagram-spec-1.schema.json",
  "$defs": {
+  "DividerSpec": {
+   "additionalProperties": false,
+   "description": "A dashed line across a fragment, between two of its operands, as for UML's alt.",
+   "properties": {
+    "before": {
+     "description": "Key of the message the line goes just above.",
+     "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
+     "title": "Before",
+     "type": "string"
+    },
+    "label": {
+     "default": "",
+     "description": "A guard such as [else], shown on the line.",
+     "maxLength": 2000,
+     "title": "Label",
+     "type": "string"
+    }
+   },
+   "required": [
+    "before"
+   ],
+   "title": "DividerSpec",
+   "type": "object"
+  },
   "EdgeSpec": {
    "additionalProperties": false,
-   "description": "A connector between two nodes.",
+   "description": "A connector between two nodes. Between two lifelines it is a message.",
    "properties": {
+    "key": {
+     "anyOf": [
+      {
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Your own name for this edge, unique among the page's edges, for a fragment's messages or dividers to name it.",
+     "title": "Key"
+    },
     "source": {
      "description": "Key of the node the connector leaves.",
      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
@@ -229,9 +267,49 @@
    "title": "GridLayout",
    "type": "object"
   },
+  "LaneSpec": {
+   "additionalProperties": false,
+   "description": "One lane of a swimlanes node: its title and the nodes it holds.",
+   "properties": {
+    "title": {
+     "default": "",
+     "maxLength": 2000,
+     "title": "Title",
+     "type": "string"
+    },
+    "members": {
+     "default": [],
+     "description": "Keys of the nodes in this lane. Each lies wholly inside the swimlanes, with its centre in this lane.",
+     "items": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
+      "type": "string"
+     },
+     "maxItems": 300,
+     "title": "Members",
+     "type": "array"
+    },
+    "size": {
+     "anyOf": [
+      {
+       "maximum": 100000,
+       "minimum": 1,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "The lane's thickness in points, only for swimlanes given a position; lanes of fitted swimlanes are fitted to their members.",
+     "title": "Size"
+    }
+   },
+   "title": "LaneSpec",
+   "type": "object"
+  },
   "NodeSpec": {
    "additionalProperties": false,
-   "description": "One shape on the page.\n\nGive either `col` and `row`, or `x` and `y`. Both name the node's centre,\nso nodes of different sizes still line up along shared centre lines.",
+   "description": "One shape on the page.\n\nGive either `col` and `row`, or `x` and `y`. Both name the node's centre,\nso nodes of different sizes still line up along shared centre lines. A\ncontainer or swimlanes may be given neither, and is then fitted around the\nnodes it holds.",
    "properties": {
     "key": {
      "description": "Your own name for this node, unique on the page.",
@@ -240,7 +318,7 @@
      "type": "string"
     },
     "shape": {
-     "description": "rectangle, ellipse, note or text for a plain drawn shape, or '<library>/<item>' for a library shape, for example 'basic/Cylinder'. Use a selector returned by find_shapes.py, which searches the API and falls back to assets/built-in-shapes.json offline. A packaged shape needs nothing installed; a downloadable one needs its library installed.",
+     "description": "rectangle, ellipse, note or text for a plain drawn shape; container, swimlanes, table, callout or lifeline for a shape SimpleDiagrams draws itself; or '<library>/<item>' for a library shape, for example 'basic/Cylinder'. Use a selector returned by find_shapes.py, which searches the API and falls back to assets/built-in-shapes.json offline. A packaged shape needs nothing installed; a downloadable one needs its library installed.",
      "maxLength": 512,
      "minLength": 1,
      "title": "Shape",
@@ -361,7 +439,7 @@
       }
      ],
      "default": null,
-     "description": "Use 'below' or 'above' for icons whose artwork would hide a label. A label wider than its shape is then written as a separate caption grouped with the shape. Leave it out to use the library's own placement, such as below a BPMN event; a shape whose library says nothing puts its label in the middle.",
+     "description": "Use 'below' or 'above' for icons whose artwork would hide a label. A label wider than its shape is centred on it, as wide as it needs up to eight times the shape. Leave it out to use the library's own placement, such as below a BPMN event; a shape whose library says nothing puts its label in the middle.",
      "title": "Label Position"
     },
     "fill": {
@@ -441,7 +519,7 @@
     },
     "flip_horizontal": {
      "default": false,
-     "description": "Mirrors the shape's artwork left to right, as a flip in the app does. Its connection points move with the artwork and keep their ids; its label stays readable. A connector attached to a flipped shape needs SimpleDiagrams 5.1.0 or later.",
+     "description": "Mirrors the shape's artwork left to right, as a flip in the app does. Its connection points move with the artwork and keep their ids; its label stays readable.",
      "title": "Flip Horizontal",
      "type": "boolean"
     },
@@ -450,6 +528,286 @@
      "description": "Mirrors the shape's artwork top to bottom, as flip_horizontal does across.",
      "title": "Flip Vertical",
      "type": "boolean"
+    },
+    "align": {
+     "anyOf": [
+      {
+       "enum": [
+        "leading",
+        "center",
+        "trailing"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "How the label's lines are aligned, and a table's cells below its header row. A container's title starts at its leading edge unless this says otherwise; everything else is centred.",
+     "title": "Align"
+    },
+    "hand_drawn": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Complex shapes are drawn with gently uneven lines; false draws them exactly.",
+     "title": "Hand Drawn"
+    },
+    "members": {
+     "anyOf": [
+      {
+       "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
+        "type": "string"
+       },
+       "maxItems": 300,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "container: keys of the nodes it holds, each lying wholly inside it. Without a position the container is fitted around them.",
+     "title": "Members"
+    },
+    "title_style": {
+     "anyOf": [
+      {
+       "enum": [
+        "band",
+        "corner_tag"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "container: 'band', the title across its top (the default), or 'corner_tag', a UML frame's name tag in its top-left corner.",
+     "title": "Title Style"
+    },
+    "messages": {
+     "anyOf": [
+      {
+       "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
+        "type": "string"
+       },
+       "maxItems": 400,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "container: keys of the messages a UML fragment (alt, loop, opt) encloses; it is fitted from the first to the last of them, across the lifelines they join.",
+     "title": "Messages"
+    },
+    "dividers": {
+     "anyOf": [
+      {
+       "items": {
+        "$ref": "#/$defs/DividerSpec"
+       },
+       "maxItems": 400,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "container with messages: dashed lines across it between operands, as UML's alt draws them.",
+     "title": "Dividers"
+    },
+    "direction": {
+     "anyOf": [
+      {
+       "enum": [
+        "horizontal",
+        "vertical"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "swimlanes: 'horizontal' lanes run across the page as rows (the default); 'vertical' lanes run down it as columns.",
+     "title": "Direction"
+    },
+    "lanes": {
+     "anyOf": [
+      {
+       "items": {
+        "$ref": "#/$defs/LaneSpec"
+       },
+       "maxItems": 50,
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "swimlanes: the lanes in order, top to bottom or left to right.",
+     "title": "Lanes"
+    },
+    "cells": {
+     "anyOf": [
+      {
+       "items": {
+        "items": {
+         "maxLength": 2000,
+         "type": "string"
+        },
+        "type": "array"
+       },
+       "maxItems": 200,
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "table: the text of each cell, row by row; every row has the same number of cells.",
+     "title": "Cells"
+    },
+    "header_row": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "table: whether the first row is drawn as a header (the default).",
+     "title": "Header Row"
+    },
+    "column_widths": {
+     "anyOf": [
+      {
+       "items": {
+        "maximum": 100000,
+        "minimum": 1,
+        "type": "number"
+       },
+       "maxItems": 50,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "table: each column's width; by default each is sized to its text.",
+     "title": "Column Widths"
+    },
+    "row_heights": {
+     "anyOf": [
+      {
+       "items": {
+        "maximum": 100000,
+        "minimum": 1,
+        "type": "number"
+       },
+       "maxItems": 200,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "table: each row's height; by default each is sized to its text.",
+     "title": "Row Heights"
+    },
+    "tail_to": {
+     "anyOf": [
+      {
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "callout: key of the node its tail is locked to, at its connection point nearest the callout unless tail_point names one.",
+     "title": "Tail To"
+    },
+    "tail_point": {
+     "anyOf": [
+      {
+       "maximum": 9223372036854775807,
+       "minimum": 0,
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "callout: the id of tail_to's connection point to lock the tail to.",
+     "title": "Tail Point"
+    },
+    "tail_at": {
+     "anyOf": [
+      {
+       "$ref": "#/$defs/PagePoint"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "callout: the page point a free tail aims at."
+    },
+    "head": {
+     "anyOf": [
+      {
+       "enum": [
+        "box",
+        "actor"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "lifeline: 'box', a participant's name in a box (the default), or 'actor', a stick figure with the name below it.",
+     "title": "Head"
+    },
+    "ends_in_destroy_mark": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "lifeline: whether its line ends in UML's destroy mark, an X, just below its last message.",
+     "title": "Ends In Destroy Mark"
     }
    },
    "required": [
@@ -457,6 +815,30 @@
     "shape"
    ],
    "title": "NodeSpec",
+   "type": "object"
+  },
+  "PagePoint": {
+   "additionalProperties": false,
+   "description": "A point on the page.",
+   "properties": {
+    "x": {
+     "maximum": 1000000,
+     "minimum": -1000000,
+     "title": "X",
+     "type": "number"
+    },
+    "y": {
+     "maximum": 1000000,
+     "minimum": -1000000,
+     "title": "Y",
+     "type": "number"
+    }
+   },
+   "required": [
+    "x",
+    "y"
+   ],
+   "title": "PagePoint",
    "type": "object"
   },
   "PageSpec": {

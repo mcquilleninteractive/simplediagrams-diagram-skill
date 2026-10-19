@@ -10,17 +10,62 @@
 
 The skill asks the public catalogue once per run and stores nothing; offline, or if the
 request fails, it uses its bundled list of packaged shapes. Every shape can be placed. A packaged shape ships inside SimpleDiagrams; a
-downloadable one needs its library installed, and a document that uses one is written
-at format 16 and names that library.
+downloadable one needs its library installed, and a document that uses one names that
+library. A search for something SimpleDiagrams draws itself,
+such as a pool, a class box or a lifeline, also names the complex shape to use.
 """
 
 from __future__ import annotations
 
-import argparse
-import json
 import sys
 
+# The skill writes nothing but the output it is asked for, not even Python's bytecode.
+sys.dont_write_bytecode = True
+
+import argparse
+import json
+
 from sd_spec import Catalog, CatalogShape, echo
+
+# The shapes SimpleDiagrams draws itself are not catalogue shapes: a spec names them
+# by kind, with their own fields (SKILL.md, "Complex shapes"). A search using one of these
+# words says which kind draws it.
+COMPLEX_SHAPE_HINTS: tuple[tuple[str, str, frozenset[str]], ...] = (
+    (
+        "container",
+        (
+            "a box that holds shapes: a BPMN expanded sub-process, a UML system boundary, or a "
+            "sequence diagram's frame or alt, loop or opt fragment"
+        ),
+        frozenset({"container", "boundary", "frame", "fragment", "sub-process", "subprocess", "alt", "loop", "opt"}),
+    ),
+    (
+        "swimlanes",
+        "lanes of a process, such as a BPMN pool and its lanes",
+        frozenset({"swimlane", "swimlanes", "lane", "lanes", "pool", "pools"}),
+    ),
+    (
+        "table",
+        "rows and columns of text, such as a UML class, interface, enumeration or database entity",
+        frozenset({"table", "class", "interface", "enumeration", "enum", "entity", "erd"}),
+    ),
+    (
+        "callout",
+        "a speech bubble whose tail points at a shape",
+        frozenset({"callout", "speech", "bubble"}),
+    ),
+    (
+        "lifeline",
+        "a UML sequence diagram's participant, its messages attached along its line",
+        frozenset({"lifeline", "lifelines", "sequence", "message", "messages", "participant"}),
+    ),
+)
+
+
+def complex_shape_hints(query: str) -> list[dict[str, str]]:
+    """The complex shapes a search's words name, each with what it draws."""
+    words = set(query.casefold().split())
+    return [{"shape": kind, "draws": draws} for kind, draws, names in COMPLEX_SHAPE_HINTS if words & names]
 
 
 def _match(shape: CatalogShape, query: str) -> bool:
@@ -146,6 +191,7 @@ def main(argv: list[str] | None = None) -> int:
             )
         return 0
     shown = shapes[arguments.offset : arguments.offset + arguments.limit]
+    hints = complex_shape_hints(arguments.query)
     if arguments.json:
         echo(
             json.dumps(
@@ -153,6 +199,7 @@ def main(argv: list[str] | None = None) -> int:
                     "source": catalog.source,
                     "total": len(shapes),
                     "matches": [_record(shape, catalog) for shape in shown],
+                    **({"complex_shapes": hints} if hints else {}),
                 },
                 ensure_ascii=False,
                 indent=2,
@@ -170,6 +217,11 @@ def main(argv: list[str] | None = None) -> int:
         echo(
             f"{len(shown)} of {len(shapes)} matches; use --offset and --limit to see more."
         )
+        for hint in hints:
+            echo(
+                f"Also: shape \"{hint['shape']}\" draws {hint['draws']}; SimpleDiagrams draws it "
+                "itself (SKILL.md, Complex shapes)."
+            )
     return 0
 
 

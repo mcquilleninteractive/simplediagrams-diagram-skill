@@ -1,0 +1,47 @@
+{
+ "spec_version": 1,
+ "name": "Order handling",
+ "pages": [
+  {
+   "name": "Process",
+   "grid": {"origin_x": 180, "origin_y": 160, "column_pitch": 170, "row_pitch": 150},
+   "nodes": [
+    {"key": "shop", "shape": "swimlanes", "label": "Web shop", "lanes": [
+      {"title": "Sales", "members": ["received", "orderData", "check", "valid", "reject", "rejected"]},
+      {"title": "Warehouse", "members": ["pack", "ship", "shipped"]}
+    ]},
+    {"key": "customer", "shape": "swimlanes", "label": "Customer", "lanes": [
+      {"title": "Buyer", "members": ["wants", "place", "receive", "done"]}
+    ]},
+    {"key": "received", "shape": "bpmn/message-start-event", "label": "Order received", "col": 0, "row": 0, "label_position": "above"},
+    {"key": "orderData", "shape": "bpmn/data-object", "label": "Order", "col": 1, "row": -0.65, "label_position": "above"},
+    {"key": "check", "shape": "basic/rounded-rectangle", "label": "Check order", "col": 1, "row": 0, "width": 98, "height": 64},
+    {"key": "valid", "shape": "basic/Diamond", "label": "Valid?", "col": 2, "row": 0, "width": 50, "height": 50, "label_position": "above"},
+    {"key": "reject", "shape": "basic/rounded-rectangle", "label": "Reject order", "col": 3, "row": 0, "width": 98, "height": 64},
+    {"key": "rejected", "shape": "bpmn/end-event", "label": "Rejected", "col": 4, "row": 0},
+    {"key": "pack", "shape": "basic/rounded-rectangle", "label": "Pack goods", "col": 3, "row": 1, "width": 98, "height": 64},
+    {"key": "ship", "shape": "bpmn/send-task", "label": "Ship goods", "col": 4, "row": 1},
+    {"key": "shipped", "shape": "bpmn/end-event", "label": "Shipped", "col": 5, "row": 1},
+    {"key": "wants", "shape": "bpmn/start-event", "label": "Needs goods", "col": -0.8, "row": 2.4},
+    {"key": "place", "shape": "basic/rounded-rectangle", "label": "Place order", "col": 0, "row": 2.4, "width": 98, "height": 64},
+    {"key": "receive", "shape": "bpmn/receive-task", "label": "Receive goods", "col": 4, "row": 2.4},
+    {"key": "done", "shape": "bpmn/end-event", "label": "Done", "col": 5, "row": 2.4}
+   ],
+   "edges": [
+    {"source": "received", "target": "check", "end_ending": "filledArrow"},
+    {"source": "check", "target": "valid", "end_ending": "filledArrow"},
+    {"source": "valid", "target": "pack", "label": "yes", "end_ending": "filledArrow", "source_side": "bottom", "target_side": "left"},
+    {"source": "valid", "target": "reject", "start_ending": "slash", "end_ending": "filledArrow"},
+    {"source": "reject", "target": "rejected", "end_ending": "filledArrow"},
+    {"source": "pack", "target": "ship", "end_ending": "filledArrow"},
+    {"source": "ship", "target": "shipped", "end_ending": "filledArrow"},
+    {"source": "orderData", "target": "check", "route": "straight", "pattern": "dotted", "end_ending": "arrow"},
+    {"source": "wants", "target": "place", "end_ending": "filledArrow"},
+    {"source": "place", "target": "receive", "end_ending": "filledArrow"},
+    {"source": "receive", "target": "done", "end_ending": "filledArrow"},
+    {"source": "place", "target": "received", "pattern": "dashed", "start_ending": "circle", "end_ending": "solidArrow", "label": "order"},
+    {"source": "ship", "target": "receive", "pattern": "dashed", "start_ending": "circle", "end_ending": "solidArrow", "label": "parcel"}
+   ]
+  }
+ ]
+}

@@ -279,6 +279,26 @@ def test_duplicate_identities_are_rejected(mutation: str) -> None:
         catalog.ShapeLibraryCatalogue.model_validate_json(json.dumps(document))
 
 
+@pytest.mark.parametrize(
+    ("page", "kept"),
+    [
+        ("https://simplediagrams.com/shape-libraries/basic/", True),
+        ("https://simplediagrams.com.example.net/basic/", False),
+        ("http://simplediagrams.com/shape-libraries/basic/", False),
+        ("https://example.com/https://simplediagrams.com/", False),
+        ("javascript:alert(1)", False),
+        ("file:///etc/passwd", False),
+    ],
+)
+def test_only_a_page_on_the_simplediagrams_website_is_kept(page: str, kept: bool) -> None:
+    """A library's page is shown to the user to open; catalogue text is untrusted, so an
+    address anywhere but the SimpleDiagrams website is dropped, not passed on."""
+    document = _document()
+    document["libraries"][0]["page_url"] = page
+    parsed = catalog.ShapeLibraryCatalogue.model_validate_json(json.dumps(document))
+    assert parsed.libraries[0].page_url == (page if kept else "")
+
+
 def test_shapes_keep_published_order_and_custom_anchors() -> None:
     """Search order and explicit connection-point lists belong to the API."""
     document = _document()

@@ -1,0 +1,30 @@
+{
+ "spec_version": 1,
+ "name": "Ordering classes",
+ "pages": [
+  {
+   "name": "Classes",
+   "grid": {"origin_x": 200, "origin_y": 200, "column_pitch": 280, "row_pitch": 200},
+   "nodes": [
+    {"key": "ordering", "shape": "container", "label": "Ordering", "members": ["customer", "order", "line", "status"]},
+    {"key": "customer", "shape": "table", "align": "leading", "col": 0, "row": 0,
+     "cells": [["Customer"], ["id: UUID\nname: Text"], ["orders(): Order[]"]]},
+    {"key": "order", "shape": "table", "align": "leading", "col": 1, "row": 0,
+     "cells": [["Order"], ["id: UUID\ntotal: Money"], ["place()\ncancel()"]]},
+    {"key": "line", "shape": "table", "align": "leading", "col": 2, "row": 0,
+     "cells": [["OrderLine"], ["quantity: Int\nprice: Money"]]},
+    {"key": "status", "shape": "table", "align": "leading", "col": 1, "row": 1,
+     "cells": [["«enumeration»\nOrderStatus"], ["OPEN\nPAID\nSHIPPED"]]},
+    {"key": "payable", "shape": "table", "align": "leading", "col": 1, "row": -1.2,
+     "cells": [["«interface»\nPayable"], ["pay(amount: Money)"]]},
+    {"key": "tip", "shape": "callout", "label": "Totals include tax", "col": 2, "row": -1.2, "tail_to": "order"}
+   ],
+   "edges": [
+    {"source": "customer", "target": "order", "end_ending": "none", "label": "places"},
+    {"source": "order", "target": "line", "start_ending": "diamond", "end_ending": "none"},
+    {"source": "order", "target": "payable", "pattern": "dashed", "end_ending": "solidArrow"},
+    {"source": "order", "target": "status", "pattern": "dashed", "end_ending": "arrow"}
+   ]
+  }
+ ]
+}
