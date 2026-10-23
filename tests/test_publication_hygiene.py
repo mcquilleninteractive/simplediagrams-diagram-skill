@@ -17,6 +17,7 @@ import os
 import re
 import shutil
 import stat
+import struct
 import subprocess
 from pathlib import Path
 
@@ -60,8 +61,8 @@ FORBIDDEN_TEXT: dict[str, re.Pattern[str]] = {
 }
 # Generic text a file may hold although it matches a pattern above, by file.
 ALLOWED_TEXT: dict[str, tuple[str, ...]] = {"README.md": ("~" + "/.claude/skills/",)}
-# Published files that may be other than UTF-8 text. There are none.
-ALLOWED_NON_TEXT: frozenset[str] = frozenset()
+# Only the reviewed plugin-listing logo may be binary.
+ALLOWED_NON_TEXT: frozenset[str] = frozenset({".claude-plugin/icon.png"})
 # Files that never ship: logs, merge leftovers, archives, caches, Finder files, pictures
 # and documents people supply, keys and credentials, databases, and built documents,
 # which are made from a spec rather than kept.
@@ -102,6 +103,18 @@ def problems(root: Path, names: list[str]) -> list[str]:
         if not stat.S_ISREG(mode):
             found.append(f"{name}: not a plain file")
             continue
+        if name in ALLOWED_NON_TEXT:
+            if path.stat().st_size >= 2_000_000:
+                found.append(f"{name}: icon must be under 2 MB")
+                continue
+            data = path.read_bytes()
+            if len(data) < 33 or data[:16] != b"\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR":
+                found.append(f"{name}: icon must be a PNG with an IHDR header")
+                continue
+            width, height = struct.unpack(">II", data[16:24])
+            if width != height or not 512 <= width <= 2048:
+                found.append(f"{name}: icon must be square and 512 to 2048 pixels")
+            continue
         if FORBIDDEN_NAMES.search(name):
             found.append(f"{name}: a kind of file that is never published")
         if path.stat().st_size > LARGEST_FILE:
@@ -135,6 +148,25 @@ def test_nothing_published_is_private_secret_or_stray() -> None:
     repository's name or an internal record in any file would leak with it, and a log,
     cache, picture, key, link or built document has no place in it."""
     assert problems(ROOT, _published_names()) == []
+
+
+def test_only_the_listing_icon_is_allowed_as_a_binary_image(tmp_path: Path) -> None:
+    """The product icon exception must not admit user images or malformed icons."""
+    name = ".claude-plugin/icon.png"
+    icon = tmp_path / name
+    icon.parent.mkdir()
+    icon.write_bytes((ROOT / name).read_bytes())
+    assert problems(tmp_path, [name]) == []
+    (tmp_path / "photo.png").write_bytes(icon.read_bytes())
+    assert problems(tmp_path, ["photo.png"])
+    icon.write_bytes(b"not a PNG")
+    assert any("IHDR" in problem for problem in problems(tmp_path, [name]))
+    data = bytearray((ROOT / name).read_bytes())
+    data[16:24] = struct.pack(">II", 1024, 512)
+    icon.write_bytes(data)
+    assert any("square" in problem for problem in problems(tmp_path, [name]))
+    icon.write_bytes(b"x" * 2_000_000)
+    assert any("under 2 MB" in problem for problem in problems(tmp_path, [name]))
 
 
 # One probe of each kind the checker must catch, written only to a temporary folder.

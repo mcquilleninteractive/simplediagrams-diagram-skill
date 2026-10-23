@@ -18,7 +18,6 @@ id_ed25519*
 *credentials*
 *secret*
 *token*
-.netrc
 .npmrc
 .pypirc
 .envs/
@@ -88,3 +87,6 @@ output/
 
 # Previews made with the skill
 *.svg
+
+# The reviewed product logo used by the plugin listing.
+!/.claude-plugin/icon.png
