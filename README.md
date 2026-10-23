@@ -13,6 +13,14 @@ claude plugin marketplace add mcquilleninteractive/simplediagrams-diagram-skill
 claude plugin install simplediagrams-diagram-skill@simplediagrams
 ```
 
+In Codex, paste this into a chat:
+
+```text
+$skill-installer Install the skill from https://github.com/mcquilleninteractive/simplediagrams-diagram-skill (the repository root), named simplediagrams-diagram-skill.
+```
+
+Then ask Codex to use `simplediagrams-diagram-skill` with a request like the examples below. If the skill does not appear after installation, restart Codex. See the [Codex skill installation documentation](https://learn.chatgpt.com/docs/build-skills#install-curated-skills-for-local-use).
+
 To install by copying, keep the folder name `simplediagrams-diagram-skill`.
 
 - Claude Code: copy it into `~/.claude/skills/` or a project's `.claude/skills/`.
