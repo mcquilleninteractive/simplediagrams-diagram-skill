@@ -8,6 +8,7 @@
     "url": "https://simplediagrams.com/"
   },
   "homepage": "https://simplediagrams.com/",
+  "privacyPolicyUrl": "https://github.com/mcquilleninteractive/simplediagrams-diagram-skill/blob/main/PRIVACY.md",
   "repository": "https://github.com/mcquilleninteractive/simplediagrams-diagram-skill",
   "license": "MIT",
   "keywords": ["simplediagrams", "diagrams", "flowchart", "architecture", "hand-drawn"]
