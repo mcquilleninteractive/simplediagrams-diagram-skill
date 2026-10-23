@@ -9,11 +9,8 @@ running the skill handles prompts and supplied files under its own policies.
 
 ## Plugin submission review
 
-Two non-executable entries can be mistaken for a credential-to-network path:
+A non-executable entry can be mistaken for a credential-to-network path:
 
-- The submission scanner cited a `.netrc` exclusion in `.gitignore` as a file
-  read. That exclusion has since been removed. Ignore rules do not open or read
-  files; the remaining credential patterns are exclusions too.
 - `assets/built-in-shapes.json` contains `mail` search keywords for shapes.
   This is catalogue data, not an email command or network operation.
 
