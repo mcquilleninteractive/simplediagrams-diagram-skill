@@ -29,7 +29,7 @@ from pathlib import Path
 
 import sd_format as wire
 from pydantic import ValidationError
-from sd_spec import Catalog, SpecError, compile_spec, echo, load_spec
+from sd_spec import SpecError, compile_spec, echo, load_spec
 
 MARGIN = 40
 # XML 1.0 cannot carry these at all, even escaped.
@@ -242,17 +242,12 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("source", type=Path, help="A diagram spec (.json)")
     parser.add_argument("output", type=Path, help="New SVG to write; later pages get -2, -3 before the suffix")
-    parser.add_argument("--offline", action="store_true", help="Use the packaged shapes only, without a request")
     arguments = parser.parse_args(argv)
     if arguments.source.suffix != ".json" or arguments.output.suffix != ".svg":
         echo("error   Expected a JSON spec and a new .svg output.")
         return 1
     try:
-        catalog = Catalog.load_current(offline=arguments.offline)
-        echo(f"Catalogue: {catalog.source}", file=sys.stderr)
-        if catalog.warning:
-            echo(catalog.warning, file=sys.stderr)
-        document = compile_spec(load_spec(arguments.source), catalog)
+        document = compile_spec(load_spec(arguments.source))
     except (SpecError, ValidationError) as failure:
         for line in str(failure).splitlines():
             echo(f"error   {line}")

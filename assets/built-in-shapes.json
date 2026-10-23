@@ -9,14 +9,12 @@
    "short_name": "basic",
    "display_name": "Basic",
    "asset_version": 1,
-   "published_library_id": "657227F7-7B3E-86B4-BB6F-79190E1592B3",
    "shapes": [
     {
      "item_id": "Square",
      "display_name": "Square",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "43585F7D-3420-8BA8-BFF0-8962EA373A62",
      "slug": "square",
      "description": "",
      "keywords": []
@@ -26,7 +24,6 @@
      "display_name": "Rounded Rectangle",
      "default_width": 52,
      "default_height": 37,
-     "published_item_id": "CD42B241-E873-8961-9047-CA57385FBB11",
      "slug": "rounded-rectangle",
      "description": "A box with rounded corners that stay round at any size.",
      "keywords": [
@@ -47,7 +44,6 @@
      "display_name": "Pill",
      "default_width": 52.25,
      "default_height": 27.75,
-     "published_item_id": "7036EB95-F503-8F42-935D-A80A8281CC11",
      "slug": "pill",
      "description": "A box with fully rounded ends: the start or end of a flowchart.",
      "keywords": [
@@ -66,7 +62,6 @@
      "display_name": "Box With Diagonal Cross",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "C39204AF-120A-84AF-9BEB-D93C41ED90A0",
      "slug": "boxwithdiagonalcross",
      "description": "",
      "keywords": []
@@ -76,7 +71,6 @@
      "display_name": "Dash Box",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "1FB74235-396E-820B-9F01-6768D881FF97",
      "slug": "dashbox",
      "description": "",
      "keywords": []
@@ -86,7 +80,6 @@
      "display_name": "Frame",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "DDC6357A-3245-8769-BE7C-DF465FD3F25E",
      "slug": "frame",
      "description": "",
      "keywords": []
@@ -96,7 +89,6 @@
      "display_name": "Hatch Box",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "12C91DE3-8BB7-8F2D-9F26-A62246D5FAC9",
      "slug": "hatchbox",
      "description": "",
      "keywords": []
@@ -106,7 +98,6 @@
      "display_name": "Cross Hatch Box",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "B1F04709-1983-887A-9B39-A3BECE45CB5C",
      "slug": "crosshatchbox",
      "description": "",
      "keywords": []
@@ -116,7 +107,6 @@
      "display_name": "Rectangle With Curved Sides",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "2A208993-E1C1-8FAB-B3E9-D9D4E40FE8F9",
      "slug": "rectanglecurvedsides",
      "description": "",
      "keywords": []
@@ -126,7 +116,6 @@
      "display_name": "Rectangle With One Curved Side",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9C31366A-4E86-83EF-8CC4-8D66F3862FC9",
      "slug": "rectangleonecurvedside",
      "description": "",
      "keywords": []
@@ -136,7 +125,6 @@
      "display_name": "Rectangle With Two Angled Sides",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "1B74ED74-C0E1-8DC5-BC51-618286AB2878",
      "slug": "rectangletwoangledsides",
      "description": "",
      "keywords": []
@@ -146,7 +134,6 @@
      "display_name": "Rectangle With Chip Missing",
      "default_width": 50,
      "default_height": 35,
-     "published_item_id": "7E11B62F-D0CC-870F-A912-9759AA87BB33",
      "slug": "rectanglewithchipmissing",
      "description": "",
      "keywords": []
@@ -156,7 +143,6 @@
      "display_name": "Square Wave Bottom",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "131980D1-C09A-848A-BA7E-B9A0D1A81423",
      "slug": "squarewavebottom",
      "description": "",
      "keywords": []
@@ -166,7 +152,6 @@
      "display_name": "Subprocess",
      "default_width": 53,
      "default_height": 37.25,
-     "published_item_id": "A0814A2E-F06D-8FCD-B70E-32FED116E8C8",
      "slug": "subprocess",
      "description": "A box with a bar inside each side: a step described elsewhere.",
      "keywords": [
@@ -183,7 +168,6 @@
      "display_name": "Off-Page Reference",
      "default_width": 42.875,
      "default_height": 44.75,
-     "published_item_id": "FDCAD310-15F3-8829-B544-28A6E8602E58",
      "slug": "off-page-reference",
      "description": "A box with a pointed bottom: the flow continues on another page.",
      "keywords": [
@@ -199,7 +183,6 @@
      "display_name": "Triangle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "0A3B7B93-9578-813D-863D-26FE5F22F3A0",
      "slug": "triangle",
      "description": "",
      "keywords": []
@@ -209,7 +192,6 @@
      "display_name": "Right Triangle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F54E3AB0-5BCF-8938-8D11-BF27F1AE1447",
      "slug": "righttriangle",
      "description": "",
      "keywords": []
@@ -219,7 +201,6 @@
      "display_name": "Circle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "6ABA6A5F-C1CF-8293-86E1-734F1F2412E9",
      "slug": "circle",
      "description": "",
      "keywords": [
@@ -232,7 +213,6 @@
      "display_name": "Dash Circle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "84E7375B-DE88-8C39-A04B-5B153AFBDA0E",
      "slug": "dashcircle",
      "description": "",
      "keywords": []
@@ -242,7 +222,6 @@
      "display_name": "Donut",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "7D6B31DE-689C-8B7A-BDE9-FFBFC37F7C55",
      "slug": "donut",
      "description": "",
      "keywords": []
@@ -252,7 +231,6 @@
      "display_name": "Diamond",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "28C1924A-033B-8B86-8030-8DD055E4825F",
      "slug": "diamond",
      "description": "",
      "keywords": [
@@ -265,7 +243,6 @@
      "display_name": "Trapezoid",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "23538C47-3D6C-8C84-B691-6A46E16A2B20",
      "slug": "trapezoid",
      "description": "",
      "keywords": []
@@ -275,7 +252,6 @@
      "display_name": "Parallelogram",
      "default_width": 52.875,
      "default_height": 34.875,
-     "published_item_id": "83506D7A-5574-8718-9D9E-0562FCCDCB7B",
      "slug": "parallelogram",
      "description": "A slanted box: data going in or out of a flowchart.",
      "keywords": [
@@ -293,7 +269,6 @@
      "display_name": "Pentagon",
      "default_width": 50.75,
      "default_height": 49,
-     "published_item_id": "5472866C-33C6-8A51-98D9-353B276C40C4",
      "slug": "pentagon",
      "description": "A five-sided shape with a point at the top.",
      "keywords": [
@@ -308,7 +283,6 @@
      "display_name": "Hexagon",
      "default_width": 51.875,
      "default_height": 46.25,
-     "published_item_id": "0D471F6C-207F-8249-88AB-FA53AF99B40E",
      "slug": "hexagon",
      "description": "A six-sided shape, flat at the top and bottom: preparation in a flowchart.",
      "keywords": [
@@ -325,7 +299,6 @@
      "display_name": "Heptagon",
      "default_width": 51.125,
      "default_height": 50.5,
-     "published_item_id": "EC8195B3-C582-8E78-B4B7-BA866BFE9700",
      "slug": "heptagon",
      "description": "A seven-sided shape with a point at the top.",
      "keywords": [
@@ -340,7 +313,6 @@
      "display_name": "Octagon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "1702602D-92BD-82F8-81B9-285404EC4FB5",
      "slug": "octagon",
      "description": "",
      "keywords": []
@@ -350,7 +322,6 @@
      "display_name": "Cube",
      "default_width": 40,
      "default_height": 50,
-     "published_item_id": "350A170B-C2C3-8403-97B3-940868EB327E",
      "slug": "cube",
      "description": "",
      "keywords": [
@@ -363,7 +334,6 @@
      "display_name": "Pyramid",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "348670BF-5140-8329-8DBF-070DC9633DDF",
      "slug": "pyramid",
      "description": "",
      "keywords": []
@@ -373,7 +343,6 @@
      "display_name": "Cylinder",
      "default_width": 35,
      "default_height": 50,
-     "published_item_id": "D80A971E-FE62-8B0F-8714-8BECF88B1120",
      "slug": "cylinder",
      "description": "",
      "keywords": [
@@ -386,7 +355,6 @@
      "display_name": "Open Square",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "06B42A80-08B3-87B8-AF96-62323594C504",
      "slug": "opensquare",
      "description": "",
      "keywords": []
@@ -396,7 +364,6 @@
      "display_name": "Bracket Left",
      "default_width": 20,
      "default_height": 50,
-     "published_item_id": "D0161715-1FA6-8964-BCEF-A31D81A19CB4",
      "slug": "bracketleft",
      "description": "",
      "keywords": []
@@ -406,7 +373,6 @@
      "display_name": "Bracket Right",
      "default_width": 20,
      "default_height": 50,
-     "published_item_id": "4A35919C-BB28-8F87-ABAC-7B7586B3A517",
      "slug": "bracketright",
      "description": "",
      "keywords": []
@@ -416,7 +382,6 @@
      "display_name": "Bracket 2 Left",
      "default_width": 14,
      "default_height": 50,
-     "published_item_id": "8476ACC4-8DF2-8CFE-9419-BAE739868626",
      "slug": "bracket2left",
      "description": "",
      "keywords": []
@@ -426,7 +391,6 @@
      "display_name": "Bracket 2 Right",
      "default_width": 14,
      "default_height": 50,
-     "published_item_id": "6E0C8BE7-37B8-8954-89BB-CEA501EB0652",
      "slug": "bracket2right",
      "description": "",
      "keywords": []
@@ -436,7 +400,6 @@
      "display_name": "Process Step",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "21F1B2C5-CA4E-8AF7-8F2B-E885E3632548",
      "slug": "processstep",
      "description": "",
      "keywords": []
@@ -446,7 +409,6 @@
      "display_name": "Chevron",
      "default_width": 40,
      "default_height": 50,
-     "published_item_id": "E7435BD0-63E9-84AE-8E95-ACC55210416B",
      "slug": "chevron",
      "description": "",
      "keywords": []
@@ -456,7 +418,6 @@
      "display_name": "Cross",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "98764E08-09C6-87CD-B337-D6E37264BA3E",
      "slug": "cross",
      "description": "",
      "keywords": []
@@ -466,7 +427,6 @@
      "display_name": "Grid",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "AF66E895-BD00-8EAA-BA70-E8E89E4814C9",
      "slug": "grid",
      "description": "",
      "keywords": []
@@ -476,7 +436,6 @@
      "display_name": "Burst",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "3DB167BF-3F60-888B-9B77-CFA2D2451979",
      "slug": "burst",
      "description": "",
      "keywords": []
@@ -486,7 +445,6 @@
      "display_name": "Arrow",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9163DAF6-CA94-8AEC-BF88-53DC63BA5534",
      "slug": "arrow",
      "description": "",
      "keywords": []
@@ -496,7 +454,6 @@
      "display_name": "Double Arrow",
      "default_width": 40,
      "default_height": 50,
-     "published_item_id": "AC2AD8E5-0C75-8AAB-9477-717185843DE6",
      "slug": "doublearrow",
      "description": "",
      "keywords": []
@@ -506,7 +463,6 @@
      "display_name": "Two-Sided Arrow",
      "default_width": 50,
      "default_height": 30,
-     "published_item_id": "452FEA49-0B1B-8F7E-B7E9-292374A2CF2F",
      "slug": "twosidedarrow",
      "description": "",
      "keywords": []
@@ -516,7 +472,6 @@
      "display_name": "Corner Arrows",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F112EBCD-1F7A-8114-B8B5-4801375E3DC6",
      "slug": "cornerarrows",
      "description": "",
      "keywords": []
@@ -526,7 +481,6 @@
      "display_name": "Corner Arrows Rounded",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "5F23CA2C-C8D5-87D0-A4F9-C6578822D04C",
      "slug": "cornerarrowsrounded",
      "description": "",
      "keywords": []
@@ -536,7 +490,6 @@
      "display_name": "Three Arrow Juncture",
      "default_width": 50,
      "default_height": 35,
-     "published_item_id": "A6301B13-C4B6-85BC-BCCE-62FF1219D4F4",
      "slug": "threearrowjuncture",
      "description": "",
      "keywords": []
@@ -546,7 +499,6 @@
      "display_name": "Arrow Cross",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "6B759575-5DBD-8E68-91CC-16AA8370AA98",
      "slug": "arrowcross",
      "description": "",
      "keywords": []
@@ -556,7 +508,6 @@
      "display_name": "Return Arrow",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "BA87F3F4-6396-8100-8B79-71E879F09502",
      "slug": "returnarrow",
      "description": "",
      "keywords": []
@@ -566,7 +517,6 @@
      "display_name": "Circle With Diagonal Bar",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "96A9445F-D2E5-8B8C-B4A1-18FC850782F9",
      "slug": "circlewithdiagonalbar",
      "description": "",
      "keywords": []
@@ -576,7 +526,6 @@
      "display_name": "Circle With Two Diagonal Bars",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "D3954616-E272-8C1D-B875-E52E43BDBE2C",
      "slug": "circlewithtwodiagonalbars",
      "description": "",
      "keywords": []
@@ -586,7 +535,6 @@
      "display_name": "Half Circle",
      "default_width": 30,
      "default_height": 50,
-     "published_item_id": "0BD451E1-F441-8F5F-97BE-779DC73748D4",
      "slug": "halfcircle",
      "description": "",
      "keywords": []
@@ -596,7 +544,6 @@
      "display_name": "Munch Circle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "2870914C-CF50-8A60-8EF9-5332DB462A9D",
      "slug": "munchcircle",
      "description": "",
      "keywords": []
@@ -606,7 +553,6 @@
      "display_name": "Hourglass",
      "default_width": 35,
      "default_height": 50,
-     "published_item_id": "30C01B8B-D610-88BC-B065-89CF9692273C",
      "slug": "hourglass",
      "description": "",
      "keywords": []
@@ -616,7 +562,6 @@
      "display_name": "Layers",
      "default_width": 50,
      "default_height": 40,
-     "published_item_id": "9CA5CBC1-E794-8BEC-AD0E-77F21C8911A5",
      "slug": "layers",
      "description": "",
      "keywords": []
@@ -626,7 +571,6 @@
      "display_name": "Circle Wedge",
      "default_width": 30,
      "default_height": 50,
-     "published_item_id": "2577F622-5EE4-8BD9-8197-F0DCF5534B1D",
      "slug": "circlewedge",
      "description": "",
      "keywords": []
@@ -636,7 +580,6 @@
      "display_name": "Circle Grid",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9EE9EB9F-07B6-82A9-8AE7-1DDFE369F587",
      "slug": "circlegrid",
      "description": "",
      "keywords": []
@@ -646,7 +589,6 @@
      "display_name": "Sparkle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "649C82E3-84B8-83DD-8071-1E1119AF175A",
      "slug": "sparkle",
      "description": "",
      "keywords": []
@@ -656,7 +598,6 @@
      "display_name": "Star",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "1E3C02F2-B509-850C-A569-94F4E6070B51",
      "slug": "star",
      "description": "",
      "keywords": []
@@ -666,7 +607,6 @@
      "display_name": "Six-Point Star",
      "default_width": 46.5,
      "default_height": 54.25,
-     "published_item_id": "9A6A56E0-2A60-8DC9-8605-E239FE8C2162",
      "slug": "six-point-star",
      "description": "A star with six points.",
      "keywords": [
@@ -683,7 +623,6 @@
      "display_name": "Seven-Point Star",
      "default_width": 49.625,
      "default_height": 50.625,
-     "published_item_id": "A57C94FA-3407-835A-B6A7-4DD0B65A2A8B",
      "slug": "seven-point-star",
      "description": "A star with seven points.",
      "keywords": [
@@ -699,7 +638,6 @@
      "display_name": "Insignia",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "B05457FD-9362-87F0-93DF-DC2C09B4524C",
      "slug": "insignia",
      "description": "",
      "keywords": []
@@ -709,7 +647,6 @@
      "display_name": "Document",
      "default_width": 40,
      "default_height": 50,
-     "published_item_id": "A37740D3-5D1B-86A8-9E2F-02AC174BB930",
      "slug": "document",
      "description": "",
      "keywords": []
@@ -721,14 +658,12 @@
    "short_name": "basicClean",
    "display_name": "Basic (Clean)",
    "asset_version": 1,
-   "published_library_id": "EC9D7C4F-6F5B-8C03-AE14-6E476F4BEB80",
    "shapes": [
     {
      "item_id": "Square",
      "display_name": "Square",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "1AC0EF91-8E65-8D8F-A176-25E21649FB55",
      "slug": "square",
      "description": "",
      "keywords": []
@@ -738,7 +673,6 @@
      "display_name": "Box With Diagonal Cross",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "D0F30CE2-2014-8D24-A98F-66A1AE8D1E1D",
      "slug": "boxwithdiagonalcross",
      "description": "",
      "keywords": []
@@ -748,7 +682,6 @@
      "display_name": "Dash Box",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "D46D57B0-3990-8230-9520-3B2C5CB4FFFE",
      "slug": "dashbox",
      "description": "",
      "keywords": []
@@ -758,7 +691,6 @@
      "display_name": "Frame",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "AF5A1312-2D7A-85B9-9C23-6553E3D1D2BF",
      "slug": "frame",
      "description": "",
      "keywords": []
@@ -768,7 +700,6 @@
      "display_name": "Hatch Box",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "3702CDB9-1F9A-8AE9-8DCD-3086DDD56CA5",
      "slug": "hatchbox",
      "description": "",
      "keywords": []
@@ -778,7 +709,6 @@
      "display_name": "Cross Hatch Box",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "71B44E88-91FF-895E-BEC4-F8C310936E06",
      "slug": "crosshatchbox",
      "description": "",
      "keywords": []
@@ -788,7 +718,6 @@
      "display_name": "Rectangle With Curved Sides",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "1A220594-27A6-89BA-8A99-EBAD199615C0",
      "slug": "rectanglecurvedsides",
      "description": "",
      "keywords": []
@@ -798,7 +727,6 @@
      "display_name": "Rectangle With One Curved Side",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "149628A7-40AB-8AF9-9B0C-6864DE12C1BC",
      "slug": "rectangleonecurvedside",
      "description": "",
      "keywords": []
@@ -808,7 +736,6 @@
      "display_name": "Rectangle With Chip Missing",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "922711A8-1AD1-8FB1-8C7C-539E4858195C",
      "slug": "rectanglewithchipmissing",
      "description": "",
      "keywords": []
@@ -818,7 +745,6 @@
      "display_name": "Square Wave Bottom",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "59B1B1BD-B246-8DCC-B2D6-419F1E1701F8",
      "slug": "squarewavebottom",
      "description": "",
      "keywords": []
@@ -828,7 +754,6 @@
      "display_name": "Triangle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "18209923-B36B-8DFE-9C44-5F9D84C18B68",
      "slug": "triangle",
      "description": "",
      "keywords": []
@@ -838,7 +763,6 @@
      "display_name": "Right Triangle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "A1802F9F-9194-817E-892C-3B089ABAFE67",
      "slug": "righttriangle",
      "description": "",
      "keywords": []
@@ -848,7 +772,6 @@
      "display_name": "Circle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "EB51B387-31F9-8032-A41B-4862DF61974F",
      "slug": "circle",
      "description": "",
      "keywords": []
@@ -858,7 +781,6 @@
      "display_name": "Dash Circle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "1C52B230-BE31-8D68-BB1C-4E2998C14D9D",
      "slug": "dashcircle",
      "description": "",
      "keywords": []
@@ -868,7 +790,6 @@
      "display_name": "Donut",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "C9D84F7E-A24D-872A-B016-60402C5D2D15",
      "slug": "donut",
      "description": "",
      "keywords": []
@@ -878,7 +799,6 @@
      "display_name": "Diamond",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "85E66F98-3FD0-82FB-8A72-F369CD8F0358",
      "slug": "diamond",
      "description": "",
      "keywords": []
@@ -888,7 +808,6 @@
      "display_name": "Trapezoid",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "6B63A587-413E-88A1-A68C-FD8330FD6E48",
      "slug": "trapezoid",
      "description": "",
      "keywords": []
@@ -898,7 +817,6 @@
      "display_name": "Octagon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F2A2E740-390A-8E45-BDDA-829AA3253510",
      "slug": "octagon",
      "description": "",
      "keywords": []
@@ -908,7 +826,6 @@
      "display_name": "Cube",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "A413CBC1-5652-8B29-898C-574428D855B4",
      "slug": "cube",
      "description": "",
      "keywords": []
@@ -918,7 +835,6 @@
      "display_name": "Pyramid",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "7053196B-1927-8776-BBF1-1FC756B86486",
      "slug": "pyramid",
      "description": "",
      "keywords": []
@@ -928,7 +844,6 @@
      "display_name": "Cylinder",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9602F88A-9DB3-8BF0-94A5-61D14215AD53",
      "slug": "cylinder",
      "description": "",
      "keywords": []
@@ -938,7 +853,6 @@
      "display_name": "Open Square",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "953CECD4-8133-812C-B1B3-E6DE21A5FC8D",
      "slug": "opensquare",
      "description": "",
      "keywords": []
@@ -948,7 +862,6 @@
      "display_name": "Bracket Left",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "284411D5-7077-8902-909B-054E1714618F",
      "slug": "bracketleft",
      "description": "",
      "keywords": []
@@ -958,7 +871,6 @@
      "display_name": "Bracket Right",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "6D34ACAA-2157-83AC-8C08-84E6AAB51F1A",
      "slug": "bracketright",
      "description": "",
      "keywords": []
@@ -968,7 +880,6 @@
      "display_name": "Process Step",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "DCDE1F96-592C-8B98-8C9F-2EDB2257E603",
      "slug": "processstep",
      "description": "",
      "keywords": []
@@ -978,7 +889,6 @@
      "display_name": "Chevron",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "FA6B0B97-7A15-8401-AA45-003F9E13898A",
      "slug": "chevron",
      "description": "",
      "keywords": []
@@ -988,7 +898,6 @@
      "display_name": "Cross",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9831D760-C2EF-8079-9D91-3A606CD1E10B",
      "slug": "cross",
      "description": "",
      "keywords": []
@@ -998,7 +907,6 @@
      "display_name": "Grid",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "0CB211F0-A675-827F-93F5-AC2DE65BCF6D",
      "slug": "grid",
      "description": "",
      "keywords": []
@@ -1008,7 +916,6 @@
      "display_name": "Burst",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "FEE89CF2-4490-82C2-8165-D951E3A8B30D",
      "slug": "burst",
      "description": "",
      "keywords": []
@@ -1018,7 +925,6 @@
      "display_name": "Arrow",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "90A0BF14-A7F0-8C0B-8994-87F9B97BBCCA",
      "slug": "arrow",
      "description": "",
      "keywords": []
@@ -1028,7 +934,6 @@
      "display_name": "Double Arrow",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "C846E220-74B2-80B1-A79D-0DA7C7ED5136",
      "slug": "doublearrow",
      "description": "",
      "keywords": []
@@ -1038,7 +943,6 @@
      "display_name": "Corner Arrows",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "11EDA389-C65F-8B62-B338-27772FC25205",
      "slug": "cornerarrows",
      "description": "",
      "keywords": []
@@ -1048,7 +952,6 @@
      "display_name": "Corner Arrows Rounded",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "0801360B-297D-80BE-8A6D-B6E7CE1FF74F",
      "slug": "cornerarrowsrounded",
      "description": "",
      "keywords": []
@@ -1058,7 +961,6 @@
      "display_name": "Arrow Cross",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9FF3BE59-B701-82DC-8A59-56DA275EB8A3",
      "slug": "arrowcross",
      "description": "",
      "keywords": []
@@ -1068,7 +970,6 @@
      "display_name": "Return Arrow",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "B7778FC6-E1A3-8F96-9867-AD072CF36C5F",
      "slug": "returnarrow",
      "description": "",
      "keywords": []
@@ -1078,7 +979,6 @@
      "display_name": "Circle With Diagonal Bar",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "2EE347E4-139F-8F18-9FFC-8BAACC41CA2F",
      "slug": "circlewithdiagonalbar",
      "description": "",
      "keywords": []
@@ -1088,7 +988,6 @@
      "display_name": "Circle With Two Diagonal Bars",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "709D309A-45A9-8C0F-83AB-A5F8B6DC1024",
      "slug": "circlewithtwodiagonalbars",
      "description": "",
      "keywords": []
@@ -1098,7 +997,6 @@
      "display_name": "Half Circle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "5D372A7D-9598-8F83-9EF3-2E72649F2BF8",
      "slug": "halfcircle",
      "description": "",
      "keywords": []
@@ -1108,7 +1006,6 @@
      "display_name": "Munch Circle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "22D65B99-9580-89F5-9314-1687C5633F5F",
      "slug": "munchcircle",
      "description": "",
      "keywords": []
@@ -1118,7 +1015,6 @@
      "display_name": "Hourglass",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9F38DB6E-3B72-827F-BB33-5681AEBAC6C4",
      "slug": "hourglass",
      "description": "",
      "keywords": []
@@ -1128,7 +1024,6 @@
      "display_name": "Layers",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "961D8EB6-60CF-8ACA-8D5B-22C063430F85",
      "slug": "layers",
      "description": "",
      "keywords": []
@@ -1138,7 +1033,6 @@
      "display_name": "Circle Wedge",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9E811C4E-C2E6-87C7-A97D-0935C8010AD3",
      "slug": "circlewedge",
      "description": "",
      "keywords": []
@@ -1148,7 +1042,6 @@
      "display_name": "Circle Grid",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "73E72DE7-3BF0-888A-B606-AD50523DC897",
      "slug": "circlegrid",
      "description": "",
      "keywords": []
@@ -1158,7 +1051,6 @@
      "display_name": "Sparkle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9F62742D-DCAC-80B6-8EFE-816F2D046023",
      "slug": "sparkle",
      "description": "",
      "keywords": []
@@ -1168,7 +1060,6 @@
      "display_name": "Star",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "3FDE4906-8BFB-85F6-A2F3-8317EECC559D",
      "slug": "star",
      "description": "",
      "keywords": []
@@ -1180,14 +1071,12 @@
    "short_name": "3DBasicHatch",
    "display_name": "3D Basic (Hatch)",
    "asset_version": 1,
-   "published_library_id": "B50D4690-2263-84ED-91FB-1ECE329C3592",
    "shapes": [
     {
      "item_id": "square",
      "display_name": "square",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "7D4D52A1-3429-8415-B4EE-FB295F0D653E",
      "slug": "square",
      "description": "",
      "keywords": []
@@ -1197,7 +1086,6 @@
      "display_name": "Box With Diagonal Cross",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "445BFF35-5968-8933-8C64-DFD042754239",
      "slug": "boxwithdiagonalcross",
      "description": "",
      "keywords": []
@@ -1207,7 +1095,6 @@
      "display_name": "Frame",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "8F8842B3-7ED5-8896-9CE6-87F53BE3E5BC",
      "slug": "frame",
      "description": "",
      "keywords": []
@@ -1217,7 +1104,6 @@
      "display_name": "Hatch Box",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9F9D2EAC-DB82-8550-9508-2F6EF46752C2",
      "slug": "hatchbox",
      "description": "",
      "keywords": []
@@ -1227,7 +1113,6 @@
      "display_name": "rectangle",
      "default_width": 50,
      "default_height": 30,
-     "published_item_id": "C290285F-9601-825C-B5DF-B14251988E24",
      "slug": "rectangle",
      "description": "",
      "keywords": []
@@ -1237,7 +1122,6 @@
      "display_name": "Cross Hatch Box",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "CFE09354-2DBB-8178-8A73-25871C5667C3",
      "slug": "crosshatchbox",
      "description": "",
      "keywords": []
@@ -1247,7 +1131,6 @@
      "display_name": "Rectangle With Curved Sides",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "98F1BFCE-9153-85A3-A541-791135CEE815",
      "slug": "rectanglecurvedsides",
      "description": "",
      "keywords": []
@@ -1257,7 +1140,6 @@
      "display_name": "Rectangle With One Curved Side",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "A19E1C5E-E42B-844C-9561-DB81BE5A4D62",
      "slug": "rectangleonecurvedside",
      "description": "",
      "keywords": []
@@ -1267,7 +1149,6 @@
      "display_name": "Rectangle With Two Angled Sides",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F46FCE82-0276-86EC-AB26-CB26D51A1E10",
      "slug": "rectangletwoangledsides",
      "description": "",
      "keywords": []
@@ -1277,7 +1158,6 @@
      "display_name": "Rectangle With Chip Missing",
      "default_width": 50,
      "default_height": 35,
-     "published_item_id": "665F95AD-D7EB-8B84-B478-506614BC4C59",
      "slug": "rectanglewithchipmissing",
      "description": "",
      "keywords": []
@@ -1287,7 +1167,6 @@
      "display_name": "rectangle rounded",
      "default_width": 50,
      "default_height": 30,
-     "published_item_id": "E24670DA-87CB-849B-A1C4-57FA1BC82AC9",
      "slug": "rectangle-rounded",
      "description": "",
      "keywords": []
@@ -1297,7 +1176,6 @@
      "display_name": "rectangle 2",
      "default_width": 25,
      "default_height": 50,
-     "published_item_id": "51A7F745-D69D-8DEA-8433-7EAEA0F47CFD",
      "slug": "rectangle-2",
      "description": "",
      "keywords": []
@@ -1307,7 +1185,6 @@
      "display_name": "Square Wave Bottom",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "5827BE78-EBB1-8040-93A2-FE89C8BC0641",
      "slug": "squarewavebottom",
      "description": "",
      "keywords": []
@@ -1317,7 +1194,6 @@
      "display_name": "Triangle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "28AB22E9-9990-838A-A18D-A9178F4A6D5D",
      "slug": "triangle",
      "description": "",
      "keywords": []
@@ -1327,7 +1203,6 @@
      "display_name": "Right Triangle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "DF30F53B-A4B5-835F-9E9D-C68DFA400857",
      "slug": "righttriangle",
      "description": "",
      "keywords": []
@@ -1337,7 +1212,6 @@
      "display_name": "circle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "BD28CCAA-233F-8D81-AD20-061E4ABFAAA3",
      "slug": "circle",
      "description": "",
      "keywords": []
@@ -1347,7 +1221,6 @@
      "display_name": "circle 2",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "FABB6E4C-D2BB-8005-A752-AEBF72F6AD18",
      "slug": "circle2",
      "description": "",
      "keywords": []
@@ -1357,7 +1230,6 @@
      "display_name": "Donut",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "4FD32B3C-B560-8BCD-AF32-A2D40AB8F8B9",
      "slug": "donut",
      "description": "",
      "keywords": []
@@ -1367,7 +1239,6 @@
      "display_name": "Diamond",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "13CE5CA3-7AC7-85C3-82A8-41830056DF23",
      "slug": "diamond",
      "description": "",
      "keywords": []
@@ -1377,7 +1248,6 @@
      "display_name": "Trapezoid",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "ADE13E0E-6253-8FC8-BBDE-1526BBF43E2F",
      "slug": "trapezoid",
      "description": "",
      "keywords": []
@@ -1387,7 +1257,6 @@
      "display_name": "Octagon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "A74344B1-FDE6-871C-B6D5-059D93E7BDA0",
      "slug": "octagon",
      "description": "",
      "keywords": []
@@ -1397,7 +1266,6 @@
      "display_name": "Open Square",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "EB97327B-F8E7-89D7-AA29-8D59348102EF",
      "slug": "opensquare",
      "description": "",
      "keywords": []
@@ -1407,7 +1275,6 @@
      "display_name": "Bracket Left",
      "default_width": 20,
      "default_height": 50,
-     "published_item_id": "8F2E1CDF-69EE-8A31-BFBF-F63C15AA61C4",
      "slug": "bracketleft",
      "description": "",
      "keywords": []
@@ -1417,7 +1284,6 @@
      "display_name": "Bracket Right",
      "default_width": 20,
      "default_height": 50,
-     "published_item_id": "0702FC16-A9A1-877E-9D1E-5EB240EC9AE9",
      "slug": "bracketright",
      "description": "",
      "keywords": []
@@ -1427,7 +1293,6 @@
      "display_name": "Bracket 2 Left",
      "default_width": 14,
      "default_height": 50,
-     "published_item_id": "8C24AA1F-6859-8BF2-A3F9-DCD42446DF81",
      "slug": "bracket2left",
      "description": "",
      "keywords": []
@@ -1437,7 +1302,6 @@
      "display_name": "Bracket 2 Right",
      "default_width": 14,
      "default_height": 50,
-     "published_item_id": "DBA646A3-D053-8A6D-B8D8-347456D6988F",
      "slug": "bracket2right",
      "description": "",
      "keywords": []
@@ -1447,7 +1311,6 @@
      "display_name": "Process Step",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "046017C6-0F0C-8B30-98AE-F55A08875766",
      "slug": "processstep",
      "description": "",
      "keywords": []
@@ -1457,7 +1320,6 @@
      "display_name": "Chevron",
      "default_width": 40,
      "default_height": 50,
-     "published_item_id": "4731DA2A-1B77-8FFC-AC13-114AF3F7CE95",
      "slug": "chevron",
      "description": "",
      "keywords": []
@@ -1467,7 +1329,6 @@
      "display_name": "Cross",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "8D4C649D-1B63-8DBE-859F-ACD6D2B6FECF",
      "slug": "cross",
      "description": "",
      "keywords": []
@@ -1477,7 +1338,6 @@
      "display_name": "Grid",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "D532DC93-955F-82C7-8957-663A6A576433",
      "slug": "grid",
      "description": "",
      "keywords": []
@@ -1487,7 +1347,6 @@
      "display_name": "Burst",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "D8BA2EDD-611D-8A16-B9B8-101A903CD9E8",
      "slug": "burst",
      "description": "",
      "keywords": []
@@ -1497,7 +1356,6 @@
      "display_name": "Arrow",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "4F359CCB-D3D5-8D04-8280-A40E7D79DB3B",
      "slug": "arrow",
      "description": "",
      "keywords": []
@@ -1507,7 +1365,6 @@
      "display_name": "Double Arrow",
      "default_width": 40,
      "default_height": 50,
-     "published_item_id": "A058279D-5558-89DD-8C9E-693A97C67621",
      "slug": "doublearrow",
      "description": "",
      "keywords": []
@@ -1517,7 +1374,6 @@
      "display_name": "Two-Sided Arrow",
      "default_width": 50,
      "default_height": 30,
-     "published_item_id": "3952D432-500A-8AB4-98AF-287D9E8C2224",
      "slug": "twosidedarrow",
      "description": "",
      "keywords": []
@@ -1527,7 +1383,6 @@
      "display_name": "Corner Arrows",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "0E4EEC05-8AF2-86A6-B414-707237647953",
      "slug": "cornerarrows",
      "description": "",
      "keywords": []
@@ -1537,7 +1392,6 @@
      "display_name": "Corner Arrows Rounded",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "BB7D70F3-289D-8885-99FF-FB3A53365659",
      "slug": "cornerarrowsrounded",
      "description": "",
      "keywords": []
@@ -1547,7 +1401,6 @@
      "display_name": "Three Arrow Juncture",
      "default_width": 50,
      "default_height": 35,
-     "published_item_id": "F208AD62-0CAD-859F-B91F-25FA5B686DA3",
      "slug": "threearrowjuncture",
      "description": "",
      "keywords": []
@@ -1557,7 +1410,6 @@
      "display_name": "Arrow Cross",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "0143394C-B988-8704-B7C2-8EFF78C1E33B",
      "slug": "arrowcross",
      "description": "",
      "keywords": []
@@ -1567,7 +1419,6 @@
      "display_name": "Return Arrow",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F7EAADC2-A026-8D99-AAD7-326D3505140B",
      "slug": "returnarrow",
      "description": "",
      "keywords": []
@@ -1577,7 +1428,6 @@
      "display_name": "Circle With Diagonal Bar",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "FF4B5082-9BEE-874D-98F0-706246991DA2",
      "slug": "circlewithdiagonalbar",
      "description": "",
      "keywords": []
@@ -1587,7 +1437,6 @@
      "display_name": "Circle With Two Diagonal Bars",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "231B8FC7-A17B-8641-8B7B-36943ED03ABF",
      "slug": "circlewithtwodiagonalbars",
      "description": "",
      "keywords": []
@@ -1597,7 +1446,6 @@
      "display_name": "Half Circle",
      "default_width": 30,
      "default_height": 50,
-     "published_item_id": "EB523E85-D57F-8233-A2FB-B217149502D2",
      "slug": "halfcircle",
      "description": "",
      "keywords": []
@@ -1607,7 +1455,6 @@
      "display_name": "Munch Circle",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "452C8F00-648A-8F2C-B13A-19BA9CE541EE",
      "slug": "munchcircle",
      "description": "",
      "keywords": []
@@ -1617,7 +1464,6 @@
      "display_name": "Hourglass",
      "default_width": 35,
      "default_height": 50,
-     "published_item_id": "95178A6E-1906-8749-A961-BBB9D5171FA8",
      "slug": "hourglass",
      "description": "",
      "keywords": []
@@ -1627,7 +1473,6 @@
      "display_name": "Circle Wedge",
      "default_width": 30,
      "default_height": 50,
-     "published_item_id": "E73B53EB-CCE3-89A9-BFC8-303CE61BD627",
      "slug": "circlewedge",
      "description": "",
      "keywords": []
@@ -1637,7 +1482,6 @@
      "display_name": "Circle Grid",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "1C08B5D7-030E-8543-93BF-86C47D9CDA4B",
      "slug": "circlegrid",
      "description": "",
      "keywords": []
@@ -1647,7 +1491,6 @@
      "display_name": "Star",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "1596A474-A96B-8C47-B7B2-79045C3981DB",
      "slug": "star",
      "description": "",
      "keywords": []
@@ -1657,7 +1500,6 @@
      "display_name": "Insignia",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "EF7EF950-C669-88A6-A3B8-2523D2B12573",
      "slug": "insignia",
      "description": "",
      "keywords": []
@@ -1667,7 +1509,6 @@
      "display_name": "Document",
      "default_width": 40,
      "default_height": 50,
-     "published_item_id": "2D4FF1E9-9F37-8892-B5B8-E5A8EC186E12",
      "slug": "document",
      "description": "",
      "keywords": []
@@ -1677,7 +1518,6 @@
      "display_name": "oval",
      "default_width": 50,
      "default_height": 30,
-     "published_item_id": "A1DB0FAD-3E63-8307-AC4F-E122B0F717FC",
      "slug": "oval",
      "description": "",
      "keywords": []
@@ -1687,7 +1527,6 @@
      "display_name": "heart",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "639DCC2C-14A8-84B9-9ACC-C992BCD2C6F4",
      "slug": "heart",
      "description": "",
      "keywords": []
@@ -1697,7 +1536,6 @@
      "display_name": "rectangle wave bottom",
      "default_width": 50,
      "default_height": 40,
-     "published_item_id": "C7DF8211-DD74-8ECC-83C1-99D4D111347D",
      "slug": "rectangle-wave-bottom",
      "description": "",
      "keywords": []
@@ -1707,7 +1545,6 @@
      "display_name": "process 1",
      "default_width": 50,
      "default_height": 40,
-     "published_item_id": "12191D71-9728-80CE-9A1B-56606B40D700",
      "slug": "process-1",
      "description": "",
      "keywords": []
@@ -1717,7 +1554,6 @@
      "display_name": "process 2",
      "default_width": 50,
      "default_height": 40,
-     "published_item_id": "397F8E42-0279-8B51-B8CF-B8069572E71E",
      "slug": "process-2",
      "description": "",
      "keywords": []
@@ -1727,7 +1563,6 @@
      "display_name": "burst",
      "default_width": 50,
      "default_height": 30,
-     "published_item_id": "259BDC04-8A81-8407-8066-3DEEA1B5EF42",
      "slug": "burst-2",
      "description": "",
      "keywords": []
@@ -1737,7 +1572,6 @@
      "display_name": "star",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "73BC8D54-AAB9-81AE-B921-75DDD965471F",
      "slug": "star-2",
      "description": "",
      "keywords": []
@@ -1747,7 +1581,6 @@
      "display_name": "star 2",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "0F11C2F6-F68C-8F4C-BC18-E9E592F50CF3",
      "slug": "star2",
      "description": "",
      "keywords": []
@@ -1757,7 +1590,6 @@
      "display_name": "cloud",
      "default_width": 50,
      "default_height": 30,
-     "published_item_id": "F4C03F73-C91C-84E8-871A-E2A0C308EDA5",
      "slug": "cloud2",
      "description": "",
      "keywords": []
@@ -1767,7 +1599,6 @@
      "display_name": "arrow down",
      "default_width": 30,
      "default_height": 50,
-     "published_item_id": "4A164F3D-FF29-8907-B72A-25A88D78F252",
      "slug": "arrow-down",
      "description": "",
      "keywords": []
@@ -1777,7 +1608,6 @@
      "display_name": "arrow up",
      "default_width": 30,
      "default_height": 50,
-     "published_item_id": "10944EC7-9249-81E0-85CF-063FE73C8B6B",
      "slug": "arrow-up",
      "description": "",
      "keywords": []
@@ -1787,7 +1617,6 @@
      "display_name": "arrow left",
      "default_width": 50,
      "default_height": 30,
-     "published_item_id": "81000637-480A-8470-84EB-426136311594",
      "slug": "arrow-left",
      "description": "",
      "keywords": []
@@ -1797,7 +1626,6 @@
      "display_name": "arrow right",
      "default_width": 30,
      "default_height": 50,
-     "published_item_id": "72390D23-2BE4-815F-9B85-1FA3B128042B",
      "slug": "arrow-right",
      "description": "",
      "keywords": []
@@ -1807,7 +1635,6 @@
      "display_name": "arrow down 2",
      "default_width": 20,
      "default_height": 50,
-     "published_item_id": "37CC4431-AFC9-8348-A9D0-A8CC5556F1CC",
      "slug": "arrow-down-2",
      "description": "",
      "keywords": []
@@ -1817,7 +1644,6 @@
      "display_name": "arrow up 2",
      "default_width": 20,
      "default_height": 50,
-     "published_item_id": "4BDF258F-DAC4-8A12-AEC6-F0543EFE9E04",
      "slug": "arrow-up-2",
      "description": "",
      "keywords": []
@@ -1827,7 +1653,6 @@
      "display_name": "arrow left 2",
      "default_width": 50,
      "default_height": 20,
-     "published_item_id": "43A7ECBC-1091-8B41-B1D5-796ADF436F05",
      "slug": "arrow-left-2",
      "description": "",
      "keywords": []
@@ -1837,7 +1662,6 @@
      "display_name": "arrow right 2",
      "default_width": 20,
      "default_height": 50,
-     "published_item_id": "B99F4A36-E966-8BDB-B24D-C53F382B9196",
      "slug": "arrow-right-2",
      "description": "",
      "keywords": []
@@ -1847,7 +1671,6 @@
      "display_name": "arrow down 3",
      "default_width": 20,
      "default_height": 50,
-     "published_item_id": "5918FD48-5E40-866E-9EFD-295EB19CE337",
      "slug": "arrow-down-3",
      "description": "",
      "keywords": []
@@ -1857,7 +1680,6 @@
      "display_name": "arrow up 3",
      "default_width": 20,
      "default_height": 50,
-     "published_item_id": "900AFB9D-1975-8FB7-BCFF-6FE0811F82B4",
      "slug": "arrow-up-3",
      "description": "",
      "keywords": []
@@ -1867,7 +1689,6 @@
      "display_name": "arrow left 3",
      "default_width": 50,
      "default_height": 20,
-     "published_item_id": "932F53B4-4D65-8932-BF2D-2F08F00EB690",
      "slug": "arrow-left-3",
      "description": "",
      "keywords": []
@@ -1877,7 +1698,6 @@
      "display_name": "arrow right 3",
      "default_width": 20,
      "default_height": 50,
-     "published_item_id": "01E35DF5-C3EF-8B46-9471-37A2D1E1EDF3",
      "slug": "arrow-right-3",
      "description": "",
      "keywords": []
@@ -1887,7 +1707,6 @@
      "display_name": "triangle down",
      "default_width": 50,
      "default_height": 45,
-     "published_item_id": "AABAA5C9-1CD2-825A-8CBE-F98D0E811024",
      "slug": "triangle-down",
      "description": "",
      "keywords": []
@@ -1897,7 +1716,6 @@
      "display_name": "triangle up",
      "default_width": 50,
      "default_height": 45,
-     "published_item_id": "A8A2A90A-72BB-858E-A9D8-FC6A9B836D16",
      "slug": "triangle-up",
      "description": "",
      "keywords": []
@@ -1907,7 +1725,6 @@
      "display_name": "triangle left",
      "default_width": 45,
      "default_height": 50,
-     "published_item_id": "321E98B6-6FC9-803C-A873-53D1494BE9D4",
      "slug": "triangle-left",
      "description": "",
      "keywords": []
@@ -1917,7 +1734,6 @@
      "display_name": "triangle right",
      "default_width": 45,
      "default_height": 50,
-     "published_item_id": "340350C5-B6E8-8CA6-9561-C36AA7BB973F",
      "slug": "triangle-right",
      "description": "",
      "keywords": []
@@ -1929,14 +1745,12 @@
    "short_name": "wordBubbles",
    "display_name": "Word Bubbles",
    "asset_version": 1,
-   "published_library_id": "AABE1E97-380E-8257-AFF4-0C1947298808",
    "shapes": [
     {
      "item_id": "wordBubble1",
      "display_name": "wordBubble1",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "86672E6E-64E9-8207-A5E2-87D738739B55",
      "slug": "wordbubble1",
      "description": "",
      "keywords": []
@@ -1946,7 +1760,6 @@
      "display_name": "wordBubble2",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "CD12E04C-C49E-84D7-99B7-4BCEACB0D526",
      "slug": "wordbubble2",
      "description": "",
      "keywords": []
@@ -1956,7 +1769,6 @@
      "display_name": "wordBubble3",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "4721E085-7220-866B-BECA-A41F77BAE360",
      "slug": "wordbubble3",
      "description": "",
      "keywords": []
@@ -1966,7 +1778,6 @@
      "display_name": "wordBubble4",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "C1858FBC-EB29-8E74-9560-E903D117E014",
      "slug": "wordbubble4",
      "description": "",
      "keywords": []
@@ -1976,7 +1787,6 @@
      "display_name": "wordBubble5",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "312DF742-A562-84FB-98B1-0683123E8391",
      "slug": "wordbubble5",
      "description": "",
      "keywords": []
@@ -1986,7 +1796,6 @@
      "display_name": "wordBubble6",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "3BEE368C-4237-83E9-B692-C67C5159C227",
      "slug": "wordbubble6",
      "description": "",
      "keywords": []
@@ -1996,7 +1805,6 @@
      "display_name": "wordBubble7",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "A7E5ACA2-2BF3-8751-809F-F0E47244C465",
      "slug": "wordbubble7",
      "description": "",
      "keywords": []
@@ -2006,7 +1814,6 @@
      "display_name": "wordBubble8",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "7597D38C-8BEC-83A3-BD0D-85039BFDABB6",
      "slug": "wordbubble8",
      "description": "",
      "keywords": []
@@ -2016,7 +1823,6 @@
      "display_name": "wordBubble9",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "BDDE5D7E-D19A-871B-BFF3-9EC4A826CC5F",
      "slug": "wordbubble9",
      "description": "",
      "keywords": []
@@ -2026,7 +1832,6 @@
      "display_name": "wordBubble10",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "3EE866D5-654E-8ED8-A139-0301EE8A89A3",
      "slug": "wordbubble10",
      "description": "",
      "keywords": []
@@ -2036,7 +1841,6 @@
      "display_name": "wordBubble11",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "BD910B80-0E1E-898C-A8E5-F15F1EA11DD7",
      "slug": "wordbubble11",
      "description": "",
      "keywords": []
@@ -2046,7 +1850,6 @@
      "display_name": "wordBubble12",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "C3B3EC61-3965-8718-9AB3-D71E4EFEBD66",
      "slug": "wordbubble12",
      "description": "",
      "keywords": []
@@ -2056,7 +1859,6 @@
      "display_name": "wordBubble13",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "FDB3608B-4A4D-8868-925B-878F5725E036",
      "slug": "wordbubble13",
      "description": "",
      "keywords": []
@@ -2066,7 +1868,6 @@
      "display_name": "wordBubble14",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "E1B0E748-AE7D-87DC-95D4-133B5A3FC077",
      "slug": "wordbubble14",
      "description": "",
      "keywords": []
@@ -2076,7 +1877,6 @@
      "display_name": "wordBubble15",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "09B42F8A-1B7F-85F9-9328-3769085D608B",
      "slug": "wordbubble15",
      "description": "",
      "keywords": []
@@ -2086,7 +1886,6 @@
      "display_name": "wordBubble16",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "79E81BB0-6EDE-82E2-A581-3DDEFAF50770",
      "slug": "wordbubble16",
      "description": "",
      "keywords": []
@@ -2096,7 +1895,6 @@
      "display_name": "wordBubble17",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "438F3FDF-98AD-80E0-B74C-DBB4DF607608",
      "slug": "wordbubble17",
      "description": "",
      "keywords": []
@@ -2106,7 +1904,6 @@
      "display_name": "wordBubble18",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "E8C46AF7-8CEC-8731-BC5C-3B81C5EC9F49",
      "slug": "wordbubble18",
      "description": "",
      "keywords": []
@@ -2116,7 +1913,6 @@
      "display_name": "wordBubble19",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "C0D9B9E2-069E-81C8-A1B2-C6F7F9623662",
      "slug": "wordbubble19",
      "description": "",
      "keywords": []
@@ -2126,7 +1922,6 @@
      "display_name": "wordBubble20",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9801ECED-8405-8FF3-9B9E-9E9B7D6D01F7",
      "slug": "wordbubble20",
      "description": "",
      "keywords": []
@@ -2136,7 +1931,6 @@
      "display_name": "wordBubble21",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9E13BA46-82E3-89D7-8D3B-E5ADF17B1B63",
      "slug": "wordbubble21",
      "description": "",
      "keywords": []
@@ -2146,7 +1940,6 @@
      "display_name": "wordBubble22",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "883F2A44-D36E-88FD-989F-E2703C46F2DF",
      "slug": "wordbubble22",
      "description": "",
      "keywords": []
@@ -2156,7 +1949,6 @@
      "display_name": "wordBubble23",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9C1A26F7-7E14-89DB-9918-75E4FE3FF4DE",
      "slug": "wordbubble23",
      "description": "",
      "keywords": []
@@ -2166,7 +1958,6 @@
      "display_name": "wordBubble24",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "036CF02B-2DD6-856B-AADB-E6CC33C83C01",
      "slug": "wordbubble24",
      "description": "",
      "keywords": []
@@ -2176,7 +1967,6 @@
      "display_name": "wordBubble25",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "AC1B5AFF-C31C-825D-B1D0-0A52687276C0",
      "slug": "wordbubble25",
      "description": "",
      "keywords": []
@@ -2186,7 +1976,6 @@
      "display_name": "wordBubble26",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "432C57EB-BEE2-83F9-95E3-E92F460604EE",
      "slug": "wordbubble26",
      "description": "",
      "keywords": []
@@ -2196,7 +1985,6 @@
      "display_name": "wordBubble27",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "20DDA227-3FD8-85AA-8BA3-5CD7715E93A6",
      "slug": "wordbubble27",
      "description": "",
      "keywords": []
@@ -2206,7 +1994,6 @@
      "display_name": "wordBubble28",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F74877B7-BB3F-8202-80BB-2AA8A953CD79",
      "slug": "wordbubble28",
      "description": "",
      "keywords": []
@@ -2216,7 +2003,6 @@
      "display_name": "wordBubble29",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "107A4F2E-7FA4-81F5-82F9-C72A199BF728",
      "slug": "wordbubble29",
      "description": "",
      "keywords": []
@@ -2226,7 +2012,6 @@
      "display_name": "wordBubble30",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "77D15383-A7D5-880B-A490-C35FCDE2D437",
      "slug": "wordbubble30",
      "description": "",
      "keywords": []
@@ -2236,7 +2021,6 @@
      "display_name": "wordBubble31",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "221706C2-79AB-8EFD-9140-A60DA280760D",
      "slug": "wordbubble31",
      "description": "",
      "keywords": []
@@ -2246,7 +2030,6 @@
      "display_name": "wordBubble32",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "62DBA3F7-7A90-87E6-9A09-D2A8F50EB2D0",
      "slug": "wordbubble32",
      "description": "",
      "keywords": []
@@ -2256,7 +2039,6 @@
      "display_name": "wordBubble33",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "170BAE75-565E-8417-B797-1D8EEB2D1FA7",
      "slug": "wordbubble33",
      "description": "",
      "keywords": []
@@ -2266,7 +2048,6 @@
      "display_name": "wordBubble34",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "C3A719A6-7530-8FDB-8B7B-61A0A17054B8",
      "slug": "wordbubble34",
      "description": "",
      "keywords": []
@@ -2276,7 +2057,6 @@
      "display_name": "wordBubble35",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "5AC79942-9BD3-8B75-B523-81840ED20EF1",
      "slug": "wordbubble35",
      "description": "",
      "keywords": []
@@ -2286,7 +2066,6 @@
      "display_name": "wordBubble36",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "8F7AD198-ADA9-8E68-AFE8-96A85CC2E113",
      "slug": "wordbubble36",
      "description": "",
      "keywords": []
@@ -2296,7 +2075,6 @@
      "display_name": "wordBubble37",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "E947A1D3-C395-84D0-A099-3C320300280E",
      "slug": "wordbubble37",
      "description": "",
      "keywords": []
@@ -2306,7 +2084,6 @@
      "display_name": "wordBubble38",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "96354D9A-F555-8588-9712-328B35016B05",
      "slug": "wordbubble38",
      "description": "",
      "keywords": []
@@ -2316,7 +2093,6 @@
      "display_name": "wordBubble39",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "C762C0D4-EE50-89D3-BA3E-0206C16C23D5",
      "slug": "wordbubble39",
      "description": "",
      "keywords": []
@@ -2326,7 +2102,6 @@
      "display_name": "wordBubble40",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F39CE947-EE03-89CD-ADDC-45C427AA2C7B",
      "slug": "wordbubble40",
      "description": "",
      "keywords": []
@@ -2336,7 +2111,6 @@
      "display_name": "wordBubble41",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "DADEE116-6F25-8EAA-8255-69EB325A7714",
      "slug": "wordbubble41",
      "description": "",
      "keywords": []
@@ -2346,7 +2120,6 @@
      "display_name": "wordBubble42",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "92104625-C62D-8669-98D4-18EC9E8AB351",
      "slug": "wordbubble42",
      "description": "",
      "keywords": []
@@ -2356,7 +2129,6 @@
      "display_name": "wordBubble43",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "13F50600-BAA8-88BE-B2E0-126B61F7D075",
      "slug": "wordbubble43",
      "description": "",
      "keywords": []
@@ -2366,7 +2138,6 @@
      "display_name": "wordBubble44",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "5FC824EB-2176-871D-A776-7F246A21F089",
      "slug": "wordbubble44",
      "description": "",
      "keywords": []
@@ -2376,7 +2147,6 @@
      "display_name": "wordBubble45",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "909AD989-2F8F-8352-896C-934F891BE44E",
      "slug": "wordbubble45",
      "description": "",
      "keywords": []
@@ -2386,7 +2156,6 @@
      "display_name": "wordBubble46",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F8221034-EE6C-8AF7-AC14-EA634EAD9ACE",
      "slug": "wordbubble46",
      "description": "",
      "keywords": []
@@ -2396,7 +2165,6 @@
      "display_name": "wordBubble47",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "C3681240-8A01-8F9D-AD91-C88AF4D7D60B",
      "slug": "wordbubble47",
      "description": "",
      "keywords": []
@@ -2406,7 +2174,6 @@
      "display_name": "wordBubble48",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "2DC1969E-65FC-81BB-A0F4-CC8C07A20A6B",
      "slug": "wordbubble48",
      "description": "",
      "keywords": []
@@ -2416,7 +2183,6 @@
      "display_name": "wordBubble49",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "E50BD5CF-67CF-87F8-9430-6E018CE0DDCB",
      "slug": "wordbubble49",
      "description": "",
      "keywords": []
@@ -2426,7 +2192,6 @@
      "display_name": "wordBubble50",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "A422E160-B6AA-8B96-8F3C-79550AD8D506",
      "slug": "wordbubble50",
      "description": "",
      "keywords": []
@@ -2438,14 +2203,12 @@
    "short_name": "biz",
    "display_name": "Biz",
    "asset_version": 1,
-   "published_library_id": "C8C4E0F5-FE5E-8DF7-9E62-E3C9C3CDBD3F",
    "shapes": [
     {
      "item_id": "Man",
      "display_name": "Man",
      "default_width": 25,
      "default_height": 50,
-     "published_item_id": "D094B016-6678-8DFC-859D-81112A960662",
      "slug": "man",
      "description": "A simple person icon for a man.",
      "keywords": [
@@ -2462,7 +2225,6 @@
      "display_name": "Man Customer",
      "default_width": 20,
      "default_height": 50,
-     "published_item_id": "4177A585-2932-803C-A2CC-286232C5D9E9",
      "slug": "mancustomer",
      "description": "A male customer shown with a crown.",
      "keywords": [
@@ -2479,7 +2241,6 @@
      "display_name": "Woman",
      "default_width": 25,
      "default_height": 50,
-     "published_item_id": "CA8AE640-2DA4-8D44-8E61-18E08727A9C2",
      "slug": "woman",
      "description": "A simple person icon for a woman.",
      "keywords": [
@@ -2496,7 +2257,6 @@
      "display_name": "Woman Customer",
      "default_width": 25,
      "default_height": 50,
-     "published_item_id": "45B28A99-CF0E-8DBA-B0F9-C4AACC9B07C4",
      "slug": "womancustomer",
      "description": "A female customer shown with a crown.",
      "keywords": [
@@ -2513,7 +2273,6 @@
      "display_name": "Crown",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "7DA51366-9B8A-8055-92E9-004ACBEE8AC3",
      "slug": "crown",
      "description": "A crown for royalty, leadership or authority.",
      "keywords": [
@@ -2530,7 +2289,6 @@
      "display_name": "Team",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "72B4A593-77AF-8D72-9D42-69252FDC541D",
      "slug": "team",
      "description": "A small group of people working together.",
      "keywords": [
@@ -2547,7 +2305,6 @@
      "display_name": "People Involved",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "34B9BA48-13CA-8B75-B9BD-AB8C9BBC920E",
      "slug": "peopleinvolved",
      "description": "A group of people involved in a task or decision.",
      "keywords": [
@@ -2564,7 +2321,6 @@
      "display_name": "Interaction",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "E1AEF300-2326-8892-9DF7-6D899AB3E623",
      "slug": "interaction",
      "description": "Two curved arrows showing an exchange or repeated interaction.",
      "keywords": [
@@ -2581,7 +2337,6 @@
      "display_name": "Building",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "E35088CA-5DA8-84C1-9C4C-5ADF874D02DC",
      "slug": "building",
      "description": "An office building shown in perspective.",
      "keywords": [
@@ -2597,7 +2352,6 @@
      "display_name": "Building2",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "8C083727-5840-8C46-A35D-3C485686F803",
      "slug": "building2",
      "description": "A taller office building shown in perspective.",
      "keywords": [
@@ -2613,7 +2367,6 @@
      "display_name": "Cash",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "0E9B28ED-AC57-85C4-8481-D0555B3B2E26",
      "slug": "cash",
      "description": "A banknote marked with a dollar sign.",
      "keywords": [
@@ -2630,7 +2383,6 @@
      "display_name": "Check",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "7A8C3AE4-8682-853D-8D15-82CAAE2E3E25",
      "slug": "check",
      "description": "A check mark in a box for a completed, correct or approved item.",
      "keywords": [
@@ -2648,7 +2400,6 @@
      "display_name": "X",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "5092F57B-28CB-88D1-AFDD-95E6A0E2D1EA",
      "slug": "x",
      "description": "A cross in a box for a wrong, rejected or incomplete item.",
      "keywords": [
@@ -2666,7 +2417,6 @@
      "display_name": "Clock",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "4045429B-DD2E-8608-B31D-A08E1A8DDBCC",
      "slug": "clock",
      "description": "An analogue clock for time or scheduling.",
      "keywords": [
@@ -2683,7 +2433,6 @@
      "display_name": "Computer",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "6C4D34E4-AEBC-8094-97E1-D89603770E48",
      "slug": "computer",
      "description": "A desktop computer for office work and information technology.",
      "keywords": [
@@ -2700,7 +2449,6 @@
      "display_name": "Database",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "E70FFA1C-1625-8211-9FF7-6CF05580981C",
      "slug": "database",
      "description": "A cylinder representing a database or stored information.",
      "keywords": [
@@ -2717,7 +2465,6 @@
      "display_name": "Form",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "56A59ED4-331D-8636-A206-7B9C4B8D1BF8",
      "slug": "form",
      "description": "A form with fields for collecting information.",
      "keywords": [
@@ -2734,7 +2481,6 @@
      "display_name": "Pain",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "DEF004F7-47F2-8274-8BD6-C4D7ABC01B89",
      "slug": "pain",
      "description": "A pain point or problem, shown by a lightning bolt and pointer.",
      "keywords": [
@@ -2751,7 +2497,6 @@
      "display_name": "Checklist",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "7E061653-5467-8D3C-88A1-FA6E2A1820C5",
      "slug": "checklist",
      "description": "A checklist of tasks with some items ticked off.",
      "keywords": [
@@ -2768,7 +2513,6 @@
      "display_name": "Document",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "55E059F5-6738-893C-8974-BEDBF8F3E4BC",
      "slug": "document",
      "description": "A sheet of paper representing a document or report.",
      "keywords": [
@@ -2785,7 +2529,6 @@
      "display_name": "Binders",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "5878A348-3212-8D45-A72D-A94389EF700F",
      "slug": "binders",
      "description": "Office binders for storing paperwork.",
      "keywords": [
@@ -2802,7 +2545,6 @@
      "display_name": "Coin Euro",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "EA358F74-34E2-8273-91B8-787A2685C30B",
      "slug": "coineuro",
      "description": "A coin marked with the euro sign.",
      "keywords": [
@@ -2819,7 +2561,6 @@
      "display_name": "Coin Dollar",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "19FC7F50-97D7-873A-AD6A-CAE1BDBC1730",
      "slug": "coindollar",
      "description": "A coin marked with the dollar sign, for dollar-denominated currencies.",
      "keywords": [
@@ -2839,7 +2580,6 @@
      "display_name": "Coin Pound",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F8C6AD1B-0035-8091-A53C-8884F4B95E21",
      "slug": "coinpound",
      "description": "A coin marked with the pound sterling sign.",
      "keywords": [
@@ -2856,7 +2596,6 @@
      "display_name": "Coin Yen",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "FA88BCB8-5FA0-83D9-B73B-092B211D37F9",
      "slug": "coin-yen",
      "description": "A coin marked with the yen sign: Japanese money.",
      "keywords": [
@@ -2874,7 +2613,6 @@
      "display_name": "Coin Yuan",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "58B76689-2D8E-8E02-9EF3-9975DA483D30",
      "slug": "coin-yuan",
      "description": "A coin marked with the yuan character: Chinese money, the renminbi.",
      "keywords": [
@@ -2894,7 +2632,6 @@
      "display_name": "Coin Swiss Franc",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "8AE9A64E-2793-880B-9430-08328BB6308D",
      "slug": "coin-swiss-franc",
      "description": "A coin marked Fr, for francs: Swiss money.",
      "keywords": [
@@ -2913,7 +2650,6 @@
      "display_name": "Coin Blank",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "05CB7C52-A76E-8169-BBF7-66AA05E5D817",
      "slug": "coinblank",
      "description": "A blank coin for money, a token or an unspecified currency.",
      "keywords": [
@@ -2930,7 +2666,6 @@
      "display_name": "Founder",
      "default_width": 83,
      "default_height": 60.875,
-     "published_item_id": "B1E0C272-BF25-8A26-95B5-A2B42D5BD323",
      "slug": "founder",
      "description": "The person who started the company and sets its direction.",
      "keywords": [
@@ -2948,7 +2683,6 @@
      "display_name": "Engineer",
      "default_width": 89.125,
      "default_height": 58,
-     "published_item_id": "FE061001-1329-8B96-859E-417BB8A71F2A",
      "slug": "engineer",
      "description": "A software engineer: someone who writes and ships the code.",
      "keywords": [
@@ -2965,7 +2699,6 @@
      "display_name": "Designer",
      "default_width": 89.375,
      "default_height": 58.125,
-     "published_item_id": "3C931151-2F7D-8300-9EED-3DD96C854C67",
      "slug": "designer",
      "description": "A product or brand designer, shaping how the product looks and works.",
      "keywords": [
@@ -2982,7 +2715,6 @@
      "display_name": "Product Manager",
      "default_width": 90.25,
      "default_height": 71.125,
-     "published_item_id": "3D80CF65-48F7-8F23-9296-CABA96F1DF10",
      "slug": "product-manager",
      "description": "A product manager: decides what gets built next and why.",
      "keywords": [
@@ -2998,7 +2730,6 @@
      "display_name": "Investor",
      "default_width": 103.625,
      "default_height": 67.125,
-     "published_item_id": "725B5388-327D-842C-A487-7E2975FD669E",
      "slug": "investor",
      "description": "Someone who puts money into the company in return for a share of it.",
      "keywords": [
@@ -3015,7 +2746,6 @@
      "display_name": "Recruiter",
      "default_width": 94.25,
      "default_height": 62.25,
-     "published_item_id": "699A50F4-806A-8E0E-9669-56DED34EBDD6",
      "slug": "recruiter",
      "description": "A recruiter or people-team member finding and hiring candidates.",
      "keywords": [
@@ -3032,7 +2762,6 @@
      "display_name": "Support Agent",
      "default_width": 98,
      "default_height": 65.25,
-     "published_item_id": "325BEBA0-2624-82A5-9646-34AA27B5CB55",
      "slug": "support-agent",
      "description": "A support agent answering customers and resolving their requests.",
      "keywords": [
@@ -3049,7 +2778,6 @@
      "display_name": "Stand-up Meeting",
      "default_width": 110.625,
      "default_height": 94.375,
-     "published_item_id": "83F7A85B-5AE9-89E0-AE8B-3121E0F66E25",
      "slug": "stand-up-meeting",
      "description": "A short daily team meeting at the task board: what was done, what is next, what is blocked.",
      "keywords": [
@@ -3068,7 +2796,6 @@
      "display_name": "Org Chart",
      "default_width": 105.125,
      "default_height": 88.75,
-     "published_item_id": "B9B0A7E9-9FD8-8D66-A2E8-D62E9E082334",
      "slug": "org-chart",
      "description": "Who reports to whom: the company's reporting lines, level by level.",
      "keywords": [
@@ -3085,7 +2812,6 @@
      "display_name": "One-on-One",
      "default_width": 107.125,
      "default_height": 94,
-     "published_item_id": "9BDA3F8B-18ED-866B-8AE4-53C1DD4D2601",
      "slug": "one-on-one",
      "description": "A regular private conversation between two people, usually a manager and one of their team.",
      "keywords": [
@@ -3104,7 +2830,6 @@
      "display_name": "All-Hands",
      "default_width": 108.375,
      "default_height": 108.125,
-     "published_item_id": "382FEDAC-B439-89FB-B378-2110B9171C02",
      "slug": "all-hands",
      "description": "A meeting of the whole company, where leaders share results and news with everyone at once.",
      "keywords": [
@@ -3121,7 +2846,6 @@
      "display_name": "Video Call",
      "default_width": 96.375,
      "default_height": 82.75,
-     "published_item_id": "2314E5C3-382A-8456-BBD3-5C845DA3FD1F",
      "slug": "video-call",
      "description": "A meeting held over video, with each person shown in their own tile on screen.",
      "keywords": [
@@ -3138,7 +2862,6 @@
      "display_name": "Hiring",
      "default_width": 107.625,
      "default_height": 35.25,
-     "published_item_id": "F666774F-CB17-89F7-8000-F8F2A5B01FB7",
      "slug": "hiring",
      "description": "Finding and adding a new person to the team to fill an open role.",
      "keywords": [
@@ -3155,7 +2878,6 @@
      "display_name": "Onboarding",
      "default_width": 96.625,
      "default_height": 59.375,
-     "published_item_id": "81100B07-EB8B-888E-A245-7871477D70AC",
      "slug": "onboarding",
      "description": "A new starter's first days: getting their pass, accounts and a checklist of things to learn.",
      "keywords": [
@@ -3172,7 +2894,6 @@
      "display_name": "Performance Review",
      "default_width": 69.375,
      "default_height": 88.875,
-     "published_item_id": "9BDD9694-C4D1-8832-B3A7-DB79B8EF51D4",
      "slug": "performance-review",
      "description": "A regular written assessment of how well someone is doing their job, with ratings and goals.",
      "keywords": [
@@ -3189,7 +2910,6 @@
      "display_name": "Brainstorm",
      "default_width": 103,
      "default_height": 64.125,
-     "published_item_id": "DAE2BE78-D456-84CF-BCD4-C975ADF7D7A3",
      "slug": "brainstorm",
      "description": "A session where a team puts up as many ideas as it can before choosing the best ones.",
      "keywords": [
@@ -3206,7 +2926,6 @@
      "display_name": "Distributed Team",
      "default_width": 89.875,
      "default_height": 94.375,
-     "published_item_id": "9E28F606-459C-80D6-B575-2269D8AAE61C",
      "slug": "distributed-team",
      "description": "A team whose members work together from different cities or countries.",
      "keywords": [
@@ -3223,7 +2942,6 @@
      "display_name": "Seed Funding",
      "default_width": 68.75,
      "default_height": 77,
-     "published_item_id": "FFD773CA-B482-8FAE-8B72-321B50028360",
      "slug": "seed-funding",
      "description": "The first outside money a young company raises, to get from an idea to a product.",
      "keywords": [
@@ -3242,7 +2960,6 @@
      "display_name": "Funding Round",
      "default_width": 96,
      "default_height": 71.875,
-     "published_item_id": "93EEF461-D4A1-85D8-9C5D-FEFE84AF5683",
      "slug": "funding-round",
      "description": "One stage of raising money from investors; each later round is usually larger than the last.",
      "keywords": [
@@ -3260,7 +2977,6 @@
      "display_name": "Term Sheet",
      "default_width": 72.125,
      "default_height": 92.375,
-     "published_item_id": "7A0ACBD2-3C00-8AB3-890D-D091E4A7902E",
      "slug": "term-sheet",
      "description": "A short document setting out the main terms of an investment before the contracts are written.",
      "keywords": [
@@ -3277,7 +2993,6 @@
      "display_name": "Cap Table",
      "default_width": 99.375,
      "default_height": 65.625,
-     "published_item_id": "1EC06CB8-7EAD-899C-B597-B80DAA6E433F",
      "slug": "cap-table",
      "description": "The list of who owns how much of the company: founders, investors and staff.",
      "keywords": [
@@ -3295,7 +3010,6 @@
      "display_name": "Burn Rate",
      "default_width": 83.875,
      "default_height": 73.75,
-     "published_item_id": "80ADC9CD-E059-8C61-8562-819F69A69DA4",
      "slug": "burn-rate",
      "description": "How fast a company is spending its cash each month, before it earns enough to cover its costs.",
      "keywords": [
@@ -3312,7 +3026,6 @@
      "display_name": "Recurring Revenue",
      "default_width": 77.875,
      "default_height": 82.875,
-     "published_item_id": "5952FBEA-739E-89FB-A1A3-0E6895499551",
      "slug": "recurring-revenue",
      "description": "Income that comes in again every month or year from subscriptions, not from one-off sales.",
      "keywords": [
@@ -3329,7 +3042,6 @@
      "display_name": "Payment",
      "default_width": 95.75,
      "default_height": 61.125,
-     "published_item_id": "092C8DF8-88FC-8E81-A54C-B1E185FBAD4B",
      "slug": "payment",
      "description": "A customer paying for something by tapping a card on a phone or reader.",
      "keywords": [
@@ -3346,7 +3058,6 @@
      "display_name": "Invoice",
      "default_width": 71.25,
      "default_height": 86.125,
-     "published_item_id": "E3229CBE-37E8-82B2-8E17-8474091E983D",
      "slug": "invoice",
      "description": "A bill sent to a customer, listing what was supplied and the total amount owed.",
      "keywords": [
@@ -3363,7 +3074,6 @@
      "display_name": "Payroll",
      "default_width": 98.625,
      "default_height": 75.75,
-     "published_item_id": "1F853004-AE5C-8AA1-8230-034620E508F3",
      "slug": "payroll",
      "description": "Paying everyone in the company their salary or wages on a regular schedule.",
      "keywords": [
@@ -3380,7 +3090,6 @@
      "display_name": "Pricing Plans",
      "default_width": 104.25,
      "default_height": 73.25,
-     "published_item_id": "28CB1A4D-D32D-8060-97DA-A431959DAAA1",
      "slug": "pricing-plans",
      "description": "The tiers a product is sold in, each with its own features and price, one of them recommended.",
      "keywords": [
@@ -3397,7 +3106,6 @@
      "display_name": "Kanban Board",
      "default_width": 103.5,
      "default_height": 74.875,
-     "published_item_id": "74872492-9733-8CDE-BE56-B9CCD20DAE12",
      "slug": "kanban-board",
      "description": "A board of work items moving through columns from to-do to done.",
      "keywords": [
@@ -3414,7 +3122,6 @@
      "display_name": "AI Assistant",
      "default_width": 95.625,
      "default_height": 76.625,
-     "published_item_id": "89AAB437-05FB-8D8E-96F8-5382C172A891",
      "slug": "ai-assistant",
      "description": "An AI assistant answering a question in a chat.",
      "keywords": [
@@ -3431,7 +3138,6 @@
      "display_name": "Roadmap",
      "default_width": 103,
      "default_height": 59.875,
-     "published_item_id": "77B586E5-AB82-8D3E-B26C-D8B823CA9539",
      "slug": "roadmap",
      "description": "A timeline of what the team plans to build and when, showing work in progress and milestones.",
      "keywords": [
@@ -3448,7 +3154,6 @@
      "display_name": "Sprint",
      "default_width": 80.125,
      "default_height": 87.5,
-     "published_item_id": "13EA79E4-D5AD-822F-9F96-698083240ADA",
      "slug": "sprint",
      "description": "A short, fixed period, often two weeks, in which a team finishes a set batch of work, then repeats.",
      "keywords": [
@@ -3465,7 +3170,6 @@
      "display_name": "Backlog",
      "default_width": 78.5,
      "default_height": 84.625,
-     "published_item_id": "881AB335-7370-8C8A-A39F-9D8A4E580B89",
      "slug": "backlog",
      "description": "The ordered list of work waiting to be done, with the most important items at the top.",
      "keywords": [
@@ -3482,7 +3186,6 @@
      "display_name": "Launch",
      "default_width": 71,
      "default_height": 87.75,
-     "published_item_id": "6EBD104E-63C4-8771-AF5A-C40F76428B8F",
      "slug": "launch",
      "description": "Putting a new product or feature in front of customers for the first time.",
      "keywords": [
@@ -3500,7 +3203,6 @@
      "display_name": "Release",
      "default_width": 56.875,
      "default_height": 94.5,
-     "published_item_id": "2A2CDAF2-01BD-8844-9FA0-94646099839A",
      "slug": "release",
      "description": "A packaged version of the software shipped to production, where customers use it.",
      "keywords": [
@@ -3517,7 +3219,6 @@
      "display_name": "Feature Flag",
      "default_width": 83,
      "default_height": 80.25,
-     "published_item_id": "A0E92254-6F16-84B0-8433-2C7446CD011E",
      "slug": "feature-flag",
      "description": "A switch that turns a feature on or off for chosen users without shipping new code.",
      "keywords": [
@@ -3534,7 +3235,6 @@
      "display_name": "A/B Test",
      "default_width": 104.75,
      "default_height": 62.625,
-     "published_item_id": "638A3358-0123-845D-BCB1-57A7579339E2",
      "slug": "ab-test",
      "description": "An experiment that shows two versions to different users and measures which one performs better.",
      "keywords": [
@@ -3551,7 +3251,6 @@
      "display_name": "User Feedback",
      "default_width": 93.25,
      "default_height": 70.375,
-     "published_item_id": "ACB85E3F-CC40-8993-BE82-C8FAF431BD1C",
      "slug": "user-feedback",
      "description": "What customers say about the product: their ratings, reviews and comments.",
      "keywords": [
@@ -3568,7 +3267,6 @@
      "display_name": "Customer Journey",
      "default_width": 108.25,
      "default_height": 75,
-     "published_item_id": "C597B34C-8DDB-8525-90D8-9085F821F329",
      "slug": "customer-journey",
      "description": "The steps a customer goes through, from first hearing of the product to reaching their goal.",
      "keywords": [
@@ -3585,7 +3283,6 @@
      "display_name": "Integration",
      "default_width": 107.25,
      "default_height": 41.875,
-     "published_item_id": "504FE323-F47A-8857-A9F6-82BA8B7A5A42",
      "slug": "integration",
      "description": "A connection that lets two systems or apps exchange data automatically.",
      "keywords": [
@@ -3602,7 +3299,6 @@
      "display_name": "Dashboard",
      "default_width": 100.75,
      "default_height": 74.75,
-     "published_item_id": "19EB9821-4F23-8B88-98E2-A2ABB3D6379E",
      "slug": "dashboard",
      "description": "One screen of charts and numbers that shows how the business is doing at a glance.",
      "keywords": [
@@ -3619,7 +3315,6 @@
      "display_name": "Security",
      "default_width": 69,
      "default_height": 81,
-     "published_item_id": "B2CDE960-5E23-80C7-8BBE-983A6F18CE9E",
      "slug": "security",
      "description": "Keeping the product, its data and its customers' accounts safe from misuse.",
      "keywords": [
@@ -3636,7 +3331,6 @@
      "display_name": "Growth Curve",
      "default_width": 91.25,
      "default_height": 68.125,
-     "published_item_id": "D608E068-E557-8200-85AE-154EE36C83E1",
      "slug": "growth-curve",
      "description": "Growth that starts flat and then takes off: the hockey-stick curve.",
      "keywords": [
@@ -3653,7 +3347,6 @@
      "display_name": "Funnel",
      "default_width": 86,
      "default_height": 85.625,
-     "published_item_id": "FC4E72A4-E6B2-86E6-80CA-AD6FBB40CF1F",
      "slug": "funnel",
      "description": "The steps people pass through on the way to becoming customers, with fewer left at each step.",
      "keywords": [
@@ -3670,7 +3363,6 @@
      "display_name": "Flywheel",
      "default_width": 87,
      "default_height": 86.875,
-     "published_item_id": "4005B599-80F5-8A72-9F76-AA2A8E8A7FCB",
      "slug": "flywheel",
      "description": "A growth loop where each part feeds the next, so every turn makes the following one easier.",
      "keywords": [
@@ -3686,7 +3378,6 @@
      "display_name": "North Star Metric",
      "default_width": 87.625,
      "default_height": 87.625,
-     "published_item_id": "5BEBD9DA-5767-8371-BE33-6A8B8B5B0C61",
      "slug": "north-star-metric",
      "description": "The one number a company steers by, because it best shows that customers are getting value.",
      "keywords": [
@@ -3703,7 +3394,6 @@
      "display_name": "OKRs",
      "default_width": 98.75,
      "default_height": 89,
-     "published_item_id": "48ACD2CA-B2F3-8172-BE0C-FFC35D064599",
      "slug": "okrs",
      "description": "Objectives and key results: one goal and the few measurable results that show progress towards it.",
      "keywords": [
@@ -3720,7 +3410,6 @@
      "display_name": "Churn",
      "default_width": 97.625,
      "default_height": 59.25,
-     "published_item_id": "5E993247-80A5-85F1-989C-88040E585819",
      "slug": "churn",
      "description": "Customers who stop using or paying for the product in a given period.",
      "keywords": [
@@ -3737,7 +3426,6 @@
      "display_name": "Retention",
      "default_width": 91.25,
      "default_height": 72.5,
-     "published_item_id": "C79E434A-326C-83B9-80BC-16C7A49F12F4",
      "slug": "retention",
      "description": "How many customers keep coming back over time, tracked group by group in a cohort chart.",
      "keywords": [
@@ -3754,7 +3442,6 @@
      "display_name": "Network Effect",
      "default_width": 94.25,
      "default_height": 80.75,
-     "published_item_id": "618E2C84-0248-8E5C-98E6-564E9BA2E884",
      "slug": "network-effect",
      "description": "A product that becomes more useful to everyone each time another person joins.",
      "keywords": [
@@ -3771,7 +3458,6 @@
      "display_name": "Pivot",
      "default_width": 89.75,
      "default_height": 68.625,
-     "published_item_id": "F38A770C-449C-80D8-B8D1-2321C7EBBD18",
      "slug": "pivot",
      "description": "A deliberate change of direction after the first plan did not work out.",
      "keywords": [
@@ -3787,7 +3473,6 @@
      "display_name": "2x2 Matrix",
      "default_width": 86.875,
      "default_height": 86.875,
-     "published_item_id": "F32DAF83-8575-86ED-8096-4691DB74556C",
      "slug": "two-by-two-matrix",
      "description": "A grid that sorts options by two measures at once, so the best ones stand out in one corner.",
      "keywords": [
@@ -3806,7 +3491,6 @@
      "display_name": "Product-Market Fit",
      "default_width": 95.75,
      "default_height": 76.5,
-     "published_item_id": "C245BE66-1DDF-8472-9029-2887811E2DA0",
      "slug": "product-market-fit",
      "description": "The point where a product clearly meets a need that enough customers have.",
      "keywords": [
@@ -3824,7 +3508,6 @@
      "display_name": "Sales Pipeline",
      "default_width": 112,
      "default_height": 66.75,
-     "published_item_id": "57AD6C8C-2D81-8103-ABF0-7D59563F9EE8",
      "slug": "sales-pipeline",
      "description": "Deals moving stage by stage from first contact to a closed sale, with fewer left at each stage.",
      "keywords": [
@@ -3841,7 +3524,6 @@
      "display_name": "Marketplace",
      "default_width": 111.125,
      "default_height": 62.75,
-     "published_item_id": "D12A5744-A2B2-8E27-9ED6-EFC30ACC3E0A",
      "slug": "marketplace",
      "description": "A platform that brings buyers and sellers together and handles the exchange between them.",
      "keywords": [
@@ -3858,7 +3540,6 @@
      "display_name": "Persona",
      "default_width": 89.125,
      "default_height": 82.75,
-     "published_item_id": "A0071613-6FB3-8C71-B16F-32E6397E433A",
      "slug": "persona",
      "description": "A profile of a typical customer: who they are, what they want and how they behave.",
      "keywords": [
@@ -3877,14 +3558,12 @@
    "short_name": "uiFlow",
    "display_name": "UI Flow",
    "asset_version": 1,
-   "published_library_id": "4BAC8796-959F-82D9-AFBA-0A4AE0F31D99",
    "shapes": [
     {
      "item_id": "BasicPage",
      "display_name": "Basic Page",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "305A4BD6-3BA7-8400-B603-1154A21E07C8",
      "slug": "basicpage",
      "description": "",
      "keywords": [
@@ -3903,7 +3582,6 @@
      "display_name": "Basic Window",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F188DE42-798D-8940-98A7-D5619F751708",
      "slug": "basicwindow",
      "description": "",
      "keywords": [
@@ -3924,7 +3602,6 @@
      "display_name": "Modal Dialog",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "A093F154-5DF8-8254-B159-E879D6D73FF1",
      "slug": "modaldialogpopup",
      "description": "",
      "keywords": [
@@ -3945,7 +3622,6 @@
      "display_name": "Front Page",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F1339AB0-BFE1-8735-A9DB-901736FD1E72",
      "slug": "frontpage",
      "description": "",
      "keywords": [
@@ -3965,7 +3641,6 @@
      "display_name": "Product Page",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "72ADAE25-6CF0-84D3-B5E2-FE909B5D4E9D",
      "slug": "productpage",
      "description": "",
      "keywords": [
@@ -3985,7 +3660,6 @@
      "display_name": "Item List",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "732670CC-0DFF-8021-B6A5-7599E30AD77F",
      "slug": "itemlistpage",
      "description": "",
      "keywords": [
@@ -4006,7 +3680,6 @@
      "display_name": "Item List 2",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "3070D163-E964-84E3-98D9-9E47AB030C14",
      "slug": "itemlist2page",
      "description": "",
      "keywords": [
@@ -4026,7 +3699,6 @@
      "display_name": "Item Profile",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F2CB82FF-FE8F-8F08-82D4-05F721FECA8E",
      "slug": "itemprofilepage",
      "description": "",
      "keywords": [
@@ -4046,7 +3718,6 @@
      "display_name": "Tabs",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "BB46F46A-4F21-8E1A-AA2E-4E2BD13A430D",
      "slug": "tabspage",
      "description": "",
      "keywords": [
@@ -4065,7 +3736,6 @@
      "display_name": "Grid",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "89D2A5A1-0EF5-82EA-953B-C269E193D7F8",
      "slug": "gridpage",
      "description": "",
      "keywords": [
@@ -4086,7 +3756,6 @@
      "display_name": "Two Columns",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "6E862EE2-26F9-8878-AC6D-D3A6BFCA6C1E",
      "slug": "twocolumnspage",
      "description": "",
      "keywords": [
@@ -4104,7 +3773,6 @@
      "display_name": "Three Columns",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "D058BF5D-94B4-835B-B703-2D084E266530",
      "slug": "threecolumnspage",
      "description": "",
      "keywords": [
@@ -4121,7 +3789,6 @@
      "display_name": "Map",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9B83F623-5DD1-86D7-9BED-C25C0DD9131F",
      "slug": "mappage",
      "description": "",
      "keywords": [
@@ -4141,7 +3808,6 @@
      "display_name": "Chart",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "B8E9AA6F-A966-8C29-845A-96849BEC032A",
      "slug": "chartpage",
      "description": "",
      "keywords": [
@@ -4161,7 +3827,6 @@
      "display_name": "Dashboard",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "3B144469-FF26-8DF6-B98A-DB22D3540DAD",
      "slug": "dashboardpage",
      "description": "",
      "keywords": [
@@ -4181,7 +3846,6 @@
      "display_name": "Basic Form",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "3B723253-C09A-8F21-917A-42743E99B027",
      "slug": "basicform",
      "description": "",
      "keywords": [
@@ -4201,7 +3865,6 @@
      "display_name": "Login Form",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "229953A1-00B5-889B-B388-E2B7E18E5008",
      "slug": "loginform",
      "description": "",
      "keywords": [
@@ -4222,7 +3885,6 @@
      "display_name": "Login Form Dialog",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "8842397F-2CD1-8AD6-AA61-A18506AC575F",
      "slug": "loginformdialog",
      "description": "",
      "keywords": [
@@ -4243,7 +3905,6 @@
      "display_name": "Loading Bar",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "A12BC2C1-F81A-81B0-9C55-DA7C86C8EF2C",
      "slug": "loadingbar",
      "description": "",
      "keywords": [
@@ -4263,7 +3924,6 @@
      "display_name": "Phone Screen",
      "default_width": 30,
      "default_height": 50,
-     "published_item_id": "854C32B5-66E2-8696-879F-121F693E2D3D",
      "slug": "phone-screen",
      "description": "",
      "keywords": [
@@ -4283,7 +3943,6 @@
      "display_name": "Phone List Screen",
      "default_width": 30,
      "default_height": 50,
-     "published_item_id": "BF29731D-C1EC-8B04-882C-43BF7583BF9F",
      "slug": "phone-list-screen",
      "description": "",
      "keywords": [
@@ -4304,7 +3963,6 @@
      "display_name": "Phone Chat Screen",
      "default_width": 30,
      "default_height": 50,
-     "published_item_id": "13EC80DB-341D-8B09-8C93-E3245B4814AF",
      "slug": "phone-chat-screen",
      "description": "",
      "keywords": [
@@ -4325,7 +3983,6 @@
      "display_name": "Bottom Sheet",
      "default_width": 30,
      "default_height": 50,
-     "published_item_id": "3868B2F6-EA83-8BE6-A75A-E3142151CE6F",
      "slug": "bottom-sheet",
      "description": "",
      "keywords": [
@@ -4346,7 +4003,6 @@
      "display_name": "Tablet Screen",
      "default_width": 50,
      "default_height": 38,
-     "published_item_id": "7C0DA6A7-D8B3-8A9B-A76D-1414A884C649",
      "slug": "tablet-screen",
      "description": "",
      "keywords": [
@@ -4366,7 +4022,6 @@
      "display_name": "Status Bar",
      "default_width": 50,
      "default_height": 11,
-     "published_item_id": "4B14C6EB-1F3B-840B-BA26-FA233C8EAC70",
      "slug": "mobile-status-bar",
      "description": "",
      "keywords": [
@@ -4386,7 +4041,6 @@
      "display_name": "App Bar",
      "default_width": 50,
      "default_height": 14,
-     "published_item_id": "08C4720D-59FE-8B37-BB76-3722907EC65F",
      "slug": "mobile-app-bar",
      "description": "",
      "keywords": [
@@ -4407,7 +4061,6 @@
      "display_name": "Tab Bar",
      "default_width": 50,
      "default_height": 18,
-     "published_item_id": "D3595FCC-D718-86BF-9424-4852077D5F37",
      "slug": "mobile-tab-bar",
      "description": "",
      "keywords": [
@@ -4427,7 +4080,6 @@
      "display_name": "Floating Action Button",
      "default_width": 30,
      "default_height": 30,
-     "published_item_id": "15D39BB7-FCC3-8874-9F52-97DB5EB5C4E6",
      "slug": "floating-action-button",
      "description": "",
      "keywords": [
@@ -4448,7 +4100,6 @@
      "display_name": "Keyboard",
      "default_width": 50,
      "default_height": 26,
-     "published_item_id": "F9F4EB45-B688-8977-8633-7CAF9051FADF",
      "slug": "on-screen-keyboard",
      "description": "",
      "keywords": [
@@ -4467,7 +4118,6 @@
      "display_name": "Push Notification",
      "default_width": 50,
      "default_height": 20,
-     "published_item_id": "5E62F5C8-C32D-8F39-A5C7-73B6FB44E8A2",
      "slug": "push-notification",
      "description": "",
      "keywords": [
@@ -4487,7 +4137,6 @@
      "display_name": "Pull to Refresh",
      "default_width": 50,
      "default_height": 30,
-     "published_item_id": "AB755352-1121-8267-9D6D-BA219ACD46BA",
      "slug": "pull-to-refresh",
      "description": "",
      "keywords": [
@@ -4507,7 +4156,6 @@
      "display_name": "Button",
      "default_width": 50,
      "default_height": 19,
-     "published_item_id": "9F39AF78-45C4-87EF-A1B1-4C73E9A87D5F",
      "slug": "button",
      "description": "",
      "keywords": [
@@ -4526,7 +4174,6 @@
      "display_name": "Primary Button",
      "default_width": 50,
      "default_height": 20,
-     "published_item_id": "7A79AA5C-7C6F-8868-821C-ABA4EC82BD63",
      "slug": "primary-button",
      "description": "",
      "keywords": [
@@ -4547,7 +4194,6 @@
      "display_name": "Icon Button",
      "default_width": 24,
      "default_height": 24,
-     "published_item_id": "33151FDC-E04E-879F-B444-10B405325875",
      "slug": "icon-button",
      "description": "",
      "keywords": [
@@ -4567,7 +4213,6 @@
      "display_name": "Segmented Control",
      "default_width": 50,
      "default_height": 16,
-     "published_item_id": "53DAC315-656E-85FD-BE0E-BB8E18B8D308",
      "slug": "segmented-control",
      "description": "",
      "keywords": [
@@ -4588,7 +4233,6 @@
      "display_name": "Text Field",
      "default_width": 50,
      "default_height": 22,
-     "published_item_id": "7D78CF48-E65F-8AFB-876D-886266E51F1C",
      "slug": "text-field",
      "description": "",
      "keywords": [
@@ -4609,7 +4253,6 @@
      "display_name": "Text Area",
      "default_width": 50,
      "default_height": 34,
-     "published_item_id": "58EBBB90-FAA1-8292-8861-E27C288D9B54",
      "slug": "text-area",
      "description": "",
      "keywords": [
@@ -4630,7 +4273,6 @@
      "display_name": "Search Field",
      "default_width": 50,
      "default_height": 18,
-     "published_item_id": "345A6F39-1506-8C7A-9377-E570EB1084F9",
      "slug": "search-field",
      "description": "",
      "keywords": [
@@ -4651,7 +4293,6 @@
      "display_name": "Password Field",
      "default_width": 50,
      "default_height": 18,
-     "published_item_id": "B2197107-814D-8091-85AF-E4111C2046CF",
      "slug": "password-field",
      "description": "",
      "keywords": [
@@ -4672,7 +4313,6 @@
      "display_name": "Dropdown",
      "default_width": 50,
      "default_height": 16,
-     "published_item_id": "4656E1A7-EBF1-8002-8923-B3143801536D",
      "slug": "dropdown",
      "description": "",
      "keywords": [
@@ -4693,7 +4333,6 @@
      "display_name": "Dropdown (Open)",
      "default_width": 46,
      "default_height": 50,
-     "published_item_id": "D1F32359-FC46-88F4-9520-7C23BE564C36",
      "slug": "dropdown-open",
      "description": "",
      "keywords": [
@@ -4714,7 +4353,6 @@
      "display_name": "Date Picker",
      "default_width": 44,
      "default_height": 46,
-     "published_item_id": "DA43AC54-299B-8BFF-9CAA-E3DDCD1B85A9",
      "slug": "date-picker",
      "description": "",
      "keywords": [
@@ -4735,7 +4373,6 @@
      "display_name": "Checkbox",
      "default_width": 50,
      "default_height": 18,
-     "published_item_id": "C1B3DFE0-A10B-80D4-A0C0-8B75F7120D1F",
      "slug": "checkbox",
      "description": "",
      "keywords": [
@@ -4756,7 +4393,6 @@
      "display_name": "Checkbox (Checked)",
      "default_width": 50,
      "default_height": 18,
-     "published_item_id": "2AE240C3-9D24-8618-AF79-FF1D17CD3D08",
      "slug": "checkbox-checked",
      "description": "",
      "keywords": [
@@ -4777,7 +4413,6 @@
      "display_name": "Radio Button",
      "default_width": 50,
      "default_height": 18,
-     "published_item_id": "C1FEE32E-9EA9-8860-A1D1-0298F543FA68",
      "slug": "radio",
      "description": "",
      "keywords": [
@@ -4798,7 +4433,6 @@
      "display_name": "Radio Button (Selected)",
      "default_width": 50,
      "default_height": 18,
-     "published_item_id": "D3599457-B96E-8FDE-8CC4-A4370468D619",
      "slug": "radio-selected",
      "description": "",
      "keywords": [
@@ -4819,7 +4453,6 @@
      "display_name": "Toggle (Off)",
      "default_width": 40,
      "default_height": 22,
-     "published_item_id": "9E1E4574-0898-88CE-936F-29E8E6A1EA78",
      "slug": "toggle-off",
      "description": "",
      "keywords": [
@@ -4839,7 +4472,6 @@
      "display_name": "Toggle (On)",
      "default_width": 40,
      "default_height": 22,
-     "published_item_id": "1BE7A60C-D949-84C6-961F-78AC0A7E0656",
      "slug": "toggle-on",
      "description": "",
      "keywords": [
@@ -4859,7 +4491,6 @@
      "display_name": "Slider",
      "default_width": 50,
      "default_height": 16,
-     "published_item_id": "222FB4C7-ABAC-86CF-B238-3612DB437365",
      "slug": "slider",
      "description": "",
      "keywords": [
@@ -4880,7 +4511,6 @@
      "display_name": "Stepper",
      "default_width": 50,
      "default_height": 18,
-     "published_item_id": "A5EB2B15-3B10-85BD-A3D1-C8541C5391FC",
      "slug": "stepper",
      "description": "",
      "keywords": [
@@ -4902,7 +4532,6 @@
      "display_name": "Tab Strip",
      "default_width": 50,
      "default_height": 18,
-     "published_item_id": "6EA2006A-E8D3-82AA-A90A-D694134495D1",
      "slug": "tab-strip",
      "description": "",
      "keywords": [
@@ -4922,7 +4551,6 @@
      "display_name": "Breadcrumb",
      "default_width": 50,
      "default_height": 12,
-     "published_item_id": "29B69629-A161-8736-8B44-E5E8A24C93F7",
      "slug": "breadcrumb",
      "description": "",
      "keywords": [
@@ -4943,7 +4571,6 @@
      "display_name": "Pagination",
      "default_width": 50,
      "default_height": 14,
-     "published_item_id": "F5D818B0-7720-8BCE-80D7-6BB22D79E296",
      "slug": "pagination",
      "description": "",
      "keywords": [
@@ -4964,7 +4591,6 @@
      "display_name": "Navigation Bar",
      "default_width": 50,
      "default_height": 14,
-     "published_item_id": "B36B0839-647E-8805-8A21-E62E0A2F8AAD",
      "slug": "navigation-bar",
      "description": "",
      "keywords": [
@@ -4987,7 +4613,6 @@
      "display_name": "Sidebar Navigation",
      "default_width": 26,
      "default_height": 50,
-     "published_item_id": "B0F32DD1-0A65-831D-BAA2-8BE620EB526A",
      "slug": "sidebar-nav",
      "description": "",
      "keywords": [
@@ -5008,7 +4633,6 @@
      "display_name": "Context Menu",
      "default_width": 38,
      "default_height": 44,
-     "published_item_id": "B66B3CF5-E72A-82F6-A4CC-C8C67814CB68",
      "slug": "context-menu",
      "description": "",
      "keywords": [
@@ -5029,7 +4653,6 @@
      "display_name": "Tooltip",
      "default_width": 42,
      "default_height": 22,
-     "published_item_id": "133FD84E-D53E-8378-99C0-01409B88B444",
      "slug": "tooltip",
      "description": "",
      "keywords": [
@@ -5050,7 +4673,6 @@
      "display_name": "Toast",
      "default_width": 50,
      "default_height": 19,
-     "published_item_id": "0E3A2EEC-93B7-85E0-B3D5-C0086313EE7D",
      "slug": "toast",
      "description": "",
      "keywords": [
@@ -5071,7 +4693,6 @@
      "display_name": "Alert Banner",
      "default_width": 50,
      "default_height": 17,
-     "published_item_id": "C771941E-8514-8A88-B295-F42CD8819B5B",
      "slug": "alert-banner",
      "description": "",
      "keywords": [
@@ -5092,7 +4713,6 @@
      "display_name": "Notification Badge",
      "default_width": 22,
      "default_height": 22,
-     "published_item_id": "0A43D876-F552-865E-A2F0-AA49955E60CC",
      "slug": "badge",
      "description": "",
      "keywords": [
@@ -5113,7 +4733,6 @@
      "display_name": "Chip",
      "default_width": 40,
      "default_height": 16,
-     "published_item_id": "6E185164-ED1C-8A74-9CC0-C68EB6A74916",
      "slug": "tag-chip",
      "description": "",
      "keywords": [
@@ -5134,7 +4753,6 @@
      "display_name": "Progress Ring",
      "default_width": 30,
      "default_height": 30,
-     "published_item_id": "2EB09C31-8973-80EE-A59B-295294CB7E05",
      "slug": "progress-ring",
      "description": "",
      "keywords": [
@@ -5155,7 +4773,6 @@
      "display_name": "Step Indicator",
      "default_width": 50,
      "default_height": 14,
-     "published_item_id": "4D326E71-8765-8FDF-884E-6187FCFBDE92",
      "slug": "step-indicator",
      "description": "",
      "keywords": [
@@ -5177,7 +4794,6 @@
      "display_name": "Scrollbar",
      "default_width": 10,
      "default_height": 50,
-     "published_item_id": "E00EA8B4-A8CE-8A61-980D-987F38C899EB",
      "slug": "scrollbar",
      "description": "",
      "keywords": [
@@ -5196,7 +4812,6 @@
      "display_name": "Card",
      "default_width": 40,
      "default_height": 50,
-     "published_item_id": "F92CB02C-553A-8855-AE99-72EAF1D9854E",
      "slug": "card",
      "description": "",
      "keywords": [
@@ -5216,7 +4831,6 @@
      "display_name": "List Row",
      "default_width": 50,
      "default_height": 16,
-     "published_item_id": "43D1ADF4-DC0C-8B7D-BA23-881F8726A2FF",
      "slug": "list-row",
      "description": "",
      "keywords": [
@@ -5236,7 +4850,6 @@
      "display_name": "Table",
      "default_width": 50,
      "default_height": 36,
-     "published_item_id": "D08B022A-4997-8B44-B3CB-A864A465D9CF",
      "slug": "table",
      "description": "",
      "keywords": [
@@ -5257,7 +4870,6 @@
      "display_name": "Accordion",
      "default_width": 50,
      "default_height": 40,
-     "published_item_id": "D9B09E18-D2F4-8001-817D-7A064B2EDC7C",
      "slug": "accordion",
      "description": "",
      "keywords": [
@@ -5277,7 +4889,6 @@
      "display_name": "Text Block",
      "default_width": 50,
      "default_height": 26,
-     "published_item_id": "D96FF5FD-2E8A-855E-8854-C77E85A96C6B",
      "slug": "text-block",
      "description": "",
      "keywords": [
@@ -5299,7 +4910,6 @@
      "display_name": "Image",
      "default_width": 50,
      "default_height": 38,
-     "published_item_id": "3D70F3BD-E90B-83A8-91E3-4B4D058F2C10",
      "slug": "image-placeholder",
      "description": "",
      "keywords": [
@@ -5319,7 +4929,6 @@
      "display_name": "Video Player",
      "default_width": 50,
      "default_height": 36,
-     "published_item_id": "4B92D35B-48F5-8278-A243-A0B9F8E04C40",
      "slug": "video-player",
      "description": "",
      "keywords": [
@@ -5340,7 +4949,6 @@
      "display_name": "Carousel",
      "default_width": 50,
      "default_height": 30,
-     "published_item_id": "085E03C9-8F3C-82E1-A5C1-098787D8E523",
      "slug": "carousel",
      "description": "",
      "keywords": [
@@ -5361,7 +4969,6 @@
      "display_name": "File Upload",
      "default_width": 50,
      "default_height": 36,
-     "published_item_id": "E6B9C4E3-A162-8139-B7E8-F1D603EDA8F5",
      "slug": "file-upload",
      "description": "",
      "keywords": [
@@ -5382,7 +4989,6 @@
      "display_name": "Avatar",
      "default_width": 28,
      "default_height": 28,
-     "published_item_id": "C111EF6C-EFD9-87BE-BC69-B6329B9C9F9E",
      "slug": "avatar",
      "description": "",
      "keywords": [
@@ -5402,7 +5008,6 @@
      "display_name": "Star Rating",
      "default_width": 50,
      "default_height": 12,
-     "published_item_id": "93AAC525-2BF8-8C70-A087-636477B22395",
      "slug": "rating-stars",
      "description": "",
      "keywords": [
@@ -5423,7 +5028,6 @@
      "display_name": "AI Prompt Field",
      "default_width": 50,
      "default_height": 22,
-     "published_item_id": "5A56C56D-D16D-8CC8-B802-B7CFBA46048C",
      "slug": "ai-prompt-field",
      "description": "",
      "keywords": [
@@ -5444,7 +5048,6 @@
      "display_name": "AI Chat",
      "default_width": 50,
      "default_height": 40,
-     "published_item_id": "C1F22965-D41E-8CC5-9FD5-6D3033AF62B8",
      "slug": "ai-chat",
      "description": "",
      "keywords": [
@@ -5465,7 +5068,6 @@
      "display_name": "Chat Message",
      "default_width": 50,
      "default_height": 30,
-     "published_item_id": "FB5B7107-5132-877E-8C8E-9FD2C77714F4",
      "slug": "chat-message",
      "description": "",
      "keywords": [
@@ -5486,7 +5088,6 @@
      "display_name": "AI Response",
      "default_width": 50,
      "default_height": 34,
-     "published_item_id": "6DCA8335-C832-8498-BCAC-4538332B3F1F",
      "slug": "ai-response",
      "description": "",
      "keywords": [
@@ -5507,7 +5108,6 @@
      "display_name": "Suggestion Chips",
      "default_width": 50,
      "default_height": 26,
-     "published_item_id": "3441667F-36C4-8109-9771-E2552F12FDEC",
      "slug": "ai-suggestion-chips",
      "description": "",
      "keywords": [
@@ -5528,7 +5128,6 @@
      "display_name": "Generate Button",
      "default_width": 50,
      "default_height": 20,
-     "published_item_id": "09320C80-E028-8519-8C11-6BDC77654E71",
      "slug": "ai-generate-button",
      "description": "",
      "keywords": [
@@ -5549,7 +5148,6 @@
      "display_name": "AI Sparkle Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "57F625C7-4BC5-8B1F-B8BA-5757BC06A4BB",
      "slug": "ai-sparkle-icon",
      "description": "",
      "keywords": [
@@ -5570,7 +5168,6 @@
      "display_name": "AI Assistant Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "70AC9DAE-A1B3-8AE4-B50F-4F4381CACB1A",
      "slug": "ai-assistant-icon",
      "description": "",
      "keywords": [
@@ -5591,7 +5188,6 @@
      "display_name": "AI Model Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "D8839D14-3F64-823B-835F-A56CD53DC63C",
      "slug": "ai-model-icon",
      "description": "",
      "keywords": [
@@ -5612,7 +5208,6 @@
      "display_name": "AI Thinking Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "840D96B6-2695-8682-BD1D-1E7225758912",
      "slug": "ai-thinking-icon",
      "description": "",
      "keywords": [
@@ -5635,7 +5230,6 @@
      "display_name": "Voice Input Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "19C952A0-CEF1-8E6B-BFFE-0336D842828F",
      "slug": "voice-input-icon",
      "description": "",
      "keywords": [
@@ -5656,7 +5250,6 @@
      "display_name": "Magic Wand Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "DABB9FF1-0161-8CC0-B68A-5B8A34259CB2",
      "slug": "magic-wand-icon",
      "description": "",
      "keywords": [
@@ -5677,7 +5270,6 @@
      "display_name": "Regenerate Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "87037079-2CB2-89CA-88E1-BA5ADC947EF5",
      "slug": "regenerate-icon",
      "description": "",
      "keywords": [
@@ -5698,7 +5290,6 @@
      "display_name": "AI Image Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "96A52F9F-F4CF-86DC-86CB-9A9090908C76",
      "slug": "ai-image-icon",
      "description": "",
      "keywords": [
@@ -5719,7 +5310,6 @@
      "display_name": "AI Summary Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "C945F61C-91E9-83BB-84FA-A241E8D3B259",
      "slug": "ai-summary-icon",
      "description": "",
      "keywords": [
@@ -5740,7 +5330,6 @@
      "display_name": "Thumbs Up Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "63613C3A-4022-8676-A084-DC3A9B15FF8D",
      "slug": "thumbs-up-icon",
      "description": "",
      "keywords": [
@@ -5761,7 +5350,6 @@
      "display_name": "Thumbs Down Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "838697DE-3D84-8F36-A5CF-6CD5DD9725C2",
      "slug": "thumbs-down-icon",
      "description": "",
      "keywords": [
@@ -5782,7 +5370,6 @@
      "display_name": "User Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "2426B960-7377-849B-9A5A-4DC9E51EA470",
      "slug": "usericon",
      "description": "",
      "keywords": [
@@ -5800,7 +5387,6 @@
      "display_name": "Happy User Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "D78B2435-6319-864A-A33D-8384A6D387A9",
      "slug": "happyusericon",
      "description": "",
      "keywords": [
@@ -5818,7 +5404,6 @@
      "display_name": "Unhappy User Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "2F5E1DCF-C9CC-8493-9A4C-7AA337E6E6FB",
      "slug": "unhappyusericon",
      "description": "",
      "keywords": [
@@ -5836,7 +5421,6 @@
      "display_name": "Question Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "70C7F698-E636-89C0-8B53-FE663DBC1A35",
      "slug": "questionicon",
      "description": "",
      "keywords": [
@@ -5854,7 +5438,6 @@
      "display_name": "Exclamation Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "38E12D1E-ECF0-80E8-BA18-363A8EAA6B25",
      "slug": "exclamationicon",
      "description": "",
      "keywords": [
@@ -5872,7 +5455,6 @@
      "display_name": "Stop Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "B1BB9251-E563-8AAF-8051-8BCAF880F890",
      "slug": "stopicon",
      "description": "",
      "keywords": [
@@ -5890,7 +5472,6 @@
      "display_name": "Security Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "62B076EA-CC56-8DD3-841C-A308FB9701D4",
      "slug": "securityicon",
      "description": "",
      "keywords": [
@@ -5908,7 +5489,6 @@
      "display_name": "Cart Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "0B07D09C-767A-864B-BE65-623EF039658F",
      "slug": "carticon",
      "description": "",
      "keywords": [
@@ -5926,7 +5506,6 @@
      "display_name": "Item Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9BCF236B-E3B1-8E8C-AE6C-B28691696E08",
      "slug": "itemicon",
      "description": "",
      "keywords": [
@@ -5944,7 +5523,6 @@
      "display_name": "Briefcase Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "FDA10E75-E554-8E49-B1AF-4CDBEE481038",
      "slug": "briefcaseicon",
      "description": "",
      "keywords": [
@@ -5962,7 +5540,6 @@
      "display_name": "Briefcase On Fire Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "F27CFB86-E3B7-8F53-9BC5-C8822C94A873",
      "slug": "briefcaseonfireicon",
      "description": "",
      "keywords": [
@@ -5980,7 +5557,6 @@
      "display_name": "Fire Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "B9F471CB-3549-8DB5-A7EE-9DFD4890CB04",
      "slug": "fireicon",
      "description": "",
      "keywords": [
@@ -5998,7 +5574,6 @@
      "display_name": "Interaction Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "60085989-92B2-8038-9D43-DA7BD2E44D11",
      "slug": "interactionicon",
      "description": "",
      "keywords": [
@@ -6016,7 +5591,6 @@
      "display_name": "Clock Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "A7623F99-F191-8550-9614-DB0D7159F9B0",
      "slug": "clockicon",
      "description": "",
      "keywords": [
@@ -6034,7 +5608,6 @@
      "display_name": "Reward Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "5C6D6CEE-286A-8605-A877-5069A8816582",
      "slug": "rewardicon",
      "description": "",
      "keywords": [
@@ -6052,7 +5625,6 @@
      "display_name": "Success Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "D0B567C3-FB3D-8934-BC27-1F486B34CD3E",
      "slug": "success-icon",
      "description": "",
      "keywords": [
@@ -6072,7 +5644,6 @@
      "display_name": "Close Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "2130AD8A-AAA4-8D6D-AEBF-00CA34D32FF6",
      "slug": "close-icon",
      "description": "",
      "keywords": [
@@ -6092,7 +5663,6 @@
      "display_name": "Home Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "6EEC375A-1CD3-8E8F-A804-7409179FBE56",
      "slug": "home-icon",
      "description": "",
      "keywords": [
@@ -6110,7 +5680,6 @@
      "display_name": "Search Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "49315C7C-ACD6-84C7-A243-BC9656C129BB",
      "slug": "search-icon",
      "description": "",
      "keywords": [
@@ -6129,7 +5698,6 @@
      "display_name": "Menu Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "408E1957-AE72-86B7-9238-03B06C8FFDEA",
      "slug": "menu-icon",
      "description": "",
      "keywords": [
@@ -6147,7 +5715,6 @@
      "display_name": "Settings Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "9C31358B-69FD-86AD-848E-068C6164F31F",
      "slug": "settings-icon",
      "description": "",
      "keywords": [
@@ -6166,7 +5733,6 @@
      "display_name": "Notification Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "B689B2F6-9EBC-85DD-B2B5-F33F41BA784B",
      "slug": "notification-icon",
      "description": "",
      "keywords": [
@@ -6184,7 +5750,6 @@
      "display_name": "Favorite Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "CB25B16D-1368-88B1-8C3E-C08475D8D686",
      "slug": "favorite-icon",
      "description": "",
      "keywords": [
@@ -6203,7 +5768,6 @@
      "display_name": "Share Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "DBE044E4-07C7-864B-BD2B-BA3E43D9B636",
      "slug": "share-icon",
      "description": "",
      "keywords": [
@@ -6221,7 +5785,6 @@
      "display_name": "Edit Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "2B63F060-B29D-81CB-9C0F-009074A33007",
      "slug": "edit-icon",
      "description": "",
      "keywords": [
@@ -6240,7 +5803,6 @@
      "display_name": "Delete Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "489D2A7D-B49F-81A7-8BD8-15C350963153",
      "slug": "delete-icon",
      "description": "",
      "keywords": [
@@ -6259,7 +5821,6 @@
      "display_name": "Location Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "C2C46A47-7596-8B1F-9F24-19F1B00F024D",
      "slug": "location-icon",
      "description": "",
      "keywords": [
@@ -6278,7 +5839,6 @@
      "display_name": "Fingerprint Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "D5081974-89AB-8C5A-9CDD-D665DCB7BB40",
      "slug": "fingerprint-icon",
      "description": "",
      "keywords": [
@@ -6297,7 +5857,6 @@
      "display_name": "Tap Gesture Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "295C0907-F542-80BF-A5C8-BEC7F6E7A24F",
      "slug": "tap-gesture-icon",
      "description": "",
      "keywords": [
@@ -6316,7 +5875,6 @@
      "display_name": "Swipe Gesture Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "ACD76840-3E84-8F14-8B95-165D8240469B",
      "slug": "swipe-gesture-icon",
      "description": "",
      "keywords": [
@@ -6335,7 +5893,6 @@
      "display_name": "Pinch Gesture Icon",
      "default_width": 50,
      "default_height": 50,
-     "published_item_id": "25D0717E-4F79-817F-AC44-25C278F367FD",
      "slug": "pinch-gesture-icon",
      "description": "",
      "keywords": [
@@ -6356,14 +5913,12 @@
    "short_name": "bpmn",
    "display_name": "BPMN",
    "asset_version": 1,
-   "published_library_id": "59613409-693A-8B85-825C-F3F846CF81E4",
    "shapes": [
     {
      "item_id": "start-event",
      "display_name": "Start event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "251574B6-DB25-8391-94F5-46D8EC6ED633",
      "slug": "start-event",
      "description": "Where the process starts.",
      "keywords": [
@@ -6386,7 +5941,6 @@
      "display_name": "Message start event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "4C814417-16E6-8815-8306-9CF5FAB03711",
      "slug": "message-start-event",
      "description": "The process starts when a message arrives.",
      "keywords": [
@@ -6412,7 +5966,6 @@
      "display_name": "Timer start event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "C5C352EF-F8B2-8A35-877C-B94E8151DC6B",
      "slug": "timer-start-event",
      "description": "The process starts when a set time is reached or a period has passed.",
      "keywords": [
@@ -6440,7 +5993,6 @@
      "display_name": "Conditional start event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "8F8ED358-9163-8F37-91C5-1094C80A98FD",
      "slug": "conditional-start-event",
      "description": "The process starts when a condition becomes true.",
      "keywords": [
@@ -6466,7 +6018,6 @@
      "display_name": "Signal start event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "EBAE477A-AF08-8719-A6D9-44732EF50A87",
      "slug": "signal-start-event",
      "description": "The process starts when a signal is broadcast.",
      "keywords": [
@@ -6492,7 +6043,6 @@
      "display_name": "Multiple start event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "51DD161A-2FB6-86B1-9F0F-FA2BDA329555",
      "slug": "multiple-start-event",
      "description": "The process starts when any one of several things happens.",
      "keywords": [
@@ -6518,7 +6068,6 @@
      "display_name": "Error start event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "9D1D569E-A948-842A-8FF9-8050F746E1EF",
      "slug": "error-start-event",
      "description": "The process starts when an error is raised. Used as the start of an event sub-process.",
      "keywords": [
@@ -6545,7 +6094,6 @@
      "display_name": "Compensation start event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "3B4D39B9-4951-8062-9D1C-904254A1A921",
      "slug": "compensation-start-event",
      "description": "The process starts when earlier work has to be undone. Used as the start of an event sub-process.",
      "keywords": [
@@ -6572,7 +6120,6 @@
      "display_name": "Escalation start event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "6DC45F2A-D272-8DF6-8F87-CDF5109CDBE9",
      "slug": "escalation-start-event",
      "description": "The process starts when an escalation is raised. Used as the start of an event sub-process.",
      "keywords": [
@@ -6597,7 +6144,6 @@
      "display_name": "Parallel multiple start event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "B1BB1BDF-B9CC-8EA5-8714-F9607CA24037",
      "slug": "parallel-multiple-start-event",
      "description": "The process starts when all of several things have happened.",
      "keywords": [
@@ -6623,7 +6169,6 @@
      "display_name": "Message start event, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "8916283F-F35D-8796-9457-0E4597B6F7AE",
      "slug": "message-start-event-non-interrupting",
      "description": "Starts an event sub-process when a message arrives, without stopping the work already under way.",
      "keywords": [
@@ -6650,7 +6195,6 @@
      "display_name": "Timer start event, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "00104E2B-8E96-8699-BBF9-C7FAA3BD1E31",
      "slug": "timer-start-event-non-interrupting",
      "description": "Starts an event sub-process when a set time is reached or a period has passed, without stopping the work already under way.",
      "keywords": [
@@ -6679,7 +6223,6 @@
      "display_name": "Conditional start event, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "EC9A37F7-C8FD-8559-8D32-61A8C1CBC5C2",
      "slug": "conditional-start-event-non-interrupting",
      "description": "Starts an event sub-process when a condition becomes true, without stopping the work already under way.",
      "keywords": [
@@ -6706,7 +6249,6 @@
      "display_name": "Signal start event, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "CEDD7D78-9FDD-84B2-B719-92D3BA0FDC51",
      "slug": "signal-start-event-non-interrupting",
      "description": "Starts an event sub-process when a signal is broadcast, without stopping the work already under way.",
      "keywords": [
@@ -6733,7 +6275,6 @@
      "display_name": "Multiple start event, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "2C99016C-AAF0-89FA-BF9B-00471ACC4EA2",
      "slug": "multiple-start-event-non-interrupting",
      "description": "Starts an event sub-process when any one of several things happens, without stopping the work already under way.",
      "keywords": [
@@ -6760,7 +6301,6 @@
      "display_name": "Escalation start event, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "16525FD4-73D1-8D84-A684-231B65332ADA",
      "slug": "escalation-start-event-non-interrupting",
      "description": "Starts an event sub-process when an escalation is raised, without stopping the work already under way.",
      "keywords": [
@@ -6786,7 +6326,6 @@
      "display_name": "Parallel multiple start event, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "0CCF8EB3-7F40-8BFE-B91F-A586891204FD",
      "slug": "parallel-multiple-start-event-non-interrupting",
      "description": "Starts an event sub-process when all of several things have happened, without stopping the work already under way.",
      "keywords": [
@@ -6813,7 +6352,6 @@
      "display_name": "Intermediate event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "E73C601F-CBEC-885E-A599-052837908928",
      "slug": "intermediate-event",
      "description": "Something that happens partway through the process.",
      "keywords": [
@@ -6838,7 +6376,6 @@
      "display_name": "Message intermediate event, catching",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "274A85C5-27C5-8897-AA5F-4E2C1EAABDD0",
      "slug": "message-intermediate-catch-event",
      "description": "The flow waits here until a message arrives. Placed on the edge of a task, it takes over from the task when that happens.",
      "keywords": [
@@ -6866,7 +6403,6 @@
      "display_name": "Timer intermediate event, catching",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "4C04FECF-8CD8-855D-BC46-BF066F7BD237",
      "slug": "timer-intermediate-catch-event",
      "description": "The flow waits here until a set time is reached or a period has passed. Placed on the edge of a task, it takes over from the task when that happens.",
      "keywords": [
@@ -6896,7 +6432,6 @@
      "display_name": "Error intermediate event, catching",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "12C46D8A-AF8B-80FC-B562-C48121AD904B",
      "slug": "error-intermediate-catch-event",
      "description": "The flow waits here until an error is raised. Placed on the edge of a task, it takes over from the task when that happens.",
      "keywords": [
@@ -6925,7 +6460,6 @@
      "display_name": "Cancel intermediate event, catching",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "1DF7BB40-C940-859B-8B37-8EA32F515E31",
      "slug": "cancel-intermediate-catch-event",
      "description": "The flow waits here until a transaction is cancelled. Placed on the edge of a task, it takes over from the task when that happens.",
      "keywords": [
@@ -6952,7 +6486,6 @@
      "display_name": "Compensation intermediate event, catching",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "9D78F02F-CFD2-805C-BACF-F503C07D2C1B",
      "slug": "compensation-intermediate-catch-event",
      "description": "The flow waits here until earlier work has to be undone. Placed on the edge of a task, it takes over from the task when that happens.",
      "keywords": [
@@ -6981,7 +6514,6 @@
      "display_name": "Conditional intermediate event, catching",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "27BFFAAE-29B2-8FEF-8A41-43532A4D3747",
      "slug": "conditional-intermediate-catch-event",
      "description": "The flow waits here until a condition becomes true. Placed on the edge of a task, it takes over from the task when that happens.",
      "keywords": [
@@ -7009,7 +6541,6 @@
      "display_name": "Link intermediate event, catching",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "EFE60EFC-426B-8D66-AD37-2949449C1DB6",
      "slug": "link-intermediate-catch-event",
      "description": "The flow waits here until the flow arrives from a matching link elsewhere on the page. Placed on the edge of a task, it takes over from the task when that happens.",
      "keywords": [
@@ -7038,7 +6569,6 @@
      "display_name": "Signal intermediate event, catching",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "BEC3A1EB-B1B1-8746-94F7-D2819C4372DE",
      "slug": "signal-intermediate-catch-event",
      "description": "The flow waits here until a signal is broadcast. Placed on the edge of a task, it takes over from the task when that happens.",
      "keywords": [
@@ -7066,7 +6596,6 @@
      "display_name": "Multiple intermediate event, catching",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "BB34F4B4-7220-877D-801F-0D54BC93DD02",
      "slug": "multiple-intermediate-catch-event",
      "description": "The flow waits here until any one of several things happens. Placed on the edge of a task, it takes over from the task when that happens.",
      "keywords": [
@@ -7094,7 +6623,6 @@
      "display_name": "Escalation intermediate event, catching",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "B44A6EBE-838B-8CBF-9154-199B32286FA5",
      "slug": "escalation-intermediate-catch-event",
      "description": "The flow waits here until an escalation is raised. Placed on the edge of a task, it takes over from the task when that happens.",
      "keywords": [
@@ -7121,7 +6649,6 @@
      "display_name": "Parallel multiple intermediate event, catching",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "2498F173-B595-823A-9A63-5111A6A9693D",
      "slug": "parallel-multiple-intermediate-catch-event",
      "description": "The flow waits here until all of several things have happened. Placed on the edge of a task, it takes over from the task when that happens.",
      "keywords": [
@@ -7149,7 +6676,6 @@
      "display_name": "Message intermediate event, catching, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "987B7ED2-EDBC-8E6D-A166-5D4C52326EAA",
      "slug": "message-intermediate-catch-event-non-interrupting",
      "description": "Placed on the edge of a task: when a message arrives, a side branch starts and the task carries on.",
      "keywords": [
@@ -7177,7 +6703,6 @@
      "display_name": "Timer intermediate event, catching, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "C8F797F8-A00F-8A65-AF57-8A5D1888ABA0",
      "slug": "timer-intermediate-catch-event-non-interrupting",
      "description": "Placed on the edge of a task: when a set time is reached or a period has passed, a side branch starts and the task carries on.",
      "keywords": [
@@ -7207,7 +6732,6 @@
      "display_name": "Conditional intermediate event, catching, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "255F3FB2-CA15-84A7-8542-D533A5D06DD2",
      "slug": "conditional-intermediate-catch-event-non-interrupting",
      "description": "Placed on the edge of a task: when a condition becomes true, a side branch starts and the task carries on.",
      "keywords": [
@@ -7235,7 +6759,6 @@
      "display_name": "Signal intermediate event, catching, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "69C62C11-441A-8471-880A-836E2F886BF9",
      "slug": "signal-intermediate-catch-event-non-interrupting",
      "description": "Placed on the edge of a task: when a signal is broadcast, a side branch starts and the task carries on.",
      "keywords": [
@@ -7263,7 +6786,6 @@
      "display_name": "Multiple intermediate event, catching, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "B8E3CD31-0893-8A7F-9D9C-4272D59DCDEA",
      "slug": "multiple-intermediate-catch-event-non-interrupting",
      "description": "Placed on the edge of a task: when any one of several things happens, a side branch starts and the task carries on.",
      "keywords": [
@@ -7291,7 +6813,6 @@
      "display_name": "Escalation intermediate event, catching, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "702B1EED-09A9-88C0-AD1E-644AE6226C55",
      "slug": "escalation-intermediate-catch-event-non-interrupting",
      "description": "Placed on the edge of a task: when an escalation is raised, a side branch starts and the task carries on.",
      "keywords": [
@@ -7318,7 +6839,6 @@
      "display_name": "Parallel multiple intermediate event, catching, non-interrupting",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "E6FFF400-554B-865C-9ACC-97196B2DFFFD",
      "slug": "parallel-multiple-intermediate-catch-event-non-interrupting",
      "description": "Placed on the edge of a task: when all of several things have happened, a side branch starts and the task carries on.",
      "keywords": [
@@ -7346,7 +6866,6 @@
      "display_name": "Message intermediate event, throwing",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "CB1C88C7-5ABD-816E-B58C-45DFD2DB8941",
      "slug": "message-intermediate-throw-event",
      "description": "The process sends a message here and carries on.",
      "keywords": [
@@ -7373,7 +6892,6 @@
      "display_name": "Compensation intermediate event, throwing",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "EDB164B1-A1FF-8C3F-9AB2-375DD96A04A3",
      "slug": "compensation-intermediate-throw-event",
      "description": "The process asks for earlier work to be undone here and carries on.",
      "keywords": [
@@ -7401,7 +6919,6 @@
      "display_name": "Link intermediate event, throwing",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "EBEB0900-FFBD-816A-A600-1D26ECC45668",
      "slug": "link-intermediate-throw-event",
      "description": "The process jumps to a matching link elsewhere on the page here and carries on.",
      "keywords": [
@@ -7429,7 +6946,6 @@
      "display_name": "Signal intermediate event, throwing",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "9F206F69-BD1F-8F9C-94BE-1964AE5DF784",
      "slug": "signal-intermediate-throw-event",
      "description": "The process broadcasts a signal here and carries on.",
      "keywords": [
@@ -7456,7 +6972,6 @@
      "display_name": "Multiple intermediate event, throwing",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "99D94F66-5757-8EC0-B924-0BB0D32D96E5",
      "slug": "multiple-intermediate-throw-event",
      "description": "The process sends several things at once here and carries on.",
      "keywords": [
@@ -7483,7 +6998,6 @@
      "display_name": "Escalation intermediate event, throwing",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "F6EA9F09-B3C0-8043-86A6-19260C9E9DB3",
      "slug": "escalation-intermediate-throw-event",
      "description": "The process raises an escalation here and carries on.",
      "keywords": [
@@ -7509,7 +7023,6 @@
      "display_name": "End event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "43E13E47-042A-8FD8-9E0D-5B673103D0B7",
      "slug": "end-event",
      "description": "This path of the process ends here.",
      "keywords": [
@@ -7533,7 +7046,6 @@
      "display_name": "Message end event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "9DA10990-B027-8E5C-B9EF-F8FD8915318B",
      "slug": "message-end-event",
      "description": "This path of the process ends and sends a message.",
      "keywords": [
@@ -7560,7 +7072,6 @@
      "display_name": "Error end event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "79F44A73-5C82-84C5-B204-E3368113B85F",
      "slug": "error-end-event",
      "description": "This path of the process ends and raises an error.",
      "keywords": [
@@ -7588,7 +7099,6 @@
      "display_name": "Cancel end event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "59A32DBE-E9B9-8761-93EA-ABFAF47D116C",
      "slug": "cancel-end-event",
      "description": "This path of the process ends and cancels the transaction.",
      "keywords": [
@@ -7614,7 +7124,6 @@
      "display_name": "Compensation end event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "17D32414-ABC7-8DD4-9659-9E75A484E7E5",
      "slug": "compensation-end-event",
      "description": "This path of the process ends and asks for earlier work to be undone.",
      "keywords": [
@@ -7642,7 +7151,6 @@
      "display_name": "Signal end event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "B91E2DF1-2D95-888C-84E9-7D80D944AB5C",
      "slug": "signal-end-event",
      "description": "This path of the process ends and broadcasts a signal.",
      "keywords": [
@@ -7669,7 +7177,6 @@
      "display_name": "Terminate end event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "79C08739-80FE-8382-9D95-3BCBBE330DAA",
      "slug": "terminate-end-event",
      "description": "This path of the process ends and stops every other path of the process at once.",
      "keywords": [
@@ -7695,7 +7202,6 @@
      "display_name": "Multiple end event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "7C4B1FC1-3297-88DE-AC8C-815C52D0BA38",
      "slug": "multiple-end-event",
      "description": "This path of the process ends and sends several things at once.",
      "keywords": [
@@ -7722,7 +7228,6 @@
      "display_name": "Escalation end event",
      "default_width": 40.625,
      "default_height": 41.125,
-     "published_item_id": "7D33C137-98E8-8975-9703-907D52874CBE",
      "slug": "escalation-end-event",
      "description": "This path of the process ends and raises an escalation.",
      "keywords": [
@@ -7748,7 +7253,6 @@
      "display_name": "Exclusive gateway",
      "default_width": 55,
      "default_height": 55,
-     "published_item_id": "70D79B95-5659-8B72-A415-2D8C12FA2309",
      "slug": "exclusive-gateway",
      "description": "A decision: the flow takes exactly one of the paths leaving it.",
      "keywords": [
@@ -7774,7 +7278,6 @@
      "display_name": "Event-based gateway",
      "default_width": 55,
      "default_height": 55,
-     "published_item_id": "1571192D-A95B-8D25-B8F1-E861AECF1325",
      "slug": "event-based-gateway",
      "description": "The flow takes whichever path's event happens first.",
      "keywords": [
@@ -7799,7 +7302,6 @@
      "display_name": "Event-based gateway, instantiating",
      "default_width": 55,
      "default_height": 55,
-     "published_item_id": "CBF42DDB-E65D-83F4-9CC6-B76A4E32540F",
      "slug": "event-based-gateway-instantiate",
      "description": "Starts a new process when the first of several events happens.",
      "keywords": [
@@ -7823,7 +7325,6 @@
      "display_name": "Inclusive gateway",
      "default_width": 55,
      "default_height": 55,
-     "published_item_id": "D64A5C31-74D6-86EA-8CEF-E33EBAD41F2A",
      "slug": "inclusive-gateway",
      "description": "The flow takes every path whose condition is true, one or more.",
      "keywords": [
@@ -7847,7 +7348,6 @@
      "display_name": "Parallel gateway",
      "default_width": 55,
      "default_height": 55,
-     "published_item_id": "A9473EF5-7FEB-8E11-8888-A583503F475E",
      "slug": "parallel-gateway",
      "description": "The flow splits to follow every path at once, or waits for all of them to arrive.",
      "keywords": [
@@ -7873,7 +7373,6 @@
      "display_name": "Parallel event-based gateway, instantiating",
      "default_width": 55,
      "default_height": 55,
-     "published_item_id": "6CD666FF-48A6-813C-86F8-94A48E6297AC",
      "slug": "parallel-event-based-gateway-instantiate",
      "description": "Starts a new process once all of several events have happened.",
      "keywords": [
@@ -7898,7 +7397,6 @@
      "display_name": "Complex gateway",
      "default_width": 55,
      "default_height": 55,
-     "published_item_id": "10ED0D1F-2281-8F1E-A293-0950466F64A1",
      "slug": "complex-gateway",
      "description": "A split or join with a rule of its own, explained in a note.",
      "keywords": [
@@ -7922,7 +7420,6 @@
      "display_name": "Service task",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "01244910-6DE1-89CE-9C84-830C85D6C27A",
      "slug": "service-task",
      "description": "Work done by a system or service, with nobody involved.",
      "keywords": [
@@ -7947,7 +7444,6 @@
      "display_name": "Receive task",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "70371251-12A5-8F4E-B267-E986CD9BE811",
      "slug": "receive-task",
      "description": "The process waits here for a message to arrive.",
      "keywords": [
@@ -7971,7 +7467,6 @@
      "display_name": "Send task",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "BAB29B84-9C6A-8294-AE58-639D729B31E8",
      "slug": "send-task",
      "description": "The process sends a message.",
      "keywords": [
@@ -7995,7 +7490,6 @@
      "display_name": "User task",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "0267868F-DE43-8C1D-8353-207C935A22A1",
      "slug": "user-task",
      "description": "Work a person does with the help of software, such as filling in a form.",
      "keywords": [
@@ -8019,7 +7513,6 @@
      "display_name": "Script task",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "A23D7F4E-8EA4-8861-84B0-5DC1BF1894FD",
      "slug": "script-task",
      "description": "A script the process engine runs itself.",
      "keywords": [
@@ -8042,7 +7535,6 @@
      "display_name": "Manual task",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "0DD6FA0B-FC07-80A6-8C60-2CA94E10BA86",
      "slug": "manual-task",
      "description": "Work a person does by hand, without any system.",
      "keywords": [
@@ -8066,7 +7558,6 @@
      "display_name": "Receive task, instantiating",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "CA14D941-DB28-899B-A7B0-F655B7F931F1",
      "slug": "instantiating-receive-task",
      "description": "A message arriving here starts a new process.",
      "keywords": [
@@ -8090,7 +7581,6 @@
      "display_name": "Business rule task",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "BDECE620-4122-899F-9975-94210988775F",
      "slug": "business-rule-task",
      "description": "A decision worked out from a set of business rules.",
      "keywords": [
@@ -8115,7 +7605,6 @@
      "display_name": "Collapsed sub-process",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "ACE4C4B7-E4B5-8EEC-889E-95F35980D143",
      "slug": "collapsed-sub-process",
      "description": "A step that is a whole process in itself, folded shut. Its detail is drawn elsewhere.",
      "keywords": [
@@ -8139,7 +7628,6 @@
      "display_name": "Call activity",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "E45198F4-7451-8813-875C-78495319CC5B",
      "slug": "call-activity",
      "description": "A step that calls a process defined somewhere else, so it can be reused.",
      "keywords": [
@@ -8163,7 +7651,6 @@
      "display_name": "Event sub-process",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "85D0B98C-0455-830C-A871-52CBD111CB3A",
      "slug": "event-sub-process",
      "description": "A sub-process that is started by an event and not by the flow reaching it.",
      "keywords": [
@@ -8186,7 +7673,6 @@
      "display_name": "Transaction",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "DD402FAB-9EFC-8FB6-9BC5-75893E95305F",
      "slug": "transaction",
      "description": "A sub-process that either finishes as a whole or is undone as a whole.",
      "keywords": [
@@ -8209,7 +7695,6 @@
      "display_name": "Loop",
      "default_width": 15,
      "default_height": 16,
-     "published_item_id": "A492077E-24F1-8B5C-9265-ECD3D86ABD7D",
      "slug": "loop-mark",
      "description": "Placed at the bottom of a task: the task repeats until a condition is met.",
      "keywords": [
@@ -8228,7 +7713,6 @@
      "display_name": "Multi-instance, parallel",
      "default_width": 14,
      "default_height": 17,
-     "published_item_id": "AD8FCC95-246B-896C-8289-72DDC984B736",
      "slug": "multi-instance-parallel-mark",
      "description": "Placed at the bottom of a task: the task is done several times at once, once for each item.",
      "keywords": [
@@ -8248,7 +7732,6 @@
      "display_name": "Multi-instance, sequential",
      "default_width": 17,
      "default_height": 14,
-     "published_item_id": "479713D8-C2CC-8702-B0FB-8A52BAFE733E",
      "slug": "multi-instance-sequential-mark",
      "description": "Placed at the bottom of a task: the task is done several times, one after another, once for each item.",
      "keywords": [
@@ -8268,7 +7751,6 @@
      "display_name": "Compensation",
      "default_width": 16.875,
      "default_height": 13.25,
-     "published_item_id": "8C8ABDC7-90F5-80EA-859B-E065B5D59112",
      "slug": "compensation-mark",
      "description": "Placed at the bottom of a task: the task undoes work done earlier.",
      "keywords": [
@@ -8287,7 +7769,6 @@
      "display_name": "Ad hoc",
      "default_width": 18,
      "default_height": 10,
-     "published_item_id": "ECF6A62C-72CF-8C28-AB92-FAAE88599C8C",
      "slug": "ad-hoc-mark",
      "description": "Placed at the bottom of a sub-process: its steps can be done in any order.",
      "keywords": [
@@ -8306,7 +7787,6 @@
      "display_name": "Sub-process",
      "default_width": 17.125,
      "default_height": 17.125,
-     "published_item_id": "65BB9A8B-9E56-86B2-B463-C7E1EC3865C9",
      "slug": "sub-process-mark",
      "description": "Placed at the bottom of a task to show it is a sub-process folded shut.",
      "keywords": [
@@ -8325,7 +7805,6 @@
      "display_name": "Data object",
      "default_width": 39.75,
      "default_height": 49.375,
-     "published_item_id": "5BFFF0FE-A682-8846-98B6-2A3F78C70F69",
      "slug": "data-object",
      "description": "A piece of information the process uses or produces, such as an order or a report.",
      "keywords": [
@@ -8350,7 +7829,6 @@
      "display_name": "Data object, collection",
      "default_width": 39.75,
      "default_height": 49.375,
-     "published_item_id": "F765A9E1-6D33-8554-83D9-D662C35EC12A",
      "slug": "data-object-collection",
      "description": "A set of the same kind of information, such as a list of orders.",
      "keywords": [
@@ -8375,7 +7853,6 @@
      "display_name": "Data input",
      "default_width": 39.75,
      "default_height": 49.375,
-     "published_item_id": "32167D3A-08CB-84A2-9300-BBFF59ADC21F",
      "slug": "data-input",
      "description": "Information the process needs from outside before it can start, such as an application form. Its arrow is outlined.",
      "keywords": [
@@ -8400,7 +7877,6 @@
      "display_name": "Data input, collection",
      "default_width": 39.75,
      "default_height": 49.375,
-     "published_item_id": "DF3433C6-20AF-89CB-8936-4F64404C7E7B",
      "slug": "data-input-collection",
      "description": "A set of the same kind of information the process needs from outside, such as a batch of claims.",
      "keywords": [
@@ -8425,7 +7901,6 @@
      "display_name": "Data output",
      "default_width": 39.75,
      "default_height": 49.375,
-     "published_item_id": "1C612834-D77B-842C-8870-9E7ADE224C9A",
      "slug": "data-output",
      "description": "Information the process hands back when it finishes, such as an approved order. Its arrow is solid.",
      "keywords": [
@@ -8450,7 +7925,6 @@
      "display_name": "Data output, collection",
      "default_width": 39.75,
      "default_height": 49.375,
-     "published_item_id": "0D2E8B5A-BC44-8F86-9DAD-D1BA268B0642",
      "slug": "data-output-collection",
      "description": "A set of the same kind of information the process hands back, such as a list of invoices.",
      "keywords": [
@@ -8475,7 +7949,6 @@
      "display_name": "Data store",
      "default_width": 49.25,
      "default_height": 50.875,
-     "published_item_id": "B2BD69AC-B70C-8B46-806B-8F4B04173846",
      "slug": "data-store",
      "description": "Somewhere information is kept beyond the life of the process, such as a database.",
      "keywords": [
@@ -8500,7 +7973,6 @@
      "display_name": "Message",
      "default_width": 45.25,
      "default_height": 32.5,
-     "published_item_id": "12CFB33C-B817-8FFF-817B-DA65F5DD99BA",
      "slug": "message",
      "description": "A message passed between two participants. This one starts the conversation.",
      "keywords": [
@@ -8524,7 +7996,6 @@
      "display_name": "Message, non-initiating",
      "default_width": 45.25,
      "default_height": 32.5,
-     "published_item_id": "26412F3E-3C69-82F4-BDF4-DC899082D722",
      "slug": "message-non-initiating",
      "description": "A message sent in reply to an earlier one.",
      "keywords": [
@@ -8550,7 +8021,6 @@
      "display_name": "Conversation",
      "default_width": 45,
      "default_height": 40.5,
-     "published_item_id": "66D634B0-9E72-84EE-B941-53DACD9C50D1",
      "slug": "conversation",
      "description": "For a conversation diagram: the messages two or more participants exchange about one thing, such as an order, shown as one exchange. Lines join it to each participant's pool.",
      "keywords": [
@@ -8575,7 +8045,6 @@
      "display_name": "Call conversation",
      "default_width": 45,
      "default_height": 40.5,
-     "published_item_id": "49169FFA-E482-8556-A2C8-E26343F37D29",
      "slug": "call-conversation",
      "description": "A conversation defined somewhere else and reused here. Its border is heavy, like a call activity's.",
      "keywords": [
@@ -8600,7 +8069,6 @@
      "display_name": "Text annotation",
      "default_width": 100,
      "default_height": 48,
-     "published_item_id": "AE05760C-6D7D-85F4-9910-C876C2473346",
      "slug": "text-annotation",
      "description": "A note for the reader. Its text sits to the right of the bracket.",
      "keywords": [
@@ -8624,7 +8092,6 @@
      "display_name": "Group",
      "default_width": 101.75,
      "default_height": 67.25,
-     "published_item_id": "5D841F2F-ACCE-848B-A669-55F08281D47D",
      "slug": "group",
      "description": "A frame that gathers shapes for the reader. It changes nothing about how the process runs.",
      "keywords": [
@@ -8650,14 +8117,12 @@
    "short_name": "uml",
    "display_name": "UML",
    "asset_version": 1,
-   "published_library_id": "760C7825-B829-8C82-B2A1-61F366A41E72",
    "shapes": [
     {
      "item_id": "actor",
      "display_name": "Actor",
      "default_width": 29,
      "default_height": 53,
-     "published_item_id": "EF442003-BBA6-8A7B-B12B-6192977CD176",
      "slug": "actor",
      "description": "Someone or something outside the system that uses it: a person, another system or a device. Lines join it to the use cases it takes part in. Its name goes under the figure.",
      "keywords": [
@@ -8683,7 +8148,6 @@
      "display_name": "Initial node",
      "default_width": 27.25,
      "default_height": 26.875,
-     "published_item_id": "08245384-598B-8080-BE51-9A1FE2BBD3AA",
      "slug": "initial-node",
      "description": "Where an activity or a state machine starts, with one arrow leaving it.",
      "keywords": [
@@ -8752,7 +8216,6 @@
      "display_name": "Final node",
      "default_width": 32.75,
      "default_height": 33.125,
-     "published_item_id": "7A7539DA-F5B3-89F1-ADAE-D719162A5342",
      "slug": "final-node",
      "description": "Where the whole activity ends: when the flow reaches it, every other path stops too. In a state machine, the final state.",
      "keywords": [
@@ -8820,7 +8283,6 @@
      "display_name": "Flow final",
      "default_width": 32.75,
      "default_height": 33.125,
-     "published_item_id": "1D33AE7B-DEBD-8995-BFA3-39F141060B8C",
      "slug": "flow-final",
      "description": "Where one path of an activity ends while the other paths carry on.",
      "keywords": [
@@ -8887,7 +8349,6 @@
      "display_name": "Terminate",
      "default_width": 29,
      "default_height": 29,
-     "published_item_id": "E3F852EB-3395-8983-B56C-988BA073235B",
      "slug": "terminate",
      "description": "Terminate: ends the whole state machine. To end a lifeline in a sequence diagram, right-click the lifeline and choose Ends in Destroy Mark.",
      "keywords": [
@@ -8935,7 +8396,6 @@
      "display_name": "Fork / join bar",
      "default_width": 64.125,
      "default_height": 5.25,
-     "published_item_id": "F25B9C71-BC0C-81D6-96EF-197666AB0CB3",
      "slug": "fork-join-bar",
      "description": "A fork splits one flow into several that run at the same time; a join waits for all of them and joins them into one again. Turn it upright for a flow that runs across the page.",
      "keywords": [
@@ -9026,7 +8486,6 @@
      "display_name": "Note",
      "default_width": 77.5,
      "default_height": 51.75,
-     "published_item_id": "7FFA58A9-6DC9-8EEE-A11F-C9EFC65F635F",
      "slug": "note",
      "description": "A comment for the reader. Join it to the shape it is about with a dashed line.",
      "keywords": [
@@ -9049,7 +8508,6 @@
      "display_name": "Package",
      "default_width": 81.5,
      "default_height": 59.5,
-     "published_item_id": "E450ACEC-45A3-82A0-BD7D-FF4B46947401",
      "slug": "package",
      "description": "A group of related classes or other parts of a system, drawn as a folder. Its name goes in the middle; the shapes it holds can be placed on it instead.",
      "keywords": [

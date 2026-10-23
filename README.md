@@ -1,8 +1,8 @@
 # Build SimpleDiagrams diagrams
 
-This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It searches the public shape catalogue and uses a small JSON spec for nodes, labels, positions and connectors. The builder writes the document package and checks its structure and layout.
+This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It uses the shapes packaged with SimpleDiagrams and a small JSON spec for nodes, labels, positions and connectors. The builder writes the document package and checks its structure and layout.
 
-It writes document format 18, which needs SimpleDiagrams 5.1.0 or later for macOS. A document that uses a shape from a downloadable library names that library; its shapes appear with the library installed, and the builder says which library a document needs. The skill retains an offline catalogue from SimpleDiagrams 5.1.0 with 534 packaged shapes in eight libraries. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
+It writes document format 18, which needs SimpleDiagrams 5.1.0 or later for macOS. The skill carries the list of the 534 shapes packaged with SimpleDiagrams 5.1.0, in eight libraries, and makes no network request. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
 
 ## Install
 
@@ -32,11 +32,10 @@ To install by copying, keep the folder name `simplediagrams-diagram-skill`.
 
 - Creates new documents using native rectangles, ellipses, notes, text, connectors, and the eight bundled shape libraries, BPMN and UML included. A library shape gets the connection points and label placement its library gives it, as in the app.
 - Draws the complex shapes SimpleDiagrams draws itself: containers fitted around the shapes they hold, swimlanes and BPMN pools with members in each lane, tables such as UML class, interface, enumeration and entity boxes, callouts whose tails lock to a shape, and UML sequence diagrams with lifelines, messages attached along them, destroy marks, frames and alt, loop and opt fragments.
-- Searches all published libraries through `https://simplediagrams.com/shape-libraries/catalog.json`, with one request per command, nothing stored, and the bundled packaged list offline.
-- Places every catalogued shape by its exact API reference: packaged shapes by the app's own names, downloadable ones by their published UUIDs. A document with downloadable shapes names their libraries, so SimpleDiagrams puts the artwork in place when the library is installed and otherwise names the library and links to its page. Personal libraries, embedded images and shape data remain outside this authoring profile.
-- Redraws a pictured diagram as boxes and connectors. It does not trace artwork or handwriting or embed the picture. A connector can attach to any connection point a shape has, so pin-level wiring is drawn where the parts' library shapes give their pins or leads as connection points.
+- Searches the packaged shapes by name, description and keyword, and places each by the app's own reference. Shapes from downloadable or personal libraries, embedded images and shape data are outside this authoring profile.
+- Redraws a pictured diagram as boxes and connectors. It does not trace artwork or handwriting or embed the picture. A connector can attach to any connection point a shape has.
 - Never overwrites an existing document. Keep the JSON spec to rebuild under a new name.
-- The scripts send nothing but the one catalogue request, which carries no diagram content; the AI service running the skill handles your files under its own policies.
+- The scripts make no network request and store nothing between runs; the AI service running the skill handles your files under its own policies.
 
 ## Build locally
 
@@ -54,13 +53,12 @@ The first command checks without writing. The second creates the package at a ne
 | `SKILL.md` | Agent instructions |
 | `references/visual-design.md` | Layout guidance |
 | `references/from-an-image.md` | Redrawing a photo, scan, or screenshot of a diagram |
-| `references/shape-catalogue.md` | API search, requests and offline behavior |
+| `references/shape-catalogue.md` | Searching and placing the packaged shapes |
 | `references/document-format.md` | Generated package structure |
-| `assets/built-in-shapes.json` | 534 packaged shapes, with their connection points and label placement, for offline fallback |
+| `assets/built-in-shapes.json` | The 534 packaged shapes, with their connection points and label placement |
 | `assets/example-spec.json` | Example input |
 | `assets/example-bpmn-spec.json`, `assets/example-sequence-spec.json`, `assets/example-class-spec.json` | Examples with complex shapes: a BPMN pool with lanes, a UML sequence diagram, UML classes as tables |
-| `scripts/find_shapes.py` | Search names, descriptions and keywords across published libraries |
-| `scripts/sd_catalog.py` | One bounded, validated catalogue request, with the packaged fallback |
+| `scripts/find_shapes.py` | Search the packaged shapes' names, descriptions and keywords |
 | `scripts/build_diagram.py` | Check a spec and build a new package |
 | `scripts/preview_diagram.py` | Render a new wireframe SVG from a spec |
 | `scripts/sd_spec.py`, `scripts/sd_format.py`, `scripts/sd_package.py` | Spec compiler, format models, and package writer (checked in memory before writing) |

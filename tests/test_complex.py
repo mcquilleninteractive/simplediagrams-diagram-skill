@@ -27,12 +27,9 @@ import sd_format as wire
 from find_shapes import complex_shape_hints
 from sd_package import write_package
 from sd_spec import (
-    Catalog,
-    CatalogShape,
     DiagramSpec,
     SpecError,
     compile_spec,
-    library_needs,
     lint,
     load_spec,
 )
@@ -98,29 +95,10 @@ def _sequence(edges: list[dict], *extra_nodes: dict, **lifeline: object) -> wire
 )
 def test_each_complex_shape_is_an_ordinary_part_of_the_one_format(node: dict) -> None:
     """Every document is the package SimpleDiagrams 5.1.0 writes, so a complex shape needs
-    nothing more and the build names nothing for it."""
+    no other format or version."""
     document = _compile([_box("a", 0, 0), node])
     assert document.schema_version == wire.SCHEMA_VERSION
     assert wire.manifest(document).format_version == wire.FORMAT_VERSION
-    assert library_needs(document) == []
-
-
-def test_complex_shapes_and_downloaded_shapes_share_a_document() -> None:
-    """A downloaded shape beside a complex shape still names its library, and may be held."""
-    shape = CatalogShape(
-        library_id="79FFE4B7-EA0D-87C3-AE89-D4CD62AF5202", library_short_name="notebook",
-        library_display_name="Notebook", asset_version=1, item_id="A5C619FD-0E22-8EF7-8299-45280EA3F738",
-        display_name="Transformer", default_width=61, default_height=37.375, built_in=False, slug="transformer",
-    )
-    spec = DiagramSpec.model_validate({"name": "Both", "pages": [{"nodes": [
-        {"key": "t", "shape": "notebook/transformer", "col": 0, "row": 0},
-        {"key": "c", "shape": "container", "label": "Bench", "members": ["t"]},
-    ]}]})
-    document = compile_spec(spec, Catalog(Catalog.load().shapes + [shape], "test"))
-    assert document.required_libraries is not None
-    assert [need.split(",")[0] for need in library_needs(document)] == [
-        "the Notebook library installed"
-    ]
 
 
 # ---------------------------------------------------------------------------
@@ -703,15 +681,15 @@ def test_a_complex_document_is_written_and_read_back(tmp_path: Path) -> None:
 
 
 def test_the_build_writes_a_complex_example(tmp_path: Path) -> None:
-    """The command an agent runs builds a complex-shape example cleanly, naming nothing it needs."""
+    """The command an agent runs builds a complex-shape example cleanly, with no findings."""
     target = tmp_path / "Classes.simplediagram"
     result = subprocess.run(
-        [sys.executable, str(ROOT / "scripts" / "build_diagram.py"), "--offline",
+        [sys.executable, str(ROOT / "scripts" / "build_diagram.py"),
          str(ROOT / "assets" / "example-class-spec.json"), str(target)],
         capture_output=True, text=True, check=False,
     )
     assert result.returncode == 0, result.stdout + result.stderr
-    assert not [line for line in result.stdout.splitlines() if line.startswith(("needs", "warning", "error"))]
+    assert not [line for line in result.stdout.splitlines() if line.startswith(("warning", "error"))]
     assert json.loads((target / "manifest.json").read_text())["format_version"] == 18
 
 

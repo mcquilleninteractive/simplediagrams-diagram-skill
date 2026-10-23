@@ -2,9 +2,8 @@
 5.1.0 writes and reads.
 
 Every document the skill writes is package 18 / schema 17 and needs SimpleDiagrams
-5.1.0 or later. Besides shapes, text and connectors it holds the optional list of
-downloaded libraries a document's shapes come from, the shapes the app draws itself
-(complex shapes: containers, swimlanes, tables, callouts and UML lifelines), connector
+5.1.0 or later. Besides shapes, text and connectors it holds the shapes the app draws
+itself (complex shapes: containers, swimlanes, tables, callouts and UML lifelines), connector
 ends attached anywhere along a lifeline, and label regions that start outside their
 shape.
 
@@ -42,7 +41,6 @@ from pydantic import (
     model_serializer,
     model_validator,
 )
-from pydantic.json_schema import JsonDict, SkipJsonSchema
 
 FORMAT_NAME = "com.simplediagrams.document"
 FORMAT_VERSION = 18
@@ -69,19 +67,6 @@ DESTROY_MARK_SIZE = 24.0
 LIFELINE_ATTACH_LINE = 0
 # How far a lane, row or column may fall short of its smallest size, as a fraction of it.
 SMALLEST_SIZE_ALLOWANCE = 1e-9
-
-# The app's bounds on the required-libraries list (DiagramRequiredLibrary).
-MAX_REQUIRED_LIBRARIES = 64
-MAX_REQUIRED_LIBRARY_NAME_SCALARS = 200
-MAX_LIBRARY_REVISION = 1_000_000
-# Characters that reorder the text around them; a library name may not contain one.
-DIRECTION_CONTROLS = frozenset(
-    chr(code)
-    for code in (
-        0x061C, 0x200E, 0x200F, 0x202A, 0x202B, 0x202C, 0x202D, 0x202E,
-        0x2066, 0x2067, 0x2068, 0x2069,
-    )
-)  # fmt: skip
 
 MANIFEST_FILENAME = "manifest.json"
 DOCUMENT_FILENAME = "document.json"
@@ -395,13 +380,9 @@ class ElementStyle(WireModel):
 
 
 class SymbolReference(WireModel):
-    """Names one shape in a library: one built into SimpleDiagrams, or a downloaded one.
-
-    A built-in shape is named by the app's own library and item names. A downloaded
-    shape is named by its library's and item's published UUIDs; the app puts its
-    artwork in place when the document opens with that library installed, and the
-    document lists the library in `required_libraries`. A
-    reference the app cannot resolve still opens, but draws a dashed placeholder.
+    """Names one shape in a library built into SimpleDiagrams, by the app's own library
+    and item names. A reference the app cannot resolve still opens, but draws a dashed
+    placeholder.
     """
 
     library_id: Annotated[str, Field(min_length=1)]
@@ -412,50 +393,6 @@ class SymbolReference(WireModel):
     def _check_lengths(self) -> SymbolReference:
         _check_text(self.library_id, field="library_id", max_bytes=MAX_IDENTIFIER_BYTES)
         _check_text(self.item_id, field="item_id", max_bytes=MAX_IDENTIFIER_BYTES)
-        return self
-
-
-class RequiredLibrary(WireModel):
-    """One library a document's shapes come from, so a reader who lacks it is told its name.
-
-    The app has no network access, so the document carries the name beside the identifier.
-    The entry is advisory: the app never draws, places or refuses anything because of it.
-    These rules are the app's own (`DiagramRequiredLibrary`), so a list written here is
-    never trimmed when the app reads it.
-    """
-
-    library_id: str = Field(
-        pattern=r"^[A-Za-z0-9](?:[A-Za-z0-9._-]*[A-Za-z0-9])?$",
-        max_length=MAX_IDENTIFIER_BYTES,
-        description="The identifier the document's references use for the library: its "
-        "published UUID. ASCII letters, digits, '.', '-' and '_', beginning and ending with "
-        "a letter or digit.",
-    )
-    display_name: str = Field(
-        min_length=1,
-        max_length=MAX_REQUIRED_LIBRARY_NAME_SCALARS,
-        description="The library's name, shown to a person: not blank, with no line breaks, "
-        "control characters or direction controls.",
-    )
-    minimum_revision: Annotated[int, Field(ge=1, le=MAX_LIBRARY_REVISION)] | None = Field(
-        default=None,
-        description="The lowest library revision holding every shape used, when known.",
-    )
-
-    @model_validator(mode="after")
-    def _check_entry(self) -> RequiredLibrary:
-        # The identifier's rule is its pattern; a name's length counts Unicode scalars,
-        # as Python's len does. Foundation's whitespace set, which the app trims with,
-        # still holds U+200B ZERO WIDTH SPACE, so a name of only those is blank there too.
-        name = self.display_name
-        if (
-            all(c.isspace() or c == "\u200b" for c in name)
-            or any(
-                c in DIRECTION_CONTROLS or unicodedata.category(c) in ("Cc", "Zl", "Zp")
-                for c in name
-            )
-        ):
-            raise ValueError(f"required library name {name!r} is not allowed")
         return self
 
 
@@ -1113,14 +1050,8 @@ def default_quick_styles() -> list[QuickStyle]:
     ]
 
 
-def _without_default(schema: JsonDict) -> None:
-    """Leaves a key the file omits without a schema default, so no reader fills in null."""
-    schema.pop("default", None)
-
-
 class Document(WireModel):
-    """The whole of `document.json`: these nine keys, all required, and
-    `required_libraries` when the document names any."""
+    """The whole of `document.json`: these nine keys, all required."""
 
     id: UUIDString
     schema_version: Literal[17] = Field(description="17, for package format 18.")
@@ -1133,25 +1064,10 @@ class Document(WireModel):
     quick_styles: Annotated[list[QuickStyle], Field(max_length=MAX_QUICK_STYLES)]
     embedded_assets: Annotated[list[Any], Field(max_length=0)]
     shape_data_definitions: Annotated[list[Any], Field(max_length=0)]
-    # None stands for the key left out, so the schema does not offer null.
-    required_libraries: (
-        Annotated[list[RequiredLibrary], Field(min_length=1, max_length=MAX_REQUIRED_LIBRARIES)]
-        | SkipJsonSchema[None]
-    ) = Field(
-        default=None,
-        description="The downloaded libraries the document's shapes come from, only when "
-        "there are any; left out otherwise, never null.",
-        json_schema_extra=_without_default,
-    )
 
     @model_validator(mode="after")
     def _check_document(self) -> Document:
         _check_text(self.name, field="document name", max_bytes=MAX_NAME_BYTES)
-        if "required_libraries" in self.model_fields_set and self.required_libraries is None:
-            raise ValueError("required_libraries is left out, never written as null")
-        named = [library.library_id.lower() for library in self.required_libraries or []]
-        if len(named) != len(set(named)):
-            raise ValueError("required_libraries names the same library twice")
         # One identifier space covers the document, quick styles, pages,
         # elements, connectors, groups and guides.
         seen: set[str] = set()
@@ -1530,12 +1446,8 @@ def document(
     selected_page_id: str | None = None,
     revision: int = 0,
     quick_styles: list[QuickStyle] | None = None,
-    required_libraries: list[RequiredLibrary] | None = None,
 ) -> Document:
     """A new document showing its first page, with the app's six Quick Styles."""
-    # The key is left out, not set to None, when there are none: a document given the key
-    # holds a list.
-    libraries = {"required_libraries": required_libraries} if required_libraries else {}
     return Document(
         id=id,
         schema_version=SCHEMA_VERSION,
@@ -1543,7 +1455,6 @@ def document(
         selected_page_id=selected_page_id or pages[0].core.id, pages=pages,
         quick_styles=default_quick_styles() if quick_styles is None else quick_styles,
         embedded_assets=[], shape_data_definitions=[],
-        **libraries,
     )
 
 

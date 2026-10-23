@@ -21,7 +21,7 @@ import unicodedata
 import uuid
 from itertools import pairwise, product
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Any, Literal, NamedTuple, TextIO
+from typing import Annotated, Literal, NamedTuple, TextIO
 
 import sd_format as wire
 from pydantic import (
@@ -39,9 +39,6 @@ CATALOG_PATH = Path(__file__).resolve().parent.parent / "assets" / "built-in-sha
 LIBRARY_PREFIX = "com.simplediagrams.shapeLibrary."
 CATALOG_NAME = "com.simplediagrams.skill.built-in-shapes"
 CATALOG_VERSION = 1
-
-if TYPE_CHECKING:
-    from sd_catalog import CatalogueSource, ShapeLibraryCatalogue
 
 NATIVE_KINDS = ("rectangle", "ellipse", "note", "text")
 # Shapes SimpleDiagrams draws itself from a few stored values (complex shapes). Containers
@@ -243,10 +240,9 @@ class NodeSpec(SpecModel):
         description=(
             "rectangle, ellipse, note or text for a plain drawn shape; container, "
             "swimlanes, table, callout or lifeline for a shape SimpleDiagrams draws "
-            "itself; or '<library>/<item>' for a library shape, for example 'basic/Cylinder'. "
-            "Use a selector returned by find_shapes.py, which searches the API and "
-            "falls back to assets/built-in-shapes.json offline. A packaged shape needs "
-            "nothing installed; a downloadable one needs its library installed."
+            "itself; or '<library>/<item>' for a shape from a library packaged with "
+            "SimpleDiagrams, for example 'basic/Cylinder'. Use a selector returned by "
+            "find_shapes.py, which searches assets/built-in-shapes.json."
         )
     )
     label: Label = ""
@@ -571,7 +567,8 @@ class DiagramSpec(SpecModel):
 
 
 class CatalogShape(BaseModel):
-    """A discovered shape with its exact placement reference and availability."""
+    """One shape from a library packaged with SimpleDiagrams, with its exact placement
+    reference: the app's own library ID, item ID and asset version."""
 
     model_config = ConfigDict(frozen=True)
 
@@ -583,12 +580,9 @@ class CatalogShape(BaseModel):
     display_name: str
     default_width: float
     default_height: float
-    built_in: bool = True
-    readable_library_id: str = ""
     slug: str = ""
     description: str = ""
     keywords: tuple[str, ...] = ()
-    page_url: str = ""
     # (id, x, y) for each anchor; None means the standard eight every shape has. An empty
     # tuple is a shape connectors may not attach to, such as a BPMN task mark.
     connection_points: tuple[tuple[int, float, float], ...] | None = None
@@ -605,114 +599,27 @@ class CatalogShape(BaseModel):
 
     @property
     def selector(self) -> str:
-        """`<short name>/<item>`: shipped item names for packaged shapes, slugs for discovery.
-
-        Ambiguous when two libraries share the short name; offer `Catalog.selector`, which
-        names the library in full then.
-        """
-        item = self.item_id if self.built_in else self.slug
-        return f"{self.library_short_name}/{item}"
+        """`<short name>/<item>`, the name a spec gives the shape."""
+        return f"{self.library_short_name}/{self.item_id}"
 
 
 class Catalog:
-    """Searchable library metadata. Every shape is placeable: a packaged one by the app's
-    own names, a downloaded one by its published UUIDs, which needs its library installed."""
+    """The shapes packaged with SimpleDiagrams, read from the list bundled with the skill.
+
+    The list is the skill's only source of library shapes: nothing is fetched, and a
+    shape it does not hold cannot be placed.
+    """
 
     def __init__(self, shapes: list[CatalogShape], source_app_version: str) -> None:
         self.shapes = shapes
         self.source_app_version = source_app_version
-        self.source = "bundled"
-        self.warning: str | None = None
         self._by_reference = {(shape.library_id, shape.item_id): shape for shape in shapes}
-        self._short_names: dict[str, str | None] = {}
-        self._readable_ids = {shape.readable_library_id: shape.library_id for shape in shapes}
+        self._short_names = {shape.library_short_name.lower(): shape.library_id for shape in shapes}
         self._library_ids = {shape.library_id for shape in shapes}
-        self._by_selector = dict(self._by_reference)
-        for shape in shapes:
-            short = shape.library_short_name.lower()
-            if short in self._short_names and self._short_names[short] != shape.library_id:
-                self._short_names[short] = None
-            else:
-                self._short_names[short] = shape.library_id
-            if not shape.built_in:
-                self._by_selector[(shape.library_id, shape.slug)] = shape
-
-    @classmethod
-    def from_catalogue(
-        cls,
-        catalogue: ShapeLibraryCatalogue,
-        *,
-        source: CatalogueSource,
-        warning: str | None = None,
-        packaged: Catalog | None = None,
-    ) -> Catalog:
-        """Copy API references unchanged, including their asset versions.
-
-        ``packaged`` is the bundled list made from the desktop app's own catalogue. The
-        app is the source of truth for the libraries it packages and the website copies
-        them, sometimes later, so when it is given: a packaged shape's connection points,
-        label placement and resizing rule come from it, and any packaged shape the website
-        does not list yet, alone or with its whole library, is added from it.
-        """
-        known = (
-            {(shape.library_id, shape.item_id, shape.asset_version): shape for shape in packaged.shapes}
-            if packaged is not None
-            else {}
-        )
-
-        def geometry(shape: Any, built_in: bool) -> dict[str, Any]:
-            app = known.get(
-                (shape.reference.library_id, shape.reference.item_id, shape.reference.asset_version)
-            ) if built_in else None
-            if app is not None:
-                return {
-                    "connection_points": app.connection_points,
-                    "text_region": app.text_region,
-                    "text_position": app.text_position,
-                    "resizing": app.resizing,
-                }
-            region = shape.text_region
-            return {
-                "connection_points": None
-                if shape.connection_points == "standard"
-                else tuple((point.id, point.x, point.y) for point in shape.connection_points),
-                "text_region": None
-                if region is None
-                else (region.x, region.y, region.width, region.height),
-                "text_position": shape.text_position,
-            }
-
-        shapes = [
-            CatalogShape(
-                library_id=shape.reference.library_id,
-                library_short_name=library.readable_id.rsplit(".", 1)[-1],
-                library_display_name=library.display_name,
-                readable_library_id=library.readable_id,
-                asset_version=shape.reference.asset_version,
-                item_id=shape.reference.item_id,
-                display_name=shape.display_name,
-                default_width=shape.default_width,
-                default_height=shape.default_height,
-                built_in=library.built_in,
-                slug=shape.slug,
-                description=shape.description,
-                keywords=tuple(shape.keywords),
-                page_url=library.page_url,
-                **geometry(shape, library.built_in),
-            )
-            for library in catalogue.libraries
-            for shape in library.shapes
-        ]
-        if packaged is not None:
-            listed = {(shape.library_id, shape.item_id) for shape in shapes}
-            shapes += [s for s in packaged.shapes if (s.library_id, s.item_id) not in listed]
-        result = cls(shapes, "the current catalogue")
-        result.source, result.warning = source, warning
-        return result
 
     @classmethod
     def load(cls, path: Path = CATALOG_PATH) -> Catalog:
-        """Read the bundled fallback without network access, useful for pure checks."""
+        """Read the bundled list of packaged shapes."""
         data = json.loads(path.read_text(encoding="utf-8"))
         if (data.get("catalog"), data.get("catalog_version")) != (CATALOG_NAME, CATALOG_VERSION):
             raise ValueError(f"{path} is not shape catalogue version {CATALOG_VERSION}")
@@ -726,7 +633,6 @@ class Catalog:
                 display_name=item["display_name"],
                 default_width=item["default_width"],
                 default_height=item["default_height"],
-                readable_library_id=library["library_id"],
                 slug=item.get("slug", item["item_id"]),
                 description=item.get("description", ""),
                 keywords=tuple(item.get("keywords", [])),
@@ -744,52 +650,32 @@ class Catalog:
         ]
         return cls(shapes, data["source_app_version"])
 
-    @classmethod
-    def load_current(cls, *, offline: bool = False) -> Catalog:
-        """Load one current snapshot for a complete CLI search or build."""
-        from sd_catalog import load_catalogue
-
-        result = load_catalogue(offline=offline)
-        return cls.from_catalogue(
-            result.catalogue, source=result.source, warning=result.warning, packaged=cls.load()
-        )
-
     def find_library(self, library: str) -> str | None:
-        """The library a selector names, by full library id, readable id or short name."""
+        """The library a selector names, by full library id or short name."""
         if library in self._library_ids:
             return library
-        return self._readable_ids.get(library) or self._short_names.get(library.lower())
+        return self._short_names.get(library.lower())
 
     def resolve(self, library: str, item: str) -> CatalogShape | None:
         """Finds a shape by full library id or short name. Item ids are case sensitive."""
         library_id = self.find_library(library)
         if library_id is None:
             return None
-        return self._by_selector.get((library_id, item))
+        return self._by_reference.get((library_id, item))
 
     def find_reference(self, library_id: str, item_id: str, asset_version: int) -> CatalogShape | None:
-        """The packaged or downloaded shape a reference names, at exactly its asset version."""
+        """The packaged shape a reference names, at exactly its asset version."""
         shape = self._by_reference.get((library_id, item_id))
         return shape if shape and shape.asset_version == asset_version else None
 
-    def selector(self, shape: CatalogShape) -> str:
-        """The selector to offer for a shape: its short name while that names one library,
-        else its readable library ID, which `resolve` also accepts."""
-        if self._short_names.get(shape.library_short_name.lower()) is not None:
-            return shape.selector
-        library = shape.readable_library_id or shape.library_id
-        item = shape.item_id if shape.built_in else shape.slug
-        return f"{library}/{item}"
-
     def suggestions(self, library: str, item: str) -> list[str]:
-        """Close names to offer when a shape is not found, matched on the name a selector
-        uses: a packaged shape's item ID or a downloadable shape's slug."""
+        """Close names to offer when a shape is not found, matched on its item ID."""
         wanted = item.lower()
-        found = []
-        for shape in self.shapes:
-            name = (shape.item_id if shape.built_in else shape.slug).lower()
-            if wanted in name or name in wanted:
-                found.append(self.selector(shape))
+        found = [
+            shape.selector
+            for shape in self.shapes
+            if wanted in shape.item_id.lower() or shape.item_id.lower() in wanted
+        ]
         return sorted(found)[:8]
 
 
@@ -838,11 +724,21 @@ def read_limited(path: Path, limit: int) -> bytes:
     return data
 
 
+# Characters that reorder the text around them; a diagnostic prints each as an escape.
+DIRECTION_CONTROLS = frozenset(
+    chr(code)
+    for code in (
+        0x061C, 0x200E, 0x200F, 0x202A, 0x202B, 0x202C, 0x202D, 0x202E,
+        0x2066, 0x2067, 0x2068, 0x2069,
+    )
+)  # fmt: skip
+
+
 def terminal_safe(text: str) -> str:
     """`text` with control characters other than line breaks, and direction controls,
     written as `\\uXXXX` escapes.
 
-    Values from a spec, a file name or the catalogue reach the terminal in diagnostics; an
+    Values from a spec or a file name reach the terminal in diagnostics; an
     escape sequence among them could drive the terminal, and a direction control could
     reorder the line. JSON output stays valid: inside a string the escape means the same
     character, and JSON already escapes control characters itself.
@@ -850,7 +746,7 @@ def terminal_safe(text: str) -> str:
     return "".join(
         f"\\u{ord(character):04x}"
         if (unicodedata.category(character) == "Cc" and character != "\n")
-        or character in wire.DIRECTION_CONTROLS
+        or character in DIRECTION_CONTROLS
         else character
         for character in text
     )
@@ -1263,54 +1159,21 @@ def _spread_channels(routes: list[tuple[_Route, tuple, tuple]]) -> None:
 def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Document:
     """Builds the exact document a spec describes.
 
-    The document is package format 18, which SimpleDiagrams 5.1.0 and later open. A shape
-    from a downloaded library is placed by reference, and its library is named in the
-    document's `required_libraries`. SimpleDiagrams puts the artwork in place when the
-    document opens with that library installed; without it, the shape is a placeholder
-    box, and the app names the library and links to its page.
+    The document is package format 18, which SimpleDiagrams 5.1.0 and later open. Its
+    library shapes all come from the libraries packaged with the app, so it needs nothing
+    installed.
 
     Raises:
-        SpecError: A node names a shape the catalogue does not have, the shapes come from
-            more downloadable libraries than a document can name, the catalogue gives a
-            library a name a document cannot hold, or complex shapes cannot be laid out as
-            the spec asks.
+        SpecError: A node names a shape the catalogue does not have, or complex shapes
+            cannot be laid out as the spec asks.
     """
     catalog = catalog or Catalog.load()
     document_id = spec.id.upper() if spec.id else str(uuid.uuid4()).upper()
-    # The downloaded libraries used, in the order their shapes first appear.
-    downloaded_libraries: dict[str, CatalogShape] = {}
     pages = [
-        _PageCompiler(page, page_index, document_id, catalog).compile(downloaded_libraries)
+        _PageCompiler(page, page_index, document_id, catalog).compile()
         for page_index, page in enumerate(spec.pages)
     ]
-
-    if len(downloaded_libraries) > wire.MAX_REQUIRED_LIBRARIES:
-        raise SpecError(
-            f"the diagram uses shapes from {len(downloaded_libraries)} downloadable libraries, "
-            f"and a document can name at most {wire.MAX_REQUIRED_LIBRARIES}. Use shapes from "
-            "fewer libraries, or packaged shapes."
-        )
-    # The revision is left out: the catalogue gives a library's current revision, which holds
-    # every shape used but is not necessarily the lowest that does, and the entry must not
-    # tell a person with an older revision that it is too old when it is not.
-    required: list[wire.RequiredLibrary] = []
-    for shape in downloaded_libraries.values():
-        try:
-            required.append(
-                wire.RequiredLibrary(
-                    library_id=shape.library_id, display_name=shape.library_display_name
-                )
-            )
-        except ValidationError:
-            raise SpecError(
-                f"the catalogue's name for library {shape.library_id}, "
-                f"{shape.library_display_name!r}, cannot be written into a document: it is "
-                "blank, or holds a line break, control character or direction control. Use "
-                "shapes from another library until the catalogue is corrected."
-            ) from None
-    return wire.document(
-        id=document_id, name=spec.name, pages=pages, required_libraries=required or None
-    )
+    return wire.document(id=document_id, name=spec.name, pages=pages)
 
 
 class _Look(NamedTuple):
@@ -1395,10 +1258,10 @@ class _PageCompiler:
     def _id(self, name: str) -> str:
         return _new_id(self.namespace, f"page:{self.page_index}:{name}")
 
-    def compile(self, downloaded: dict[str, CatalogShape]) -> wire.Page:
+    def compile(self) -> wire.Page:
         for node in self.page.nodes:
             if node.shape not in COMPLEX_KINDS:
-                self._place_plain(node, downloaded)
+                self._place_plain(node)
         self._lay_out_sequence()
         for node in self.page.nodes:
             if node.shape == "table":
@@ -1472,7 +1335,7 @@ class _PageCompiler:
             color_hex=node.text_color or "#212529",
         )
 
-    def _place_plain(self, node: NodeSpec, downloaded: dict[str, CatalogShape]) -> None:
+    def _place_plain(self, node: NodeSpec) -> None:
         """Places a plain or library node and decides where its label goes."""
         catalog_shape: CatalogShape | None = None
         if node.shape in NATIVE_KINDS:
@@ -1488,24 +1351,15 @@ class _PageCompiler:
             if catalog_shape is None:
                 hint = self.catalog.suggestions(library, item)
                 raise SpecError(
-                    f"node '{node.key}': '{node.shape}' is not in the selected catalogue."
+                    f"node '{node.key}': '{node.shape}' is not one of the shapes packaged with "
+                    f"SimpleDiagrams {self.catalog.source_app_version}."
                     + (f" Did you mean: {', '.join(hint)}?" if hint else "")
-                    + (
-                        " This run had only the packaged shapes (offline, or the catalogue "
-                        "request failed); a downloadable shape needs a successful catalogue "
-                        "request."
-                        if self.catalog.find_library(library) is None
-                        and not any(not shape.built_in for shape in self.catalog.shapes)
-                        else ""
-                    )
                 )
             if catalog_shape.resizing == "width_only" and node.height is not None:
                 raise SpecError(
                     f"node '{node.key}': '{node.shape}' keeps its own thickness and takes "
                     "only a width; remove its height."
                 )
-            if not catalog_shape.built_in:
-                downloaded.setdefault(catalog_shape.library_id, catalog_shape)
             kind = "symbol"
 
         width, height = _node_size(node, catalog_shape)
@@ -2282,20 +2136,6 @@ class _PageCompiler:
 # ---------------------------------------------------------------------------
 
 
-def library_needs(document: wire.Document) -> list[str]:
-    """The downloaded libraries a document's shapes come from, in plain words.
-
-    Not findings: the document is complete without them, and a strict build must not fail
-    because of them. The builder prints these so whoever sends the file can say which
-    libraries show every shape.
-    """
-    return [
-        f"the {required.display_name} library installed, to show its shapes; without it they "
-        "are placeholder boxes, and SimpleDiagrams names the library and links to its page"
-        for required in document.required_libraries or []
-    ]
-
-
 class Finding(BaseModel):
     """One problem found in a document, with where it is and how to fix it."""
 
@@ -2381,19 +2221,6 @@ def _own_end_inset(frame: wire.Rect, point: wire.ConnectorPoint) -> float:
     return max(3.0, inside + 0.5)
 
 
-def _default_symbol_paint(style: wire.ElementStyle) -> bool:
-    """True when a library shape carries only the paint the compiler gives it by default."""
-    fill, stroke, line_width = DEFAULT_STYLE["symbol"]
-    return (
-        style.fill_hex.upper() == fill
-        and style.stroke_hex.upper() == stroke
-        and style.line_width == line_width
-        and style.fill_texture is None
-        and style.stroke_texture is None
-        and style.stroke_pattern_override is None
-    )
-
-
 def _solid_part(element: wire.Element) -> wire.Rect:
     """The part of a shape a connector should not cross: its frame, or a lifeline's head,
     since the rest of a lifeline is open and its messages cross other lifelines' lines."""
@@ -2450,9 +2277,8 @@ def lint(
     placeholder. Warnings are layout problems: overlaps, connectors through
     shapes or labels, crossings, connectors drawn over each other and labels
     that do not fit. Sizes of text are estimates, so label warnings are advice.
-    Paint set on a downloaded library's shape is also a warning, because the app
-    draws such a shape in its library's own colours. Given the spec the document
-    was compiled from, a finding names a shape without a label by its node key.
+    Given the spec the document was compiled from, a finding names a shape
+    without a label by its node key.
     """
     catalog = catalog or Catalog.load()
     findings: list[Finding] = []
@@ -2484,32 +2310,18 @@ def lint(
         for element in page.elements:
             core = element.core
             reference = core.symbol_reference
-            shape = (
-                catalog.find_reference(
-                    reference.library_id, reference.item_id, reference.asset_version
-                )
-                if reference
-                else None
-            )
-            if shape is not None and not shape.built_in and not _default_symbol_paint(core.style):
-                warn(
-                    "downloaded-shape-paint",
-                    f"{page_name}: {_name(element, keys)} is a {shape.library_display_name} shape, "
-                    "which SimpleDiagrams draws in its library's own colours, so the fill, "
-                    "stroke and line width set for it are not used. Leave them out; the "
-                    "colours can be changed in the app once the shape is in place.",
-                )
-            if reference and shape is None:
+            if reference and catalog.find_reference(
+                reference.library_id, reference.item_id, reference.asset_version
+            ) is None:
                 findings.append(
                     Finding(
                         severity="error",
                         code="unresolved-shape",
                         message=(
                             f"{page_name}: {reference.library_id} / {reference.item_id} "
-                            f"(version {reference.asset_version}) is in neither SimpleDiagrams "
-                            f"{catalog.source_app_version} nor the library catalogue. The app "
-                            "would draw a dashed placeholder. Choose a shape returned by "
-                            "find_shapes.py."
+                            f"(version {reference.asset_version}) is not packaged with "
+                            f"SimpleDiagrams {catalog.source_app_version}. The app would draw a "
+                            "dashed placeholder. Choose a shape returned by find_shapes.py."
                         ),
                     )
                 )

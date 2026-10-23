@@ -178,7 +178,7 @@ def _complex(
 
 def complex_profile_document() -> wire.Document:
     """One document using every key complex shapes, connector ends along a lifeline and
-    label regions starting outside their shape add, beside a required library."""
+    label regions starting outside their shape add."""
     element = lambda number: wire.HolderMember(kind="element", id=_uuid(number))
     cell = wire.text_content
     elements = [
@@ -275,10 +275,7 @@ def complex_profile_document() -> wire.Document:
             )
         ],
     )
-    return wire.document(
-        id=DOCUMENT_ID, name="Complex profile", pages=[page],
-        required_libraries=[wire.RequiredLibrary(library_id="79FFE4B7-EA0D-87C3-AE89-D4CD62AF5202", display_name="Notebook")],
-    )
+    return wire.document(id=DOCUMENT_ID, name="Complex profile", pages=[page])
 
 
 def minimal_document() -> wire.Document:

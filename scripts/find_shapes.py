@@ -2,16 +2,14 @@
 # requires-python = ">=3.10"
 # dependencies = ["pydantic>=2.7,<3"]
 # ///
-"""Search published shape metadata and show which references can be placed.
+"""Search the shapes packaged with SimpleDiagrams and show how to place them.
 
     uv run scripts/find_shapes.py
-    uv run scripts/find_shapes.py currency --packaged
-    uv run scripts/find_shapes.py capacitor --json
+    uv run scripts/find_shapes.py currency --library biz
+    uv run scripts/find_shapes.py database --json
 
-The skill asks the public catalogue once per run and stores nothing; offline, or if the
-request fails, it uses its bundled list of packaged shapes. Every shape can be placed. A packaged shape ships inside SimpleDiagrams; a
-downloadable one needs its library installed, and a document that uses one names that
-library. A search for something SimpleDiagrams draws itself,
+The shapes come from the list bundled with the skill, assets/built-in-shapes.json; the
+search makes no network request. A search for something SimpleDiagrams draws itself,
 such as a pool, a class box or a lifeline, also names the complex shape to use.
 """
 
@@ -95,25 +93,21 @@ def _points_text(shape: CatalogShape) -> str:
     return ", ".join(f"{point_id} ({x:.3g}, {y:.3g})" for point_id, x, y in points)
 
 
-def _record(shape: CatalogShape, catalog: Catalog) -> dict[str, object]:
-    """Expose the reference unchanged alongside a clear placement capability."""
+def _record(shape: CatalogShape) -> dict[str, object]:
+    """Expose the selector and the exact reference it is written as."""
     return {
-        "selector": catalog.selector(shape),
+        "selector": shape.selector,
         "library": shape.library_display_name,
-        "readable_library_id": shape.readable_library_id,
         "display_name": shape.display_name,
         "description": shape.description,
         "keywords": list(shape.keywords),
         "default_width": shape.default_width,
         "default_height": shape.default_height,
-        "placeable": True,
-        "packaged": shape.built_in,
         "connection_points": (
             "standard"
             if shape.connection_points is None
             else [{"id": i, "x": x, "y": y} for i, x, y in shape.connection_points]
         ),
-        "page_url": shape.page_url,
         "reference": {
             "library_id": shape.library_id,
             "item_id": shape.item_id,
@@ -131,17 +125,7 @@ def main(argv: list[str] | None = None) -> int:
         default="",
         help="Text to search in names, descriptions and keywords",
     )
-    parser.add_argument(
-        "--library", default="", help="Library short name, readable ID or reference ID"
-    )
-    parser.add_argument(
-        "--packaged",
-        "--placeable",
-        dest="packaged",
-        action="store_true",
-        help="Show only packaged shapes, which need no library installed "
-        "(--placeable is the old name)",
-    )
+    parser.add_argument("--library", default="", help="Library short name or full ID")
     parser.add_argument(
         "--json", action="store_true", help="Show structured search results"
     )
@@ -149,30 +133,17 @@ def main(argv: list[str] | None = None) -> int:
         "--limit", type=int, default=30, help="At most 300 results; default 30"
     )
     parser.add_argument("--offset", type=int, default=0, help="Skip this many matches")
-    parser.add_argument(
-        "--offline",
-        action="store_true",
-        help="Use the packaged shapes only, without a request",
-    )
     arguments = parser.parse_args(argv)
     if not 1 <= arguments.limit <= 300 or arguments.offset < 0:
         parser.error("--limit must be 1 to 300 and --offset must be nonnegative")
-    catalog = Catalog.load_current(offline=arguments.offline)
-    echo(f"Catalogue: {catalog.source}", file=sys.stderr)
-    if catalog.warning:
-        echo(catalog.warning, file=sys.stderr)
+    catalog = Catalog.load()
     shapes = [
         shape
         for shape in catalog.shapes
-        if (not arguments.packaged or shape.built_in)
-        and (
+        if (
             not arguments.library
             or arguments.library.casefold()
-            in {
-                shape.library_short_name.casefold(),
-                shape.readable_library_id.casefold(),
-                shape.library_id.casefold(),
-            }
+            in {shape.library_short_name.casefold(), shape.library_id.casefold()}
         )
         and _match(shape, arguments.query)
     ]
@@ -185,10 +156,7 @@ def main(argv: list[str] | None = None) -> int:
                 1 if previous is None else previous[1] + 1,
             )
         for shape, count in libraries.values():
-            status = "packaged" if shape.built_in else "downloadable"
-            echo(
-                f"{shape.library_short_name:24} {_one_line(shape.library_display_name):32} {count:4} shapes  {status}"
-            )
+            echo(f"{shape.library_short_name:24} {shape.library_display_name:32} {count:4} shapes")
         return 0
     shown = shapes[arguments.offset : arguments.offset + arguments.limit]
     hints = complex_shape_hints(arguments.query)
@@ -196,9 +164,8 @@ def main(argv: list[str] | None = None) -> int:
         echo(
             json.dumps(
                 {
-                    "source": catalog.source,
                     "total": len(shapes),
-                    "matches": [_record(shape, catalog) for shape in shown],
+                    "matches": [_record(shape) for shape in shown],
                     **({"complex_shapes": hints} if hints else {}),
                 },
                 ensure_ascii=False,
@@ -207,9 +174,8 @@ def main(argv: list[str] | None = None) -> int:
         )
     else:
         for shape in shown:
-            status = "packaged" if shape.built_in else "downloadable"
             size = f"{shape.default_width:g} x {shape.default_height:g}"
-            echo(f"{catalog.selector(shape):50} {size:14} {_one_line(shape.display_name)}  [{status}]")
+            echo(f"{shape.selector:50} {size:14} {_one_line(shape.display_name)}")
             if shape.description:
                 echo(f"  {_one_line(shape.description)}")
             if shape.connection_points is not None:

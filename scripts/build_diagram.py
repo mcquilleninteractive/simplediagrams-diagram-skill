@@ -31,7 +31,6 @@ from sd_spec import (
     SpecError,
     compile_spec,
     echo,
-    library_needs,
     lint,
     load_spec,
 )
@@ -47,13 +46,9 @@ def main(argv: list[str] | None = None) -> int:
         "output", type=Path, nargs="?", help="New document to write, ending in .simplediagram"
     )
     parser.add_argument("--strict", action="store_true", help="Treat layout warnings as a failure")
-    parser.add_argument("--offline", action="store_true", help="Use the packaged shapes only, without a request")
     arguments = parser.parse_args(argv)
 
-    catalog = Catalog.load_current(offline=arguments.offline)
-    echo(f"Catalogue: {catalog.source}", file=sys.stderr)
-    if catalog.warning:
-        echo(catalog.warning, file=sys.stderr)
+    catalog = Catalog.load()
     try:
         spec = load_spec(arguments.spec)
         document = compile_spec(spec, catalog)
@@ -83,8 +78,6 @@ def main(argv: list[str] | None = None) -> int:
         hidden = shown[finding.code] - MAX_FINDINGS_PER_CODE
         if hidden > 0:
             echo(f"{finding.severity:8}{finding.code}: {hidden} more like these, not shown")
-    for need in library_needs(document):
-        echo(f"needs   {need}")
     elements = sum(len(page.elements) for page in document.pages)
     connectors = sum(len(page.connections) for page in document.pages)
     summary = (

@@ -33,7 +33,6 @@ from sd_spec import (
     DiagramSpec,
     SpecError,
     compile_spec,
-    library_needs,
     lint,
     load_spec,
     terminal_safe,
@@ -333,48 +332,15 @@ def test_an_edge_to_a_shape_without_connection_points_is_refused() -> None:
         )
 
 
-def test_packaged_facts_come_from_the_apps_own_list() -> None:
-    """The website copies the app's packaged libraries and may lag behind it, so a
-    packaged library or shape it does not list yet is still offered, and a packaged
-    shape's points and label come from the list made from the app, not from the website."""
-    from sd_catalog import ShapeLibraryCatalogue, _bundled_catalogue
-
-    bundled = json.loads(_bundled_catalogue().model_dump_json())
-    without_bpmn = [
-        library for library in bundled["libraries"]
-        if library["readable_id"] != "com.simplediagrams.shapeLibrary.bpmn"
-    ]
-    assert len(without_bpmn) == len(bundled["libraries"]) - 1
-    biz = next(lib for lib in without_bpmn if lib["readable_id"].endswith(".biz"))
-    biz["shapes"] = [shape for shape in biz["shapes"] if shape["slug"] != "coin-yen"]
-    website = ShapeLibraryCatalogue.model_validate_json(
-        json.dumps(bundled | {"libraries": without_bpmn})
-    )
-    plain = Catalog.from_catalogue(website, source="live")
-    assert plain.resolve("bpmn", "loop-mark") is None, "Without the app's list, nothing is added."
-
-    merged = Catalog.from_catalogue(website, source="live", packaged=Catalog.load())
-    mark = merged.resolve("bpmn", "loop-mark")
-    assert mark is not None and mark.connection_points == ()
-    assert merged.resolve("bpmn", "start-event").text_position == "below"
-    merged_bar, plain_bar = merged.resolve("uml", "fork-join-bar"), plain.resolve("uml", "fork-join-bar")
-    assert merged_bar is not None and merged_bar.resizing == "width_only"
-    assert plain_bar is not None and plain_bar.resizing == "free", "The website has no rule."
-    assert merged.resolve("biz", "coin-yen") is not None, "A newer shape in a listed library."
-    assert plain.resolve("biz", "coin-yen") is None
-    assert len(merged.shapes) == len(Catalog.load().shapes)
-
-
 def test_a_document_of_packaged_shapes_needs_nothing_more() -> None:
     """Every packaged shape and line ending is in the SimpleDiagrams that opens the file,
-    so only a downloaded library is ever named; nothing is a warning."""
+    so nothing is a warning."""
     document = compile_spec(
         _spec(
             [_box("a", 0, 0), {"key": "e", "shape": "bpmn/end-event", "label": "Done", "col": 1, "row": 0}],
             [{"source": "a", "target": "e", "end_ending": "cross"}],
         )
     )
-    assert library_needs(document) == []
     assert lint(document) == []
 
 
@@ -512,7 +478,7 @@ def test_nothing_that_exists_is_ever_overwritten(tmp_path: Path) -> None:
 
 def _run(script: str, *arguments: object) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
-        [sys.executable, str(ROOT / "scripts" / script), "--offline", *map(str, arguments)],
+        [sys.executable, str(ROOT / "scripts" / script), *map(str, arguments)],
         capture_output=True, text=True, check=False, cwd="/",
     )
 
@@ -540,7 +506,7 @@ def test_build_refuses_bad_specs_before_writing(tmp_path: Path) -> None:
     huge.write_text(" " * (2 * 1024 * 1024 + 1))
     unknown = tmp_path / "unknown.json"
     unknown.write_text(json.dumps({"name": "X", "pages": [{"nodes": [{"key": "a", "shape": "aws/S3", "col": 0, "row": 0}]}]}))
-    for spec, message in ((huge, "limit"), (unknown, "not in the selected catalogue"), (tmp_path / "absent.json", "Cannot read")):
+    for spec, message in ((huge, "limit"), (unknown, "not one of the shapes packaged"), (tmp_path / "absent.json", "Cannot read")):
         result = _run("build_diagram.py", spec, target)
         assert result.returncode == 1 and message in result.stdout, result.stdout
     assert not target.exists()
@@ -598,184 +564,34 @@ def test_versions_are_stated_consistently() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Shapes from downloaded libraries, placed by their published references
+# Only packaged shapes
 # ---------------------------------------------------------------------------
 
-NOTEBOOK_ID = "79FFE4B7-EA0D-87C3-AE89-D4CD62AF5202"
-GARDEN_ID = "11111111-2222-4333-8444-666666666666"
+
+def test_a_shape_from_a_downloadable_library_is_refused() -> None:
+    """The skill knows only the shapes packaged with SimpleDiagrams; a selector for any
+    other library must stop the build and say so, never write a placeholder."""
+    spec = _spec([{"key": "t", "shape": "notebook/transformer", "x": 0, "y": 0}])
+    with pytest.raises(SpecError, match="not one of the shapes packaged with SimpleDiagrams 5.1.0"):
+        compile_spec(spec)
 
 
-def _downloaded(
-    library_id: str, short: str, name: str, item: str, slug: str,
-    points: tuple[tuple[int, float, float], ...] | None = None,
-) -> CatalogShape:
-    """A downloadable catalogue shape, with its own connection points when given."""
-    return CatalogShape(
-        library_id=library_id, library_short_name=short, library_display_name=name,
-        asset_version=1, item_id=item, display_name=slug.title(), default_width=61,
-        default_height=37.375, built_in=False, slug=slug, connection_points=points,
+def test_lint_flags_a_reference_the_app_does_not_package() -> None:
+    """A document whose reference is not in the packaged list would open with a dashed
+    placeholder, so the validator reports it as an error naming the reference."""
+    outsider = CatalogShape(
+        library_id="79FFE4B7-EA0D-87C3-AE89-D4CD62AF5202", library_short_name="notebook",
+        library_display_name="Notebook", asset_version=1,
+        item_id="A5C619FD-0E22-8EF7-8299-45280EA3F738", display_name="Transformer",
+        default_width=61, default_height=37.375,
     )
-
-
-def _catalog_with_downloads() -> Catalog:
-    """The packaged list plus two invented downloadable libraries."""
-    packaged = Catalog.load().shapes
-    return Catalog(
-        packaged
-        + [
-            _downloaded(NOTEBOOK_ID, "notebook", "Hobby Electronics Notebook",
-                        "A5C619FD-0E22-8EF7-8299-45280EA3F738", "transformer"),
-            _downloaded(NOTEBOOK_ID, "notebook", "Hobby Electronics Notebook",
-                        "0B6E2C1A-6F3D-8E21-9C4B-7D5A1E2F3C4D", "switch"),
-            _downloaded(GARDEN_ID, "garden", "Green Walls",
-                        "22222222-3333-4444-8555-666666666666", "planter"),
-        ],
-        "test",
-    )
-
-
-def _downloaded_spec(*shapes: str) -> DiagramSpec:
-    """One page placing each selector in a row."""
-    return DiagramSpec.model_validate(
-        {
-            "name": "Downloaded shapes",
-            "pages": [
-                {
-                    "nodes": [
-                        {"key": f"n{index}", "shape": shape, "col": index, "row": 0}
-                        for index, shape in enumerate(shapes)
-                    ]
-                }
-            ],
-        }
-    )
-
-
-def test_downloaded_shapes_are_placed_by_their_published_reference() -> None:
-    """The app resolves the reference only if it is exactly the catalogue's."""
-    document = compile_spec(_downloaded_spec("notebook/transformer"), _catalog_with_downloads())
-
-    reference = document.pages[0].elements[0].core.symbol_reference
-    assert reference is not None
-    assert (reference.library_id, reference.item_id, reference.asset_version) == (
-        NOTEBOOK_ID, "A5C619FD-0E22-8EF7-8299-45280EA3F738", 1,
-    )
-
-
-def test_each_downloaded_library_is_named_once_in_the_order_first_used() -> None:
-    """The app names missing libraries from this list, so each appears once, by its name."""
-    document = compile_spec(
-        _downloaded_spec("notebook/transformer", "garden/planter", "notebook/switch", "basic/Square"),
-        _catalog_with_downloads(),
-    )
-
-    assert [(lib.library_id, lib.display_name) for lib in document.required_libraries or []] == [
-        (NOTEBOOK_ID, "Hobby Electronics Notebook"), (GARDEN_ID, "Green Walls"),
-    ]
-    assert all(lib.minimum_revision is None for lib in document.required_libraries or [])
-
-
-def test_a_document_of_packaged_shapes_names_no_library() -> None:
-    """Only a downloaded shape adds a library to the document's list."""
-    document = compile_spec(_downloaded_spec("basic/Square"), _catalog_with_downloads())
-
-    assert document.required_libraries is None
-
-
-def test_lint_accepts_downloaded_shapes_and_still_flags_unknown_ones() -> None:
-    """A catalogued downloaded shape is not a defect; a reference nothing knows still is."""
-    catalog = _catalog_with_downloads()
-    document = compile_spec(_downloaded_spec("notebook/transformer"), catalog)
+    catalog = Catalog(Catalog.load().shapes + [outsider], "test")
+    document = compile_spec(_spec([{"key": "t", "shape": "notebook/A5C619FD-0E22-8EF7-8299-45280EA3F738", "x": 0, "y": 0}]), catalog)
 
     assert not [f for f in lint(document, catalog) if f.code == "unresolved-shape"]
-    assert [f.code for f in lint(document) if f.severity == "error"] == ["unresolved-shape"]
-
-
-def test_the_build_says_which_library_a_document_needs() -> None:
-    """Whoever sends the file must be able to say which library shows its shapes."""
-    needs = library_needs(compile_spec(_downloaded_spec("notebook/transformer"), _catalog_with_downloads()))
-
-    assert needs == [
-        (
-            "the Hobby Electronics Notebook library installed, to show its shapes; without it "
-            "they are placeholder boxes, and SimpleDiagrams names the library and links to its page"
-        )
-    ]
-
-
-def test_paint_on_a_downloaded_shape_is_reported_as_unused() -> None:
-    """The app draws a downloaded shape in its library's own colours, so a spec's paint on
-    one would silently vanish; the same paint on a packaged shape is used and not reported."""
-    catalog = _catalog_with_downloads()
-    spec = _downloaded_spec("notebook/transformer", "basic/Square")
-    painted = spec.model_copy(deep=True)
-    for node in painted.pages[0].nodes:
-        node.fill = "#FF0000"
-
-    def codes(document_spec: DiagramSpec) -> list[str]:
-        return [f.code for f in lint(compile_spec(document_spec, catalog), catalog)]
-
-    assert codes(painted).count("downloaded-shape-paint") == 1
-    assert "downloaded-shape-paint" not in codes(spec)
-
-
-@pytest.mark.parametrize("name", ["Bad\nName", "\u202eEvil", "   ", "\u200b"])
-def test_a_library_name_a_document_cannot_hold_stops_the_build_plainly(name: str) -> None:
-    """Catalogue text is untrusted; a name the app would drop must fail the build with a
-    message naming the library, not a validation dump."""
-    odd = _downloaded(GARDEN_ID, "garden", name, "22222222-3333-4444-8555-666666666666", "planter")
-    catalog = Catalog(Catalog.load().shapes + [odd], "test")
-    with pytest.raises(SpecError, match=GARDEN_ID):
-        compile_spec(_downloaded_spec("garden/planter"), catalog)
-
-
-def test_more_libraries_than_a_document_can_name_stops_the_build_plainly() -> None:
-    """The app keeps at most 64 entries, so a 65th library is refused with the reason."""
-    shapes = [
-        _downloaded(f"00000000-0000-4000-8000-{index:012d}", f"lib{index}", f"Library {index}",
-                    f"00000000-0000-4000-9000-{index:012d}", "shape")
-        for index in range(wire.MAX_REQUIRED_LIBRARIES + 1)
-    ]
-    catalog = Catalog(Catalog.load().shapes + shapes, "test")
-    selectors = [f"lib{index}/shape" for index in range(wire.MAX_REQUIRED_LIBRARIES + 1)]
-    with pytest.raises(SpecError, match="at most 64"):
-        compile_spec(_downloaded_spec(*selectors), catalog)
-
-
-def test_a_wide_label_on_a_downloaded_shape_is_centred_on_it() -> None:
-    """A downloaded shape's label follows the same rule as a packaged one's."""
-    spec = _downloaded_spec("notebook/transformer")
-    node = spec.pages[0].nodes[0]
-    node.label, node.label_position = "A label far wider than the shape", "below"
-    page = compile_spec(spec, _catalog_with_downloads()).pages[0]
-
-    (shape,) = page.elements
-    layout = shape.content.text_layout
-    assert shape.core.symbol_reference is not None
-    assert shape.core.text_content.string == "A label far wider than the shape"
-    assert layout is not None and layout.frame.width > 1 and layout.frame.x < 0
-
-
-def test_a_shared_short_name_gets_a_selector_that_still_builds() -> None:
-    """Two libraries may share a short name; the selector offered must name one of them."""
-    other = _downloaded(GARDEN_ID, "notebook", "Another Notebook",
-                        "22222222-3333-4444-8555-777777777777", "transformer")
-    catalog = Catalog(_catalog_with_downloads().shapes + [other], "test")
-    selector = catalog.selector(other)
-
-    assert selector == f"{GARDEN_ID}/transformer"
-    reference = compile_spec(_downloaded_spec(selector), catalog).pages[0].elements[0].core.symbol_reference
-    assert reference is not None and reference.item_id == other.item_id
-
-
-def test_a_missing_downloadable_shape_says_how_to_find_it() -> None:
-    """With only packaged shapes (offline, or after a failed request) the error says a
-    downloadable shape needs the catalogue; with it, a mistyped slug is matched."""
-    with pytest.raises(SpecError, match="needs a successful catalogue request"):
-        compile_spec(_downloaded_spec("notebook/transformer"), Catalog.load())
-    with pytest.raises(SpecError, match="notebook/transformer") as failure:
-        compile_spec(_downloaded_spec("notebook/transform"), _catalog_with_downloads())
-    assert "successful catalogue request" not in str(failure.value)
+    errors = [f for f in lint(document) if f.severity == "error"]
+    assert [f.code for f in errors] == ["unresolved-shape"]
+    assert "not packaged with SimpleDiagrams 5.1.0" in errors[0].message
 
 
 # ---------------------------------------------------------------------------
@@ -798,7 +614,11 @@ def _parts_catalog(*shapes: CatalogShape) -> Catalog:
 
 def _part(slug: str, points: tuple[tuple[int, float, float], ...] | None) -> CatalogShape:
     """An invented part in a 'parts' library, with the given connection points."""
-    return _downloaded(NOTEBOOK_ID, "parts", "Parts", f"00000000-0000-4000-8000-{len(slug):012d}", slug, points)
+    return CatalogShape(
+        library_id="com.simplediagrams.shapeLibrary.parts", library_short_name="parts",
+        library_display_name="Parts", asset_version=1, item_id=slug, display_name=slug.title(),
+        default_width=61, default_height=37.375, connection_points=points,
+    )
 
 
 def _wired(nodes: list[dict], edges: list[dict]) -> DiagramSpec:
@@ -1215,7 +1035,7 @@ def test_building_and_previewing_store_nothing_but_the_named_output(tmp_path: Pa
     before = _bytecode(ROOT)
     for script, output in (("build_diagram.py", "Out.simplediagram"), ("preview_diagram.py", "out.svg")):
         result = subprocess.run(
-            [sys.executable, str(ROOT / "scripts" / script), "--offline", str(spec), output],
+            [sys.executable, str(ROOT / "scripts" / script), str(spec), output],
             capture_output=True, text=True, check=False, cwd=work, env=environment,
         )
         assert result.returncode == 0, result.stdout + result.stderr
@@ -1244,7 +1064,7 @@ def test_the_scripts_write_no_bytecode_even_when_python_would(tmp_path: Path) ->
         ["find_shapes.py", "database"],
     ):
         result = subprocess.run(
-            [sys.executable, str(copy / "scripts" / command[0]), "--offline", *command[1:]],
+            [sys.executable, str(copy / "scripts" / command[0]), *command[1:]],
             capture_output=True, text=True, check=False, cwd=tmp_path, env=environment,
         )
         assert result.returncode == 0, result.stdout + result.stderr

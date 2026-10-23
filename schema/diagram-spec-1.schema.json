@@ -318,7 +318,7 @@
      "type": "string"
     },
     "shape": {
-     "description": "rectangle, ellipse, note or text for a plain drawn shape; container, swimlanes, table, callout or lifeline for a shape SimpleDiagrams draws itself; or '<library>/<item>' for a library shape, for example 'basic/Cylinder'. Use a selector returned by find_shapes.py, which searches the API and falls back to assets/built-in-shapes.json offline. A packaged shape needs nothing installed; a downloadable one needs its library installed.",
+     "description": "rectangle, ellipse, note or text for a plain drawn shape; container, swimlanes, table, callout or lifeline for a shape SimpleDiagrams draws itself; or '<library>/<item>' for a shape from a library packaged with SimpleDiagrams, for example 'basic/Cylinder'. Use a selector returned by find_shapes.py, which searches assets/built-in-shapes.json.",
      "maxLength": 512,
      "minLength": 1,
      "title": "Shape",
