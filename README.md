@@ -2,7 +2,7 @@
 
 This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It uses the shapes packaged with SimpleDiagrams and a small JSON spec for nodes, labels, positions and connectors. The builder writes the document package and checks its structure and layout.
 
-It writes document format 18, which needs SimpleDiagrams 5.1.0 or later for macOS. The skill carries the list of the 534 shapes packaged with SimpleDiagrams 5.1.0, in eight libraries, and makes no network request. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached.
+It writes document format 18, which needs SimpleDiagrams 5.1.0 or later for macOS. The skill carries the list of the 534 shapes packaged with SimpleDiagrams 5.1.0, in eight libraries, and makes no network request. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached. Download it only with uv 0.13.4 or later, or pip 26.2.2 or later: older versions still trust the certificate authority withdrawn after the October 2026 eMudhra (emSign) certificate incident, so a download could be tampered with.
 
 ## Install
 
