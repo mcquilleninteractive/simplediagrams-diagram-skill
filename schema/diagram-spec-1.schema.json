@@ -227,6 +227,45 @@
    "title": "EdgeSpec",
    "type": "object"
   },
+  "FieldSpec": {
+   "additionalProperties": false,
+   "description": "One field of an entity table: a row of its name and type.",
+   "properties": {
+    "name": {
+     "maxLength": 2000,
+     "title": "Name",
+     "type": "string"
+    },
+    "type": {
+     "default": "",
+     "maxLength": 2000,
+     "title": "Type",
+     "type": "string"
+    },
+    "marks": {
+     "default": [],
+     "description": "What the field is, drawn as small icons beside its name.",
+     "items": {
+      "enum": [
+       "primary_key",
+       "foreign_key",
+       "unique",
+       "indexed",
+       "nullable"
+      ],
+      "type": "string"
+     },
+     "maxItems": 8,
+     "title": "Marks",
+     "type": "array"
+    }
+   },
+   "required": [
+    "name"
+   ],
+   "title": "FieldSpec",
+   "type": "object"
+  },
   "GridLayout": {
    "additionalProperties": false,
    "description": "Turns `col` and `row` into page coordinates.\n\nA node's centre sits at `origin + (col * column_pitch, row * row_pitch)`.\nFractional columns and rows are allowed for staggered layouts.",
@@ -273,7 +312,7 @@
    "properties": {
     "title": {
      "default": "",
-     "maxLength": 2000,
+     "maxLength": 1000,
      "title": "Title",
      "type": "string"
     },
@@ -318,7 +357,7 @@
      "type": "string"
     },
     "shape": {
-     "description": "rectangle, ellipse, note or text for a plain drawn shape; container, swimlanes, table, callout or lifeline for a shape SimpleDiagrams draws itself; or '<library>/<item>' for a shape from a library packaged with SimpleDiagrams, for example 'basic/Cylinder'. Use a selector returned by find_shapes.py, which searches assets/built-in-shapes.json.",
+     "description": "rectangle, ellipse, note or text for a plain drawn shape; container, swimlanes, table, entity_table, callout, lifeline, ring, flow, pyramid, cycle or gauge for a shape SimpleDiagrams draws itself; or '<library>/<item>' for a shape from a library packaged with SimpleDiagrams, for example 'basic/Cylinder'. Use a selector returned by find_shapes.py, which searches assets/built-in-shapes.json.",
      "maxLength": 512,
      "minLength": 1,
      "title": "Shape",
@@ -498,6 +537,21 @@
      "default": null,
      "title": "Text Color"
     },
+    "highlight": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "A highlight colour behind the words, like a highlighter pen.",
+     "title": "Highlight"
+    },
     "font_size": {
      "default": 15,
      "maximum": 720,
@@ -560,6 +614,27 @@
      "description": "Complex shapes are drawn with gently uneven lines; false draws them exactly.",
      "title": "Hand Drawn"
     },
+    "note_style": {
+     "anyOf": [
+      {
+       "enum": [
+        "stickyNote",
+        "indexCard",
+        "tapedNote",
+        "tag",
+        "notebookPage",
+        "pinnedNote"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "note: its look, placed at that look's own size and colours unless the spec sets them: stickyNote, indexCard, tapedNote, tag, notebookPage or pinnedNote.",
+     "title": "Note Style"
+    },
     "members": {
      "anyOf": [
       {
@@ -594,6 +669,23 @@
      "default": null,
      "description": "container: 'band', the title across its top (the default), or 'corner_tag', a UML frame's name tag in its top-left corner.",
      "title": "Title Style"
+    },
+    "layout": {
+     "anyOf": [
+      {
+       "enum": [
+        "free",
+        "proportional"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "container: 'free' keeps shapes where they are put (the default); with 'proportional', resizing it in the app spreads the shapes inside, keeping their sizes.",
+     "title": "Layout"
     },
     "messages": {
      "anyOf": [
@@ -635,7 +727,11 @@
       {
        "enum": [
         "horizontal",
-        "vertical"
+        "vertical",
+        "across",
+        "down",
+        "clockwise",
+        "anticlockwise"
        ],
        "type": "string"
       },
@@ -644,7 +740,7 @@
       }
      ],
      "default": null,
-     "description": "swimlanes: 'horizontal' lanes run across the page as rows (the default); 'vertical' lanes run down it as columns.",
+     "description": "swimlanes: 'horizontal' lanes run across the page as rows (the default); 'vertical' lanes run down it as columns. flow: 'across' (the default) or 'down'. cycle: 'clockwise' (the default) or 'anticlockwise'.",
      "title": "Direction"
     },
     "lanes": {
@@ -737,6 +833,290 @@
      "default": null,
      "description": "table: each row's height; by default each is sized to its text.",
      "title": "Row Heights"
+    },
+    "fields": {
+     "anyOf": [
+      {
+       "items": {
+        "$ref": "#/$defs/FieldSpec"
+       },
+       "maxItems": 60,
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "entity_table: its fields, each owning connection points of its own; the node's label is the entity's name.",
+     "title": "Fields"
+    },
+    "sections": {
+     "anyOf": [
+      {
+       "items": {
+        "anyOf": [
+         {
+          "maxLength": 2000,
+          "type": "string"
+         },
+         {
+          "$ref": "#/$defs/PartSpec"
+         }
+        ]
+       },
+       "maxItems": 12,
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "ring: its sections, clockwise from twelve o'clock.",
+     "title": "Sections"
+    },
+    "ring_width": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "const": "full",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "ring: how wide the band is in points, a multiple of 10 (40 by default), or 'full' for a solid pie. cycle: the same (50 by default), without 'full'.",
+     "title": "Ring Width"
+    },
+    "steps": {
+     "anyOf": [
+      {
+       "items": {
+        "anyOf": [
+         {
+          "maxLength": 2000,
+          "type": "string"
+         },
+         {
+          "$ref": "#/$defs/PartSpec"
+         }
+        ]
+       },
+       "maxItems": 12,
+       "minItems": 2,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "flow: its steps, first to last, 2 to 12. cycle: its steps from twelve o'clock, 3 to 8.",
+     "title": "Steps"
+    },
+    "base_shape": {
+     "anyOf": [
+      {
+       "enum": [
+        "chevron",
+        "arrow_box",
+        "block_arrow",
+        "rectangle",
+        "rounded_rectangle",
+        "circle",
+        "hexagon"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "flow: the shape every step takes; 'chevron' by default.",
+     "title": "Base Shape"
+    },
+    "spacing": {
+     "anyOf": [
+      {
+       "enum": [
+        "gap",
+        "touch",
+        "overlap"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "flow: how neighbouring steps meet, 'gap' by default. Only rectangle, rounded_rectangle and circle steps can overlap.",
+     "title": "Spacing"
+    },
+    "pointer": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "flow: whether each step but the last has a small point at its front. Only rectangle, rounded_rectangle and circle steps can.",
+     "title": "Pointer"
+    },
+    "layers": {
+     "anyOf": [
+      {
+       "items": {
+        "anyOf": [
+         {
+          "maxLength": 2000,
+          "type": "string"
+         },
+         {
+          "$ref": "#/$defs/PartSpec"
+         }
+        ]
+       },
+       "maxItems": 8,
+       "minItems": 2,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "pyramid: its layers from the top, 2 to 8.",
+     "title": "Layers"
+    },
+    "form": {
+     "anyOf": [
+      {
+       "enum": [
+        "pyramid",
+        "funnel"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "pyramid: 'pyramid', apex at the top (the default), or 'funnel', wide at the top and narrowing to a spout.",
+     "title": "Form"
+    },
+    "arrow_style": {
+     "anyOf": [
+      {
+       "enum": [
+        "arrow",
+        "chevron"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "cycle: each step a curved 'arrow' (the default) or a 'chevron'.",
+     "title": "Arrow Style"
+    },
+    "bands": {
+     "anyOf": [
+      {
+       "items": {
+        "anyOf": [
+         {
+          "maxLength": 2000,
+          "type": "string"
+         },
+         {
+          "$ref": "#/$defs/PartSpec"
+         }
+        ]
+       },
+       "maxItems": 5,
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "gauge: its bands from the minimum to the maximum, 1 to 5. The node's label is its caption.",
+     "title": "Bands"
+    },
+    "minimum": {
+     "anyOf": [
+      {
+       "maximum": 1000000,
+       "minimum": -1000000,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "gauge: the range's left end, 0 by default.",
+     "title": "Minimum"
+    },
+    "maximum": {
+     "anyOf": [
+      {
+       "maximum": 1000000,
+       "minimum": -1000000,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "gauge: the range's right end, 100 by default.",
+     "title": "Maximum"
+    },
+    "value": {
+     "anyOf": [
+      {
+       "maximum": 1000000,
+       "minimum": -1000000,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "gauge: where the needle points; the middle of the range by default.",
+     "title": "Value"
+    },
+    "auto_rotate_labels": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "gauge: whether each band's words follow their band (the default) or stay level.",
+     "title": "Auto Rotate Labels"
     },
     "tail_to": {
      "anyOf": [
@@ -898,6 +1278,62 @@
     "nodes"
    ],
    "title": "PageSpec",
+   "type": "object"
+  },
+  "PartSpec": {
+   "additionalProperties": false,
+   "description": "One section, step, layer or band with paint of its own. A plain string is the same\nwith only a label.",
+   "properties": {
+    "label": {
+     "default": "",
+     "maxLength": 2000,
+     "title": "Label",
+     "type": "string"
+    },
+    "fill": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Fill"
+    },
+    "stroke": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Stroke"
+    },
+    "line_width": {
+     "anyOf": [
+      {
+       "maximum": 10000,
+       "minimum": 0,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Line Width"
+    }
+   },
+   "title": "PartSpec",
    "type": "object"
   }
  },

@@ -1,0 +1,26 @@
+{
+ "spec_version": 1,
+ "name": "Orders database",
+ "pages": [
+  {
+   "name": "Tables",
+   "grid": {"origin_x": 200, "origin_y": 160, "column_pitch": 400, "row_pitch": 240},
+   "nodes": [
+    {"key": "customer", "shape": "entity_table", "label": "Customer", "col": 0, "row": 0, "fields": [
+      {"name": "id", "type": "uuid", "marks": ["primary_key"]},
+      {"name": "email", "type": "text", "marks": ["unique", "indexed"]},
+      {"name": "nickname", "type": "text", "marks": ["nullable"]}
+    ]},
+    {"key": "order", "shape": "entity_table", "label": "Order", "col": 1, "row": 0, "fields": [
+      {"name": "id", "type": "uuid", "marks": ["primary_key"]},
+      {"name": "customer_id", "type": "uuid", "marks": ["foreign_key", "indexed"]},
+      {"name": "placed_at", "type": "timestamp"}
+    ]}
+   ],
+   "edges": [
+    {"source": "customer", "target": "order", "source_point": 9, "target_point": 10,
+     "start_ending": "oneAndOnlyOne", "end_ending": "zeroOrMany"}
+   ]
+  }
+ ]
+}

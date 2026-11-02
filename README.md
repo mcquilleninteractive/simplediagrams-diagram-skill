@@ -1,8 +1,8 @@
 # Build SimpleDiagrams diagrams
 
-This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It uses the shapes packaged with SimpleDiagrams and a small JSON spec for nodes, labels, positions and connectors. The builder writes the document package and checks its structure and layout.
+This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It uses the shapes packaged with SimpleDiagrams, the shapes the app draws itself (containers, swimlanes, tables and database tables, callouts, UML lifelines, process flows, pyramids and funnels, donut and pie charts, cycles and gauges) and a small JSON spec for nodes, labels, positions and connectors. The builder writes the document package and checks its structure and layout.
 
-It writes document format 18, which needs SimpleDiagrams 5.1.0 or later for macOS. The skill carries the list of the 534 shapes packaged with SimpleDiagrams 5.1.0, in eight libraries, and makes no network request. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached. Download it only with uv 0.13.4 or later, or pip 26.2.2 or later: older versions still trust the certificate authority withdrawn after the October 2026 eMudhra (emSign) certificate incident, so a download could be tampered with.
+It writes document format 19, which needs SimpleDiagrams 5.2.0 or later for macOS. The skill carries the list of the 534 shapes packaged with SimpleDiagrams 5.2.0, in eight libraries, and makes no network request. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached. Download it only with uv 0.13.4 or later, or pip 26.2.2 or later: older versions still trust the certificate authority withdrawn after the October 2026 eMudhra (emSign) certificate incident, so a download could be tampered with.
 
 See the [privacy policy](PRIVACY.md) for how the skill and your chosen AI application handle data.
 
@@ -36,12 +36,14 @@ To install by copying, keep the folder name `simplediagrams-diagram-skill`.
 - "Diagram the architecture described in this repository's README."
 - "Make an org chart for this team."
 - "Turn this procedure into a flowchart."
+- "Draw our sales funnel, with the stages from this report."
+- "Draw these database tables and the relationships between their fields."
 - "Redraw this whiteboard photo as a diagram."
 
 ## Scope
 
 - Creates new documents using native rectangles, ellipses, notes, text, connectors, and the eight bundled shape libraries, BPMN and UML included. A library shape gets the connection points and label placement its library gives it, as in the app.
-- Draws the complex shapes SimpleDiagrams draws itself: containers fitted around the shapes they hold, swimlanes and BPMN pools with members in each lane, tables such as UML class, interface, enumeration and entity boxes, callouts whose tails lock to a shape, and UML sequence diagrams with lifelines, messages attached along them, destroy marks, frames and alt, loop and opt fragments.
+- Draws the complex shapes SimpleDiagrams draws itself: containers fitted around the shapes they hold, swimlanes and BPMN pools with members in each lane, tables such as UML class, interface and enumeration boxes, database tables with field marks and relationships ending on a field, process flows, pyramids and funnels, donut and pie charts, cycles, gauges, callouts whose tails lock to a shape, and UML sequence diagrams with lifelines, messages attached along them, destroy marks, frames and alt, loop and opt fragments.
 - Searches the packaged shapes by name, description and keyword, and places each by the app's own reference. Shapes from downloadable or personal libraries, embedded images and shape data are outside this authoring profile.
 - Redraws a pictured diagram as boxes and connectors. It does not trace artwork or handwriting or embed the picture. A connector can attach to any connection point a shape has.
 - Never overwrites an existing document. Keep the JSON spec to rebuild under a new name.
@@ -68,10 +70,12 @@ The first command checks without writing. The second creates the package at a ne
 | `assets/built-in-shapes.json` | The 534 packaged shapes, with their connection points and label placement |
 | `assets/example-spec.json` | Example input |
 | `assets/example-bpmn-spec.json`, `assets/example-sequence-spec.json`, `assets/example-class-spec.json` | Examples with complex shapes: a BPMN pool with lanes, a UML sequence diagram, UML classes as tables |
+| `assets/example-business-spec.json`, `assets/example-database-spec.json` | Examples with the shapes drawn from their parts: a flow, a funnel, a pie, a cycle and a gauge; database tables with a relationship between two fields |
 | `scripts/find_shapes.py` | Search the packaged shapes' names, descriptions and keywords |
 | `scripts/build_diagram.py` | Check a spec and build a new package |
 | `scripts/preview_diagram.py` | Render a new wireframe SVG from a spec |
 | `scripts/sd_spec.py`, `scripts/sd_format.py`, `scripts/sd_package.py` | Spec compiler, format models, and package writer (checked in memory before writing) |
 | `schema/` | Generated JSON Schemas |
+| `maintainers/` | Checks for a release: the JSON Schema generator, and a comparison with SimpleDiagrams' own reader |
 
 The skill is MIT licensed. SimpleDiagrams and its built-in shapes have separate licenses.

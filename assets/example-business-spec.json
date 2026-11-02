@@ -1,0 +1,29 @@
+{
+ "spec_version": 1,
+ "name": "Quarterly review",
+ "pages": [
+  {
+   "name": "Overview",
+   "grid": {"origin_x": 220, "origin_y": 120, "column_pitch": 400, "row_pitch": 300},
+   "nodes": [
+    {"key": "roadmap", "shape": "flow", "x": 620, "y": 80, "steps": [
+      "Discover", "Design", "Build", {"label": "Launch", "fill": "#DDF5E3"}
+    ]},
+    {"key": "sales", "shape": "pyramid", "form": "funnel", "col": 0, "row": 1, "layers": [
+      {"label": "Visitors", "fill": "#D8ECFF"}, "Leads", "Trials", "Sales"
+    ]},
+    {"key": "revenue", "shape": "ring", "col": 1, "row": 1, "ring_width": "full", "sections": [
+      {"label": "Direct", "fill": "#FFF1A8"}, {"label": "Partners", "fill": "#D8ECFF"}, {"label": "Online", "fill": "#DDF5E3"}
+    ]},
+    {"key": "review", "shape": "cycle", "col": 2, "row": 1, "steps": ["Plan", "Do", "Check", "Act"]},
+    {"key": "load", "shape": "gauge", "label": "Team load", "col": 1, "row": 2, "value": 72, "bands": [
+      {"label": "Low", "fill": "#DDF5E3"}, {"label": "OK", "fill": "#FFF1A8"}, {"label": "High", "fill": "#FFD8D8"}
+    ]},
+    {"key": "note", "shape": "note", "note_style": "pinnedNote", "label": "Review again in January", "col": 2, "row": 2}
+   ],
+   "edges": [
+    {"source": "roadmap", "target": "review", "source_point": 15, "target_point": 2}
+   ]
+  }
+ ]
+}

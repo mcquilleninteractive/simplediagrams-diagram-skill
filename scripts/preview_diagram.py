@@ -9,8 +9,10 @@ Give it a diagram spec to look at a layout before the document is built.
 
 Each shape is drawn as its frame with its label, and each connector as its
 stored route. A complex shape is drawn as its parts: a container's title, lanes
-and their titles, a table's cells, a callout's tail and a lifeline's head and
-line. This shows spacing, alignment, crossings and label fit. It does not draw
+and their titles, a table's cells, a callout's tail, a lifeline's head and line,
+and the sections, steps, layers and bands of a ring, flow, pyramid, cycle or gauge,
+with each step or layer as a plain outline. This shows spacing, alignment, crossings
+and label fit. It does not draw
 the library artwork, fonts or hand-drawn line style; only SimpleDiagrams does
 that.
 """
@@ -23,6 +25,7 @@ import sys
 sys.dont_write_bytecode = True
 
 import argparse
+import math
 import re
 from html import escape as _escape_markup
 from pathlib import Path
@@ -172,32 +175,34 @@ def _complex_svg(element: wire.Element) -> list[str]:
             parts.append(_text(f.x + 12, f.y + 21, title, size, "start"))
     elif shape.type == "swimlanes":
         parts.append(f'<rect x="{f.x:g}" y="{f.y:g}" width="{f.width:g}" height="{f.height:g}" fill="{fill}" {stroke}/>')
-        band = shape.title_band_size or wire.SWIMLANES_STRIP
-        strip = shape.title_strip_size or wire.SWIMLANES_STRIP
+        band = float(shape.settings["title_band_size"])
+        strip = float(shape.settings["title_strip_size"])
+        horizontal = shape.settings["direction"] == "horizontal"
         parts.append(f'<line x1="{f.x:g}" y1="{f.y + band:g}" x2="{f.x + f.width:g}" y2="{f.y + band:g}" {stroke}/>')
         parts.append(_text(f.x + f.width / 2, f.y + band / 2 + size * 0.35, title, size))
-        for index, (lane, lane_frame) in enumerate(zip(shape.lanes or [], wire.swimlane_frames(shape, f), strict=True)):
-            if shape.direction == "horizontal":
+        for index, (lane, lane_frame) in enumerate(zip(shape.lanes, wire.swimlane_frames(shape, f), strict=True)):
+            assert lane.text is not None
+            if horizontal:
                 if index:
                     parts.append(f'<line x1="{f.x:g}" y1="{lane_frame.y:g}" x2="{f.x + f.width:g}" y2="{lane_frame.y:g}" {stroke}/>')
                 cx, cy = f.x + strip / 2, lane_frame.y + lane_frame.height / 2
-                parts.append(_text(cx, cy + size * 0.35, lane.title.string, size, extra=f' transform="rotate(-90 {cx:g} {cy:g})"'))
+                parts.append(_text(cx, cy + size * 0.35, lane.text.string, size, extra=f' transform="rotate(-90 {cx:g} {cy:g})"'))
             else:
                 if index:
                     parts.append(f'<line x1="{lane_frame.x:g}" y1="{lane_frame.y:g}" x2="{lane_frame.x:g}" y2="{f.y + f.height:g}" {stroke}/>')
-                parts.append(_text(lane_frame.x + lane_frame.width / 2, lane_frame.y + strip / 2 + size * 0.35, lane.title.string, size))
-        if shape.direction == "horizontal":
+                parts.append(_text(lane_frame.x + lane_frame.width / 2, lane_frame.y + strip / 2 + size * 0.35, lane.text.string, size))
+        if horizontal:
             parts.append(f'<line x1="{f.x + strip:g}" y1="{f.y + band:g}" x2="{f.x + strip:g}" y2="{f.y + f.height:g}" {stroke}/>')
         else:
             parts.append(f'<line x1="{f.x:g}" y1="{f.y + band + strip:g}" x2="{f.x + f.width:g}" y2="{f.y + band + strip:g}" {stroke}/>')
-    elif shape.type == "table":
-        rows, columns = shape.row_sizes or [], shape.column_sizes or []
+    elif shape.type in ("table", "entity_table"):
+        rows, columns = shape.row_sizes, shape.column_sizes
         heights = [share / sum(rows) * f.height for share in rows]
         widths = [share / sum(columns) * f.width for share in columns]
-        header = shape.header_row is None
+        header = shape.settings.get("header_row", True)
         parts.append(f'<rect x="{f.x:g}" y="{f.y:g}" width="{f.width:g}" height="{f.height:g}" fill="none" {stroke}/>')
         y = f.y
-        for row, (height, cells) in enumerate(zip(heights, shape.cells or [], strict=True)):
+        for row, (height, cells) in enumerate(zip(heights, shape.cell_rows, strict=True)):
             if header and row == 0:
                 parts.append(f'<rect x="{f.x:g}" y="{y:g}" width="{f.width:g}" height="{height:g}" fill="{fill}" {stroke}/>')
             x = f.x
@@ -221,7 +226,7 @@ def _complex_svg(element: wire.Element) -> list[str]:
     elif shape.type == "lifeline":
         start, end = wire.lifeline_line(shape, f)
         cx = f.x + f.width / 2
-        if shape.head_style == "actor":
+        if shape.settings["head_style"] == "actor":
             parts.append(f'<circle cx="{cx:g}" cy="{f.y + 8:g}" r="7" fill="none" {stroke}/>')
             parts.append(f'<polyline points="{cx - 12:g},{f.y + 22:g} {cx + 12:g},{f.y + 22:g}" fill="none" {stroke}/>')
             parts.append(f'<polyline points="{cx:g},{f.y + 15:g} {cx:g},{f.y + 34:g} {cx - 10:g},{f.y + 48:g}" fill="none" {stroke}/>')
@@ -231,10 +236,106 @@ def _complex_svg(element: wire.Element) -> list[str]:
             parts.append(f'<rect x="{f.x:g}" y="{f.y:g}" width="{f.width:g}" height="{start:g}" fill="{fill}" {stroke}/>')
             parts.append(_text(cx, f.y + start / 2 + size * 0.35, title, size))
         parts.append(f'<line x1="{cx:g}" y1="{f.y + start:g}" x2="{cx:g}" y2="{f.y + end:g}" stroke-dasharray="8 5" {stroke}/>')
-        if shape.ends_in_destroy_mark:
+        if shape.settings["ends_in_destroy_mark"]:
             half = wire.DESTROY_MARK_SIZE / 2
             y = f.y + end
             parts.append(f'<path d="M{cx - half:g} {y - half:g}L{cx + half:g} {y + half:g}M{cx + half:g} {y - half:g}L{cx - half:g} {y + half:g}" {stroke}/>')
+    else:
+        parts += _parts_svg(element, fill, stroke)
+    return parts
+
+
+def _part_fill(part: wire.Part, fill: str) -> str:
+    """A part's own fill, for the wireframe, else the shape's."""
+    own = part.style.fill_hex if part.style is not None else None
+    if own is None:
+        return fill
+    return own if len(own) == 7 else "none"
+
+
+def _words(part: wire.Part, x: float, y: float) -> str:
+    text = part.text
+    if text is None or not text.string:
+        return ""
+    return _text(x, y + text.base_style.font_size * 0.35, text.string, text.base_style.font_size)
+
+
+def _parts_svg(element: wire.Element, fill: str, stroke: str) -> list[str]:
+    """A ring, flow, pyramid, cycle or gauge as plain outlines of its parts with their words."""
+    core, shape = element.core, element.complex_shape
+    assert shape is not None
+    f = core.frame
+    cx, cy = f.x + f.width / 2, f.y + f.height / 2
+    parts: list[str] = []
+    if shape.type == "flow":
+        down = shape.settings["direction"] == "down"
+        for step, part in zip(wire.flow_steps(shape, f.width, f.height), shape.parts, strict=True):
+            x, y, width, height = (step.y, step.x, step.thickness, step.length) if down else (step.x, step.y, step.length, step.thickness)
+            parts.append(f'<rect x="{f.x + x:g}" y="{f.y + y:g}" width="{width:g}" height="{height:g}" fill="{_part_fill(part, fill)}" {stroke}/>')
+            parts.append(_words(part, f.x + x + width / 2, f.y + y + height / 2))
+    elif shape.type == "pyramid":
+        for layer, part in zip(wire.pyramid_layers(shape, f.width, f.height), shape.parts, strict=True):
+            corners = (
+                (cx - layer.top_half_width, f.y + layer.top), (cx + layer.top_half_width, f.y + layer.top),
+                (cx + layer.bottom_half_width, f.y + layer.bottom), (cx - layer.bottom_half_width, f.y + layer.bottom),
+            )
+            points = " ".join(f"{x:g},{y:g}" for x, y in corners)
+            parts.append(f'<polygon points="{points}" fill="{_part_fill(part, fill)}" {stroke}/>')
+            parts.append(_words(part, cx, f.y + (layer.top + layer.bottom) / 2))
+    elif shape.type in ("ring", "cycle"):
+        if shape.type == "ring":
+            outer = min(f.width, f.height) / 2
+            band = shape.settings["ring_width"]
+            inner = 0.0 if band == "full" else max(0.0, outer - float(band))
+            first = -90.0
+        else:
+            band_shape = wire.cycle_band(shape, f.width, f.height)
+            outer, inner = band_shape.outer, band_shape.inner
+            first = -90.0 - band_shape.share / 2
+        share = 360 / len(shape.parts)
+        mirror = -1 if shape.settings.get("direction") == "anticlockwise" else 1
+        for index, part in enumerate(shape.parts):
+            start = math.radians(first + index * share)
+            end = math.radians(first + (index + 1) * share)
+            middle = (start + end) / 2
+            corner = lambda radius, angle: (cx + mirror * radius * math.cos(angle), cy + radius * math.sin(angle))
+            sweep = 1 if mirror > 0 else 0
+            big = 1 if share > 180 else 0
+            if len(shape.parts) == 1:
+                parts.append(f'<circle cx="{cx:g}" cy="{cy:g}" r="{outer:g}" fill="{_part_fill(part, fill)}" {stroke}/>')
+                if inner > 0:
+                    parts.append(f'<circle cx="{cx:g}" cy="{cy:g}" r="{inner:g}" fill="#ffffff" {stroke}/>')
+            else:
+                a, b, c, d = corner(outer, start), corner(outer, end), corner(inner, end), corner(inner, start)
+                parts.append(
+                    f'<path d="M{a[0]:g} {a[1]:g}A{outer:g} {outer:g} 0 {big} {sweep} {b[0]:g} {b[1]:g}'
+                    f'L{c[0]:g} {c[1]:g}A{inner:g} {inner:g} 0 {big} {1 - sweep} {d[0]:g} {d[1]:g}Z" '
+                    f'fill="{_part_fill(part, fill)}" {stroke}/>'
+                )
+            x, y = corner((outer + inner) / 2, middle)
+            parts.append(_words(part, x, y))
+    elif shape.type == "gauge":
+        gx, gy, radius, bottom = wire.gauge_circle(f.width, f.height)
+        gx, gy, bottom = f.x + gx, f.y + gy, f.y + bottom
+        bands = [part for part in shape.parts if part.role == "band"]
+        inner = radius * 0.75
+        for index, part in enumerate(bands):
+            start = math.pi + index * math.pi / len(bands)
+            end = math.pi + (index + 1) * math.pi / len(bands)
+            corner = lambda distance, angle: (gx + distance * math.cos(angle), gy + distance * math.sin(angle))
+            a, b, c, d = corner(radius, start), corner(radius, end), corner(inner, end), corner(inner, start)
+            parts.append(
+                f'<path d="M{a[0]:g} {a[1]:g}A{radius:g} {radius:g} 0 0 1 {b[0]:g} {b[1]:g}'
+                f'L{c[0]:g} {c[1]:g}A{inner:g} {inner:g} 0 0 0 {d[0]:g} {d[1]:g}Z" fill="{_part_fill(part, fill)}" {stroke}/>'
+            )
+            x, y = corner((radius + inner) / 2, (start + end) / 2)
+            parts.append(_words(part, x, y))
+        low, high, value = (float(shape.settings[name]) for name in ("minimum", "maximum", "value"))
+        angle = math.pi + (value - low) / (high - low) * math.pi
+        tip = (gx + radius * 0.875 * math.cos(angle), gy + radius * 0.875 * math.sin(angle))
+        parts.append(f'<line x1="{gx:g}" y1="{gy:g}" x2="{tip[0]:g}" y2="{tip[1]:g}" {stroke}/>')
+        size = core.text_content.base_style.font_size
+        parts.append(_text(gx, (gy + bottom) / 2 + size * 0.35, core.text_content.string, size))
     return parts
 
 

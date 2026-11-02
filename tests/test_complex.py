@@ -1,10 +1,10 @@
 """Tests for complex shapes: the shapes SimpleDiagrams draws itself.
 
-Containers, swimlanes, tables, callouts and UML lifelines are records the app reads
-strictly and refuses a whole file for getting wrong, so these cover the exact records
-the app reads and writes back unchanged, the containment and attachment rules it checks,
-and the layouts the builder works out so an agent can name members and messages instead
-of computing coordinates.
+Every complex shape is a record the app reads strictly and refuses a whole file for
+getting wrong, so these cover the one structure every type is saved in, what each type
+holds within it, the containment and attachment rules the app checks, how much a shape
+and a page may hold, and the layouts the builder works out so an agent can name members
+and messages instead of computing coordinates.
 """
 
 from __future__ import annotations
@@ -35,7 +35,10 @@ from sd_spec import (
 )
 
 SPEC_ID = "11111111-2222-4333-8444-555555555555"
-EXAMPLES = ("example-bpmn-spec.json", "example-sequence-spec.json", "example-class-spec.json")
+EXAMPLES = (
+    "example-bpmn-spec.json", "example-sequence-spec.json", "example-class-spec.json",
+    "example-business-spec.json", "example-database-spec.json",
+)
 
 
 def _compile(nodes: list[dict], edges: list[dict] | None = None, **page: object) -> wire.Document:
@@ -91,10 +94,16 @@ def _sequence(edges: list[dict], *extra_nodes: dict, **lifeline: object) -> wire
         {"key": "t", "shape": "table", "cells": [["x"]], "col": 2, "row": 0},
         {"key": "o", "shape": "callout", "label": "Hi", "col": 2, "row": 0},
         {"key": "l", "shape": "lifeline", "label": "L", "col": 2, "row": 0},
+        {"key": "r", "shape": "ring", "sections": ["S"], "col": 2, "row": 0},
+        {"key": "f", "shape": "flow", "steps": ["S", "T"], "col": 2, "row": 0},
+        {"key": "p", "shape": "pyramid", "layers": ["S", "T"], "col": 2, "row": 0},
+        {"key": "y", "shape": "cycle", "steps": ["S", "T", "U"], "col": 2, "row": 0},
+        {"key": "g", "shape": "gauge", "bands": ["S"], "col": 2, "row": 0},
+        {"key": "e", "shape": "entity_table", "label": "E", "fields": [{"name": "id"}], "col": 2, "row": 0},
     ],
 )
 def test_each_complex_shape_is_an_ordinary_part_of_the_one_format(node: dict) -> None:
-    """Every document is the package SimpleDiagrams 5.1.0 writes, so a complex shape needs
+    """Every document is the package SimpleDiagrams 5.2 writes, so a complex shape needs
     no other format or version."""
     document = _compile([_box("a", 0, 0), node])
     assert document.schema_version == wire.SCHEMA_VERSION
@@ -114,9 +123,9 @@ def test_the_complex_profile_round_trips_unchanged() -> None:
     assert wire.dump(wire.Document.model_validate_json(json.dumps(dumped))) == dumped
 
 
-def test_optional_complex_keys_are_written_only_when_they_differ_from_the_default() -> None:
-    """The app leaves a default out; writing it would make the skill's files differ from
-    the app's for the same shape."""
+def test_every_setting_is_written_even_at_its_default() -> None:
+    """Format 19 requires each setting a type declares, so a default left out would refuse
+    the document; `hand_drawn` alone is written only as false."""
     document = _compile([
         {"key": "c", "shape": "container", "label": "C", "members": ["a"]},
         _box("a", 0, 0),
@@ -127,24 +136,31 @@ def test_optional_complex_keys_are_written_only_when_they_differ_from_the_defaul
         element.complex_shape.type: wire.dump(element)["complex_shape"]
         for element in document.pages[0].elements if element.complex_shape
     }
-    assert set(records["container"]) == {"type", "members"}
-    assert set(records["table"]) == {"type", "row_sizes", "column_sizes", "cells"}
-    assert records["lifeline"] == {"type": "lifeline"}
+    assert records["container"]["settings"] == {"layout": "free", "title_style": "band"}
+    assert records["table"]["settings"] == {"header_row": True}
+    assert records["lifeline"]["settings"] == {"head_style": "box", "ends_in_destroy_mark": False}
+    for record in records.values():
+        assert record["version"] == 1 and "hand_drawn" not in record
 
 
 @pytest.mark.parametrize(
     ("mutate", "message"),
     [
         (lambda shape: shape.update(layout="automatic"), "Extra inputs"),
-        (lambda shape: shape.update(direction="vertical"), "container does not take direction"),
+        (lambda shape: shape["settings"].update(direction="vertical"), "not its own"),
+        (lambda shape: shape["settings"].pop("layout"), "missing"),
+        (lambda shape: shape["settings"].update(layout="automatic"), "layout cannot be"),
         (lambda shape: shape.pop("members"), "container needs members"),
         (lambda shape: shape.update(type="sticker"), "type"),
+        (lambda shape: shape.update(version=2), "version"),
         (lambda shape: shape.update(hand_drawn=True), "hand_drawn"),
-        (lambda shape: shape.update(title_style="band"), "title_style"),
+        (lambda shape: shape["settings"].update(title_style="Band"), "title_style"),
+        (lambda shape: shape["parts"].append({"role": "lane"}), "parts come in"),
     ],
 )
-def test_a_complex_record_holds_only_the_keys_its_type_uses(mutate, message: str) -> None:
-    """The app refuses a record with a key its type does not use, or an unknown one."""
+def test_a_complex_record_holds_exactly_what_its_entry_declares(mutate, message: str) -> None:
+    """The app refuses a missing or undeclared setting, a word its entry does not list, and
+    an unknown key, type or version it would otherwise have to guess at."""
     dumped = wire.dump(fixtures.complex_profile_document())
     container = next(e for e in dumped["pages"][0]["elements"] if e.get("complex_shape", {}).get("type") == "container")
     mutate(container["complex_shape"])
@@ -182,16 +198,16 @@ def test_the_rules_the_app_reads_a_complex_shape_by() -> None:
     )
     assert "smaller than" in _mutated(lambda p: _core(_of(p, "table"))["frame"].update(height=20))
     assert "smaller than" in _mutated(lambda p: _core(_of(p, "lifeline"))["frame"].update(height=50))
-    assert "one row of cells per row size" in _mutated(lambda p: _of(p, "table")["complex_shape"]["cells"].pop())
+    assert "one cell per column" in _mutated(lambda p: _of(p, "table")["complex_shape"]["parts"][-1]["cells"].pop())
     assert "share an id" in _mutated(
-        lambda p: _of(p, "swimlanes")["complex_shape"]["lanes"][1].update(
-            id=_of(p, "swimlanes")["complex_shape"]["lanes"][0]["id"]
+        lambda p: _of(p, "swimlanes")["complex_shape"]["parts"][1].update(
+            id=_of(p, "swimlanes")["complex_shape"]["parts"][0]["id"]
         )
     )
     assert "needs its tail_tip" in _mutated(
         lambda p: next(
-            e for e in p["elements"] if e.get("complex_shape", {}).get("tail_attachment")
-        )["complex_shape"].pop("tail_tip")
+            e for e in p["elements"] if e.get("complex_shape", {}).get("settings", {}).get("tail_attachment")
+        )["complex_shape"]["settings"].pop("tail_tip")
     )
 
 
@@ -199,13 +215,16 @@ def test_the_rules_complex_shapes_add_to_a_page() -> None:
     """Members, nesting and tail locks involve other shapes, and the app checks them
     across the page."""
     def outer(page: dict) -> dict:
-        return next(e for e in page["elements"] if e.get("complex_shape", {}).get("title_style") == "corner_tag")
+        return next(
+            e for e in page["elements"]
+            if e.get("complex_shape", {}).get("settings", {}).get("title_style") == "corner_tag"
+        )
 
     assert "which is in a group" in _mutated(
         lambda p: outer(p)["complex_shape"]["members"].append({"kind": "element", "id": fixtures._uuid(2)})
     )
     assert "held by two" in _mutated(
-        lambda p: _of(p, "swimlanes")["complex_shape"]["lanes"][1]["members"].append(
+        lambda p: _of(p, "swimlanes")["complex_shape"]["parts"][1]["members"].append(
             {"kind": "element", "id": fixtures._uuid(1)}
         )
     )
@@ -220,8 +239,8 @@ def test_the_rules_complex_shapes_add_to_a_page() -> None:
     )
     assert "does not have" in _mutated(
         lambda p: next(
-            e for e in p["elements"] if e.get("complex_shape", {}).get("tail_attachment")
-        )["complex_shape"]["tail_attachment"].update(connection_point_id=99)
+            e for e in p["elements"] if e.get("complex_shape", {}).get("settings", {}).get("tail_attachment")
+        )["complex_shape"]["settings"]["tail_attachment"].update(connection_point_id=99)
     )
 
 
@@ -320,7 +339,7 @@ def test_the_corner_tag_and_alignment_are_written() -> None:
     ])
     frame, system = _element(document, "sd Login"), _element(document, "System")
     assert frame.complex_shape is not None and frame.complex_shape.title_style == "corner_tag"
-    assert system.complex_shape is not None and system.complex_shape.title_style is None
+    assert system.complex_shape is not None and system.complex_shape.title_style == "band"
     assert system.complex_shape.hand_drawn is False
     assert system.core.text_content.base_alignment == "center"
 
@@ -335,7 +354,7 @@ def test_horizontal_swimlanes_fit_each_lane_around_its_members() -> None:
     ])
     pool = _element(document, "Pool")
     shape = pool.complex_shape
-    assert shape is not None and shape.direction == "horizontal"
+    assert shape is not None and shape.settings["direction"] == "horizontal"
     lanes = wire.swimlane_frames(shape, pool.core.frame)
     for lane, keys in zip(lanes, (("a", "b"), ("c",)), strict=True):
         for key in keys:
@@ -343,7 +362,7 @@ def test_horizontal_swimlanes_fit_each_lane_around_its_members() -> None:
             assert _inside(frame, pool.core.frame)
             assert lane.y <= frame.y + frame.height / 2 <= lane.y + lane.height
             assert frame.x >= pool.core.frame.x + wire.SWIMLANES_STRIP
-    assert [lane.title.string for lane in shape.lanes or []] == ["One", "Two"]
+    assert [lane.text.string for lane in shape.lanes] == ["One", "Two"]
 
 
 def test_vertical_swimlanes_fit_their_columns() -> None:
@@ -354,7 +373,7 @@ def test_vertical_swimlanes_fit_their_columns() -> None:
         _box("a", 0, 0), _box("b", 1, 0), _box("c", 1, 1),
     ])
     pool = _element(document, "Columns")
-    assert pool.complex_shape is not None and pool.complex_shape.direction == "vertical"
+    assert pool.complex_shape is not None and pool.complex_shape.settings["direction"] == "vertical"
     lanes = wire.swimlane_frames(pool.complex_shape, pool.core.frame)
     for lane, keys in zip(lanes, (("a",), ("b", "c")), strict=True):
         for key in keys:
@@ -386,7 +405,7 @@ def test_placed_swimlanes_check_each_member_is_in_its_lane() -> None:
         {"key": "a", "shape": "rectangle", "label": "a", "x": 300, "y": 190, "width": 100, "height": 40},
     ]
     shape = _element(_compile(nodes), "P").complex_shape
-    assert shape is not None and [lane.size for lane in shape.lanes or []] == [1, 2]
+    assert shape is not None and [lane.size for lane in shape.lanes] == [1, 2]
     nodes[1] |= {"y": 380}
     with pytest.raises(SpecError, match="with its centre in that lane"):
         _compile(nodes)
@@ -414,10 +433,10 @@ def test_a_table_holds_its_cells_sized_to_their_text() -> None:
                           "cells": [["Order"], ["id: UUID\ntotal: Money"], ["place()"]]}])
     (element,) = document.pages[0].elements
     shape = element.complex_shape
-    assert shape is not None and shape.header_row is None and element.core.text_content.string == ""
-    assert [[cell.string for cell in row] for row in shape.cells or []] == [["Order"], ["id: UUID\ntotal: Money"], ["place()"]]
-    assert [row[0].base_alignment for row in shape.cells or []] == ["center", "leading", "leading"]
-    rows = shape.row_sizes or []
+    assert shape is not None and shape.settings["header_row"] is True and element.core.text_content.string == ""
+    assert [[cell.string for cell in row] for row in shape.cell_rows] == [["Order"], ["id: UUID\ntotal: Money"], ["place()"]]
+    assert [row[0].base_alignment for row in shape.cell_rows] == ["center", "leading", "leading"]
+    rows = shape.row_sizes
     assert rows[1] > rows[0] == rows[2]
     assert sum(rows) == pytest.approx(element.core.frame.height)
 
@@ -427,7 +446,7 @@ def test_table_sizes_and_header_can_be_chosen() -> None:
     document = _compile([{"key": "t", "shape": "table", "col": 0, "row": 0, "header_row": False,
                           "column_widths": [60, 120], "row_heights": [30, 50], "cells": [["a", "b"], ["c", "d"]]}])
     shape = document.pages[0].elements[0].complex_shape
-    assert shape is not None and shape.header_row is False
+    assert shape is not None and shape.settings["header_row"] is False
     assert (shape.column_sizes, shape.row_sizes) == ([60, 120], [30, 50])
     with pytest.raises(SpecError, match="under 12 points"):
         _compile([{"key": "t", "shape": "table", "col": 0, "row": 0, "height": 20, "cells": [["a"], ["b"]]}])
@@ -558,7 +577,7 @@ def test_lifelines_are_long_enough_and_a_destroyed_one_ends_after_its_last_messa
     )
     page = document.pages[0]
     a, b = _element(document, "A"), _element(document, "B")
-    assert b.complex_shape == wire.ComplexShape(type="lifeline", head_style="actor", ends_in_destroy_mark=True)
+    assert b.complex_shape == wire.lifeline_shape("actor", True)
     last = max(point.y for connection in page.connections for point in connection.content.points)
     assert a.core.frame.y + a.core.frame.height - last >= 16
     _, b_end = wire.lifeline_line(b.complex_shape, b.core.frame)
@@ -671,11 +690,11 @@ def test_a_lane_title_longer_than_its_lane_is_reported() -> None:
 
 
 def test_a_complex_document_is_written_and_read_back(tmp_path: Path) -> None:
-    """The package on disk carries manifest 18 and the records, and reads back as written."""
+    """The package on disk carries manifest 19 and the records, and reads back as written."""
     document = compile_spec(load_spec(ROOT / "assets" / "example-sequence-spec.json"))
     written = write_package(document, tmp_path / "Sequence.simplediagram")
     manifest = json.loads((written / "manifest.json").read_text())
-    assert manifest["format_version"] == 18
+    assert manifest["format_version"] == 19
     again = wire.Document.model_validate_json((written / "document.json").read_text())
     assert wire.dump(again) == wire.dump(document)
 
@@ -690,7 +709,7 @@ def test_the_build_writes_a_complex_example(tmp_path: Path) -> None:
     )
     assert result.returncode == 0, result.stdout + result.stderr
     assert not [line for line in result.stdout.splitlines() if line.startswith(("warning", "error"))]
-    assert json.loads((target / "manifest.json").read_text())["format_version"] == 18
+    assert json.loads((target / "manifest.json").read_text())["format_version"] == 19
 
 
 def test_a_search_for_a_complex_shape_names_the_kind() -> None:
@@ -699,7 +718,11 @@ def test_a_search_for_a_complex_shape_names_the_kind() -> None:
     assert [hint["shape"] for hint in complex_shape_hints("BPMN pool")] == ["swimlanes"]
     assert [hint["shape"] for hint in complex_shape_hints("class")] == ["table"]
     assert {hint["shape"] for hint in complex_shape_hints("sequence lifeline")} == {"lifeline"}
-    assert complex_shape_hints("database") == []
+    assert {hint["shape"] for hint in complex_shape_hints("database")} == {"entity_table"}
+    assert [hint["shape"] for hint in complex_shape_hints("sales funnel")] == ["pyramid"]
+    assert [hint["shape"] for hint in complex_shape_hints("donut")] == ["ring"]
+    assert [hint["shape"] for hint in complex_shape_hints("funnels")] == ["pyramid"]
+    assert complex_shape_hints("currency") == []
 
 
 def test_the_complex_profile_names_each_key_once_removed_without_breaking() -> None:

@@ -10,7 +10,8 @@
 
 The shapes come from the list bundled with the skill, assets/built-in-shapes.json; the
 search makes no network request. A search for something SimpleDiagrams draws itself,
-such as a pool, a class box or a lifeline, also names the complex shape to use.
+such as a pool, a funnel, a donut chart or a database table, also names the complex shape
+to use.
 """
 
 from __future__ import annotations
@@ -44,8 +45,38 @@ COMPLEX_SHAPE_HINTS: tuple[tuple[str, str, frozenset[str]], ...] = (
     ),
     (
         "table",
-        "rows and columns of text, such as a UML class, interface, enumeration or database entity",
-        frozenset({"table", "class", "interface", "enumeration", "enum", "entity", "erd"}),
+        "rows and columns of text, such as a UML class, interface or enumeration",
+        frozenset({"table", "class", "interface", "enumeration", "enum"}),
+    ),
+    (
+        "entity_table",
+        "one table of a database, a row for each field with its type and key marks; a connector can end on a field",
+        frozenset({"entity", "erd", "database", "schema", "field", "fields", "column", "columns", "foreign", "primary"}),
+    ),
+    (
+        "ring",
+        'a donut or pie chart cut into sections (`"ring_width": "full"` for a pie)',
+        frozenset({"ring", "rings", "donut", "donuts", "doughnut", "pie", "pies", "chart", "section", "sections", "segment", "segments"}),
+    ),
+    (
+        "flow",
+        "a row of steps showing a process in order: chevrons, arrows, boxes or circles, across or down",
+        frozenset({"flow", "flows", "chevron", "chevrons", "step", "steps", "stage", "stages", "process", "timeline", "pipeline"}),
+    ),
+    (
+        "pyramid",
+        'a pyramid of layers, or with `"form": "funnel"` a funnel narrowing to a spout',
+        frozenset({"pyramid", "pyramids", "funnel", "funnels", "hierarchy", "layer", "layers", "conversion", "tier", "tiers"}),
+    ),
+    (
+        "cycle",
+        "steps round a circle, each pointing to the next, for a process that repeats",
+        frozenset({"cycle", "cycles", "circular", "loop", "repeat", "pdca", "lifecycle"}),
+    ),
+    (
+        "gauge",
+        "a half dial with coloured bands and a needle pointing at a value",
+        frozenset({"gauge", "gauges", "dial", "meter", "speedometer", "needle", "kpi"}),
     ),
     (
         "callout",

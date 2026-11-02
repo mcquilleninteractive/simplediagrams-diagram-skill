@@ -1,7 +1,7 @@
 {
  "catalog": "com.simplediagrams.skill.built-in-shapes",
  "catalog_version": 1,
- "source_app_version": "5.1.0",
+ "source_app_version": "5.2.0",
  "note": "Shapes that SimpleDiagrams resolves by reference. A symbol_reference uses library_id, item_id and the library's asset_version exactly as listed.",
  "libraries": [
   {
@@ -1079,7 +1079,13 @@
      "default_height": 50,
      "slug": "square",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.144,
+      "y": 0.04,
+      "width": 0.808,
+      "height": 0.792
+     }
     },
     {
      "item_id": "BoxWithDiagonalCross",
@@ -1115,7 +1121,13 @@
      "default_height": 30,
      "slug": "rectangle",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.1,
+      "y": 0.048,
+      "width": 0.872,
+      "height": 0.796
+     }
     },
     {
      "item_id": "CrossHatchBox",
@@ -1169,7 +1181,13 @@
      "default_height": 30,
      "slug": "rectangle-rounded",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.128,
+      "y": 0.052,
+      "width": 0.816,
+      "height": 0.812
+     }
     },
     {
      "item_id": "rectangle_2",
@@ -1178,7 +1196,13 @@
      "default_height": 50,
      "slug": "rectangle-2",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.164,
+      "y": 0.04,
+      "width": 0.8,
+      "height": 0.868
+     }
     },
     {
      "item_id": "SquareWaveBottom",
@@ -1214,7 +1238,13 @@
      "default_height": 50,
      "slug": "circle",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.22,
+      "y": 0.16,
+      "width": 0.644,
+      "height": 0.612
+     }
     },
     {
      "item_id": "circle2",
@@ -1223,7 +1253,13 @@
      "default_height": 50,
      "slug": "circle2",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.2,
+      "y": 0.156,
+      "width": 0.656,
+      "height": 0.652
+     }
     },
     {
      "item_id": "Donut",
@@ -1520,7 +1556,13 @@
      "default_height": 30,
      "slug": "oval",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.176,
+      "y": 0.16,
+      "width": 0.688,
+      "height": 0.62
+     }
     },
     {
      "item_id": "heart",
@@ -1529,7 +1571,13 @@
      "default_height": 50,
      "slug": "heart",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.14,
+      "y": 0.208,
+      "width": 0.764,
+      "height": 0.316
+     }
     },
     {
      "item_id": "rectangle_wave_bottom",
@@ -1538,7 +1586,13 @@
      "default_height": 40,
      "slug": "rectangle-wave-bottom",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.128,
+      "y": 0.056,
+      "width": 0.844,
+      "height": 0.644
+     }
     },
     {
      "item_id": "process_1",
@@ -1547,7 +1601,13 @@
      "default_height": 40,
      "slug": "process-1",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.236,
+      "y": 0.152,
+      "width": 0.628,
+      "height": 0.608
+     }
     },
     {
      "item_id": "process_2",
@@ -1556,7 +1616,13 @@
      "default_height": 40,
      "slug": "process-2",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.232,
+      "y": 0.052,
+      "width": 0.612,
+      "height": 0.792
+     }
     },
     {
      "item_id": "burst",
@@ -1565,7 +1631,13 @@
      "default_height": 30,
      "slug": "burst-2",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.188,
+      "y": 0.312,
+      "width": 0.66,
+      "height": 0.364
+     }
     },
     {
      "item_id": "star",
@@ -1574,7 +1646,13 @@
      "default_height": 50,
      "slug": "star-2",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.352,
+      "y": 0.328,
+      "width": 0.404,
+      "height": 0.344
+     }
     },
     {
      "item_id": "star2",
@@ -1583,7 +1661,13 @@
      "default_height": 50,
      "slug": "star2",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.3,
+      "y": 0.348,
+      "width": 0.428,
+      "height": 0.384
+     }
     },
     {
      "item_id": "cloud2",
@@ -1592,7 +1676,13 @@
      "default_height": 30,
      "slug": "cloud2",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.2,
+      "y": 0.26,
+      "width": 0.688,
+      "height": 0.404
+     }
     },
     {
      "item_id": "arrow_down",
@@ -1601,7 +1691,13 @@
      "default_height": 50,
      "slug": "arrow-down",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.396,
+      "y": 0.052,
+      "width": 0.332,
+      "height": 0.724
+     }
     },
     {
      "item_id": "arrow_up",
@@ -1610,7 +1706,13 @@
      "default_height": 50,
      "slug": "arrow-up",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.38,
+      "y": 0.12,
+      "width": 0.356,
+      "height": 0.74
+     }
     },
     {
      "item_id": "arrow_left",
@@ -1619,7 +1721,13 @@
      "default_height": 30,
      "slug": "arrow-left",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.212,
+      "y": 0.236,
+      "width": 0.752,
+      "height": 0.352
+     }
     },
     {
      "item_id": "arrow_right",
@@ -1628,7 +1736,13 @@
      "default_height": 50,
      "slug": "arrow-right",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.132,
+      "y": 0.26,
+      "width": 0.752,
+      "height": 0.372
+     }
     },
     {
      "item_id": "arrow_down_2",
@@ -1637,7 +1751,13 @@
      "default_height": 50,
      "slug": "arrow-down-2",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.404,
+      "y": 0.036,
+      "width": 0.336,
+      "height": 0.784
+     }
     },
     {
      "item_id": "arrow_up_2",
@@ -1646,7 +1766,13 @@
      "default_height": 50,
      "slug": "arrow-up-2",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.4,
+      "y": 0.1,
+      "width": 0.328,
+      "height": 0.784
+     }
     },
     {
      "item_id": "arrow_left_2",
@@ -1655,7 +1781,13 @@
      "default_height": 20,
      "slug": "arrow-left-2",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.136,
+      "y": 0.26,
+      "width": 0.832,
+      "height": 0.32
+     }
     },
     {
      "item_id": "arrow_right_2",
@@ -1664,7 +1796,13 @@
      "default_height": 50,
      "slug": "arrow-right-2",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.108,
+      "y": 0.256,
+      "width": 0.808,
+      "height": 0.352
+     }
     },
     {
      "item_id": "arrow_down_3",
@@ -1673,7 +1811,13 @@
      "default_height": 50,
      "slug": "arrow-down-3",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.4,
+      "y": 0.032,
+      "width": 0.324,
+      "height": 0.592
+     }
     },
     {
      "item_id": "arrow_up_3",
@@ -1682,7 +1826,13 @@
      "default_height": 50,
      "slug": "arrow-up-3",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.404,
+      "y": 0.192,
+      "width": 0.34,
+      "height": 0.616
+     }
     },
     {
      "item_id": "arrow_left_3",
@@ -1691,7 +1841,13 @@
      "default_height": 20,
      "slug": "arrow-left-3",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.368,
+      "y": 0.268,
+      "width": 0.6,
+      "height": 0.32
+     }
     },
     {
      "item_id": "arrow_right_3",
@@ -1700,7 +1856,13 @@
      "default_height": 50,
      "slug": "arrow-right-3",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.192,
+      "y": 0.28,
+      "width": 0.648,
+      "height": 0.296
+     }
     },
     {
      "item_id": "triangle_down",
@@ -1709,7 +1871,13 @@
      "default_height": 45,
      "slug": "triangle-down",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.36,
+      "y": 0.036,
+      "width": 0.44,
+      "height": 0.424
+     }
     },
     {
      "item_id": "triangle_up",
@@ -1718,7 +1886,13 @@
      "default_height": 45,
      "slug": "triangle-up",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.368,
+      "y": 0.368,
+      "width": 0.388,
+      "height": 0.44
+     }
     },
     {
      "item_id": "triangle_left",
@@ -1727,7 +1901,13 @@
      "default_height": 50,
      "slug": "triangle-left",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.4,
+      "y": 0.288,
+      "width": 0.6,
+      "height": 0.328
+     }
     },
     {
      "item_id": "triangle_right",
@@ -1736,7 +1916,13 @@
      "default_height": 50,
      "slug": "triangle-right",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.196,
+      "y": 0.244,
+      "width": 0.588,
+      "height": 0.332
+     }
     }
    ]
   },
@@ -1753,7 +1939,13 @@
      "default_height": 50,
      "slug": "wordbubble1",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.1,
+      "y": 0.06,
+      "width": 0.832,
+      "height": 0.668
+     }
     },
     {
      "item_id": "wordBubble2",
@@ -1762,7 +1954,13 @@
      "default_height": 50,
      "slug": "wordbubble2",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.048,
+      "y": 0.048,
+      "width": 0.916,
+      "height": 0.624
+     }
     },
     {
      "item_id": "wordBubble3",
@@ -1771,7 +1969,13 @@
      "default_height": 50,
      "slug": "wordbubble3",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.08,
+      "y": 0.112,
+      "width": 0.844,
+      "height": 0.544
+     }
     },
     {
      "item_id": "wordBubble4",
@@ -1780,7 +1984,13 @@
      "default_height": 50,
      "slug": "wordbubble4",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.036,
+      "y": 0.036,
+      "width": 0.924,
+      "height": 0.652
+     }
     },
     {
      "item_id": "wordBubble5",
@@ -1789,7 +1999,13 @@
      "default_height": 50,
      "slug": "wordbubble5",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.14,
+      "y": 0.036,
+      "width": 0.816,
+      "height": 0.616
+     }
     },
     {
      "item_id": "wordBubble6",
@@ -1798,7 +2014,13 @@
      "default_height": 50,
      "slug": "wordbubble6",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.228,
+      "y": 0.096,
+      "width": 0.628,
+      "height": 0.464
+     }
     },
     {
      "item_id": "wordBubble7",
@@ -1807,7 +2029,13 @@
      "default_height": 50,
      "slug": "wordbubble7",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.12,
+      "y": 0.068,
+      "width": 0.772,
+      "height": 0.632
+     }
     },
     {
      "item_id": "wordBubble8",
@@ -1816,7 +2044,13 @@
      "default_height": 50,
      "slug": "wordbubble8",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.044,
+      "y": 0.048,
+      "width": 0.908,
+      "height": 0.656
+     }
     },
     {
      "item_id": "wordBubble9",
@@ -1825,7 +2059,13 @@
      "default_height": 50,
      "slug": "wordbubble9",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.04,
+      "y": 0.048,
+      "width": 0.9,
+      "height": 0.68
+     }
     },
     {
      "item_id": "wordBubble10",
@@ -1834,7 +2074,13 @@
      "default_height": 50,
      "slug": "wordbubble10",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.116,
+      "y": 0.12,
+      "width": 0.792,
+      "height": 0.528
+     }
     },
     {
      "item_id": "wordBubble11",
@@ -1843,7 +2089,13 @@
      "default_height": 50,
      "slug": "wordbubble11",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.108,
+      "y": 0.104,
+      "width": 0.768,
+      "height": 0.58
+     }
     },
     {
      "item_id": "wordBubble12",
@@ -1852,7 +2104,13 @@
      "default_height": 50,
      "slug": "wordbubble12",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.048,
+      "y": 0.044,
+      "width": 0.88,
+      "height": 0.688
+     }
     },
     {
      "item_id": "wordBubble13",
@@ -1861,7 +2119,13 @@
      "default_height": 50,
      "slug": "wordbubble13",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.04,
+      "y": 0.06,
+      "width": 0.856,
+      "height": 0.564
+     }
     },
     {
      "item_id": "wordBubble14",
@@ -1870,7 +2134,13 @@
      "default_height": 50,
      "slug": "wordbubble14",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.044,
+      "y": 0.04,
+      "width": 0.948,
+      "height": 0.724
+     }
     },
     {
      "item_id": "wordBubble15",
@@ -1879,7 +2149,13 @@
      "default_height": 50,
      "slug": "wordbubble15",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.04,
+      "y": 0.044,
+      "width": 0.892,
+      "height": 0.684
+     }
     },
     {
      "item_id": "wordBubble16",
@@ -1888,7 +2164,13 @@
      "default_height": 50,
      "slug": "wordbubble16",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.04,
+      "y": 0.04,
+      "width": 0.944,
+      "height": 0.692
+     }
     },
     {
      "item_id": "wordBubble17",
@@ -1897,7 +2179,13 @@
      "default_height": 50,
      "slug": "wordbubble17",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.048,
+      "y": 0.048,
+      "width": 0.888,
+      "height": 0.684
+     }
     },
     {
      "item_id": "wordBubble18",
@@ -1906,7 +2194,13 @@
      "default_height": 50,
      "slug": "wordbubble18",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.136,
+      "y": 0.172,
+      "width": 0.7,
+      "height": 0.52
+     }
     },
     {
      "item_id": "wordBubble19",
@@ -1915,7 +2209,13 @@
      "default_height": 50,
      "slug": "wordbubble19",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.18,
+      "y": 0.152,
+      "width": 0.636,
+      "height": 0.524
+     }
     },
     {
      "item_id": "wordBubble20",
@@ -1924,7 +2224,13 @@
      "default_height": 50,
      "slug": "wordbubble20",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.152,
+      "y": 0.176,
+      "width": 0.696,
+      "height": 0.54
+     }
     },
     {
      "item_id": "wordBubble21",
@@ -1933,7 +2239,13 @@
      "default_height": 50,
      "slug": "wordbubble21",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.144,
+      "y": 0.148,
+      "width": 0.668,
+      "height": 0.564
+     }
     },
     {
      "item_id": "wordBubble22",
@@ -1942,7 +2254,13 @@
      "default_height": 50,
      "slug": "wordbubble22",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.192,
+      "y": 0.216,
+      "width": 0.628,
+      "height": 0.536
+     }
     },
     {
      "item_id": "wordBubble23",
@@ -1951,7 +2269,13 @@
      "default_height": 50,
      "slug": "wordbubble23",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.128,
+      "y": 0.176,
+      "width": 0.744,
+      "height": 0.616
+     }
     },
     {
      "item_id": "wordBubble24",
@@ -1960,7 +2284,13 @@
      "default_height": 50,
      "slug": "wordbubble24",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.204,
+      "y": 0.24,
+      "width": 0.58,
+      "height": 0.488
+     }
     },
     {
      "item_id": "wordBubble25",
@@ -1969,7 +2299,13 @@
      "default_height": 50,
      "slug": "wordbubble25",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.172,
+      "y": 0.184,
+      "width": 0.664,
+      "height": 0.54
+     }
     },
     {
      "item_id": "wordBubble26",
@@ -1978,7 +2314,13 @@
      "default_height": 50,
      "slug": "wordbubble26",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.172,
+      "y": 0.204,
+      "width": 0.68,
+      "height": 0.576
+     }
     },
     {
      "item_id": "wordBubble27",
@@ -1987,7 +2329,13 @@
      "default_height": 50,
      "slug": "wordbubble27",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.124,
+      "y": 0.096,
+      "width": 0.772,
+      "height": 0.448
+     }
     },
     {
      "item_id": "wordBubble28",
@@ -1996,7 +2344,13 @@
      "default_height": 50,
      "slug": "wordbubble28",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.22,
+      "y": 0.096,
+      "width": 0.692,
+      "height": 0.54
+     }
     },
     {
      "item_id": "wordBubble29",
@@ -2005,7 +2359,13 @@
      "default_height": 50,
      "slug": "wordbubble29",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.188,
+      "y": 0.168,
+      "width": 0.656,
+      "height": 0.392
+     }
     },
     {
      "item_id": "wordBubble30",
@@ -2014,7 +2374,13 @@
      "default_height": 50,
      "slug": "wordbubble30",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.136,
+      "y": 0.132,
+      "width": 0.708,
+      "height": 0.636
+     }
     },
     {
      "item_id": "wordBubble31",
@@ -2023,7 +2389,13 @@
      "default_height": 50,
      "slug": "wordbubble31",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.132,
+      "y": 0.14,
+      "width": 0.704,
+      "height": 0.644
+     }
     },
     {
      "item_id": "wordBubble32",
@@ -2032,7 +2404,13 @@
      "default_height": 50,
      "slug": "wordbubble32",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.228,
+      "y": 0.168,
+      "width": 0.628,
+      "height": 0.44
+     }
     },
     {
      "item_id": "wordBubble33",
@@ -2041,7 +2419,13 @@
      "default_height": 50,
      "slug": "wordbubble33",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.26,
+      "y": 0.132,
+      "width": 0.624,
+      "height": 0.48
+     }
     },
     {
      "item_id": "wordBubble34",
@@ -2050,7 +2434,13 @@
      "default_height": 50,
      "slug": "wordbubble34",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.228,
+      "y": 0.112,
+      "width": 0.672,
+      "height": 0.516
+     }
     },
     {
      "item_id": "wordBubble35",
@@ -2059,7 +2449,13 @@
      "default_height": 50,
      "slug": "wordbubble35",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.196,
+      "y": 0.168,
+      "width": 0.688,
+      "height": 0.52
+     }
     },
     {
      "item_id": "wordBubble36",
@@ -2068,7 +2464,13 @@
      "default_height": 50,
      "slug": "wordbubble36",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.224,
+      "y": 0.22,
+      "width": 0.692,
+      "height": 0.5
+     }
     },
     {
      "item_id": "wordBubble37",
@@ -2077,7 +2479,13 @@
      "default_height": 50,
      "slug": "wordbubble37",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.148,
+      "y": 0.168,
+      "width": 0.74,
+      "height": 0.532
+     }
     },
     {
      "item_id": "wordBubble38",
@@ -2086,7 +2494,13 @@
      "default_height": 50,
      "slug": "wordbubble38",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.084,
+      "y": 0.06,
+      "width": 0.876,
+      "height": 0.632
+     }
     },
     {
      "item_id": "wordBubble39",
@@ -2095,7 +2509,13 @@
      "default_height": 50,
      "slug": "wordbubble39",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.088,
+      "y": 0.052,
+      "width": 0.86,
+      "height": 0.62
+     }
     },
     {
      "item_id": "wordBubble40",
@@ -2104,7 +2524,13 @@
      "default_height": 50,
      "slug": "wordbubble40",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.088,
+      "y": 0.052,
+      "width": 0.884,
+      "height": 0.616
+     }
     },
     {
      "item_id": "wordBubble41",
@@ -2113,7 +2539,13 @@
      "default_height": 50,
      "slug": "wordbubble41",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.076,
+      "y": 0.052,
+      "width": 0.892,
+      "height": 0.636
+     }
     },
     {
      "item_id": "wordBubble42",
@@ -2122,7 +2554,13 @@
      "default_height": 50,
      "slug": "wordbubble42",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.148,
+      "y": 0.168,
+      "width": 0.712,
+      "height": 0.508
+     }
     },
     {
      "item_id": "wordBubble43",
@@ -2131,7 +2569,13 @@
      "default_height": 50,
      "slug": "wordbubble43",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.148,
+      "y": 0.152,
+      "width": 0.736,
+      "height": 0.536
+     }
     },
     {
      "item_id": "wordBubble44",
@@ -2140,7 +2584,13 @@
      "default_height": 50,
      "slug": "wordbubble44",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.144,
+      "y": 0.144,
+      "width": 0.72,
+      "height": 0.54
+     }
     },
     {
      "item_id": "wordBubble45",
@@ -2149,7 +2599,13 @@
      "default_height": 50,
      "slug": "wordbubble45",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.144,
+      "y": 0.124,
+      "width": 0.696,
+      "height": 0.636
+     }
     },
     {
      "item_id": "wordBubble46",
@@ -2158,7 +2614,13 @@
      "default_height": 50,
      "slug": "wordbubble46",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.072,
+      "y": 0.22,
+      "width": 0.824,
+      "height": 0.44
+     }
     },
     {
      "item_id": "wordBubble47",
@@ -2167,7 +2629,13 @@
      "default_height": 50,
      "slug": "wordbubble47",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.04,
+      "y": 0.228,
+      "width": 0.916,
+      "height": 0.412
+     }
     },
     {
      "item_id": "wordBubble48",
@@ -2176,7 +2644,13 @@
      "default_height": 50,
      "slug": "wordbubble48",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.088,
+      "y": 0.308,
+      "width": 0.844,
+      "height": 0.412
+     }
     },
     {
      "item_id": "wordBubble49",
@@ -2185,7 +2659,13 @@
      "default_height": 50,
      "slug": "wordbubble49",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.096,
+      "y": 0.28,
+      "width": 0.772,
+      "height": 0.408
+     }
     },
     {
      "item_id": "wordBubble50",
@@ -2194,7 +2674,13 @@
      "default_height": 50,
      "slug": "wordbubble50",
      "description": "",
-     "keywords": []
+     "keywords": [],
+     "text_region": {
+      "x": 0.036,
+      "y": 0.048,
+      "width": 0.944,
+      "height": 0.68
+     }
     }
    ]
   },

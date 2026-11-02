@@ -1,11 +1,11 @@
-"""Exact models of a SimpleDiagrams document at package format 18, which SimpleDiagrams
-5.1.0 writes and reads.
+"""Exact models of a SimpleDiagrams document at package format 19, which SimpleDiagrams
+5.2 writes and reads.
 
-Every document the skill writes is package 18 / schema 17 and needs SimpleDiagrams
-5.1.0 or later. Besides shapes, text and connectors it holds the shapes the app draws
-itself (complex shapes: containers, swimlanes, tables, callouts and UML lifelines), connector
-ends attached anywhere along a lifeline, and label regions that start outside their
-shape.
+Every document the skill writes is package 19 / schema 18 and needs SimpleDiagrams 5.2
+or later. Besides shapes, text and connectors it holds the shapes the app draws itself
+(complex shapes: containers, swimlanes, tables, entity tables, callouts, UML lifelines,
+rings, flows, pyramids and funnels, cycles and gauges), connector ends attached anywhere
+along a lifeline, and label regions that start outside their shape.
 
 A `.simplediagram` document is a folder holding `manifest.json`,
 `document.json` and an `assets/` directory. These Pydantic models describe the
@@ -20,7 +20,8 @@ hear about.
 
 Left out of the profile, and therefore rejected here even though the app can
 read them: embedded images and embedded library artwork, shape data, page
-background images, print layout, and unresolved legacy content.
+background images, print layout, unresolved legacy content, a container's Automatic
+layout or artwork, and a place a person chose for a part's words.
 
 `FORMAT_VERSION` and `SCHEMA_VERSION` are separate counters and both are
 pinned. See VERSIONS.md before changing either.
@@ -30,7 +31,8 @@ from __future__ import annotations
 
 import math
 import unicodedata
-from typing import Annotated, Any, Literal
+from collections.abc import Callable
+from typing import Annotated, Any, Literal, NamedTuple
 
 from pydantic import (
     BaseModel,
@@ -38,13 +40,14 @@ from pydantic import (
     Field,
     SerializerFunctionWrapHandler,
     StringConstraints,
+    ValidationInfo,
     model_serializer,
     model_validator,
 )
 
 FORMAT_NAME = "com.simplediagrams.document"
-FORMAT_VERSION = 18
-SCHEMA_VERSION = 17
+FORMAT_VERSION = 19
+SCHEMA_VERSION = 18
 
 # The app's limits on complex shapes (ComplexShape.Limits and the drawing constants).
 MIN_SHARE = 0.000_001
@@ -55,6 +58,25 @@ MAX_TABLE_COLUMNS = 50
 MAX_TABLE_CELLS = 2_000
 MAX_HOLDER_NESTING = 4
 MAX_COMPLEX_SHAPE_TEXTS = 100_000
+# How much a complex shape and a page of them hold (document format 19, elements 12.11). A
+# document over any of these is refused whole. Characters are Unicode scalars.
+MAX_HOLDER_MEMBERS = 1_000
+MAX_SWIMLANES_MEMBERS = 2_000
+MAX_LANE_TITLE = 1_000
+MAX_LANE_TITLE_RUNS = 100
+MAX_CELL_CHARACTERS = 2_000
+MAX_CELL_RUNS = 200
+MAX_TABLE_CHARACTERS = 100_000
+MAX_TABLE_RUNS = 10_000
+MAX_PAGE_COMPLEX_SHAPES = 2_000
+MAX_PAGE_HOLDERS = 500
+MAX_PAGE_PART_CHARACTERS = 1_000_000
+MAX_PART_TEXT = 500
+MAX_ENTITY_FIELDS = 60
+MAX_FIELD_MARKS = 8
+FIELD_MARKS = ("primary_key", "foreign_key", "unique", "indexed", "nullable")
+# The numbers from here up are the ones a shape's parts own.
+FIRST_PART_POINT = 8
 MIN_TABLE_COLUMN_WIDTH = 16.0
 MIN_TABLE_ROW_HEIGHT = 12.0
 # A new swimlanes' title strip and title band, and the thinnest either (or a lane) may be.
@@ -63,6 +85,32 @@ MAX_SWIMLANES_STRIP = 10_000.0
 LIFELINE_HEAD_HEIGHT = {"box": 40.0, "actor": 72.0}
 SHORTEST_LIFELINE_LINE = 20.0
 DESTROY_MARK_SIZE = 24.0
+# How the app lays out the shapes it draws from their parts, which fixes where their
+# connection points are: from each generator's starting values.
+FLOW_BASE_SHAPES = ("chevron", "arrow_box", "block_arrow", "rectangle", "rounded_rectangle", "circle", "hexagon")
+FLOW_PLAIN_GAP = 12.0
+FLOW_POINTING_GAP = 6.0
+FLOW_LARGEST_GAP_SHARE = 0.25
+FLOW_OVERLAP_SHARE = 0.2
+FLOW_POINT_DEPTH_SHARE = 0.35
+FLOW_POINTER_BASE_SHARE = 0.3
+FLOW_POINTER_DEPTH_SHARE = 0.5
+FLOW_SMALLEST_POINTER_DEPTH = 4.0
+FLOW_LARGEST_POINTER_SHARE = 1 / 3
+PYRAMID_GAP = 4.0
+PYRAMID_LARGEST_GAP_SHARE = 0.25
+FUNNEL_SPOUT_SHARE = 0.2
+CYCLE_GAP = 4.0
+CYCLE_LARGEST_GAP_SHARE = 0.25
+CYCLE_LARGEST_REACH_SHARE = 0.75
+CYCLE_HEAD_OVERHANG_SHARE = 0.25
+CYCLE_POINT_DEPTH_SHARE = 0.35
+CYCLE_LARGEST_POINT_SHARE = 0.5
+GAUGE_CAPTION_ROOM_SHARE = 0.4
+GAUGE_HUB_SHARE = 0.05
+GAUGE_CAPTION_MARGIN = 6.0
+# Where the eight numbered points of a ring or cycle lie, in degrees clockwise from three o'clock.
+RING_POINT_ANGLES = {0: 180.0, 1: 0.0, 2: -90.0, 3: 90.0, 4: -135.0, 5: 135.0, 6: -45.0, 7: 45.0}
 # The id of a lifeline's one attach line, its dashed line; attachments name it.
 LIFELINE_ATTACH_LINE = 0
 # How far a lane, row or column may fall short of its smallest size, as a fraction of it.
@@ -137,7 +185,7 @@ PointKind = Literal["straight", "curve"]
 FontWeight = Literal["regular", "medium", "bold"]
 TextAlignment = Literal["leading", "center", "trailing", "justified"]
 TextPosition = Literal["above", "top", "middle", "bottom", "below"]
-NoteStyle = Literal["stickyNote", "indexCard"]
+NoteStyle = Literal["stickyNote", "indexCard", "tapedNote", "tag", "notebookPage", "pinnedNote"]
 Ending = Literal[
     "none",
     "stop",
@@ -214,8 +262,8 @@ class Manifest(WireModel):
     """The whole of `manifest.json`. All three keys are required."""
 
     format: Literal["com.simplediagrams.document"]
-    format_version: Literal[18] = Field(
-        description="Package format, which SimpleDiagrams 5.1.0 and later read. document.json's "
+    format_version: Literal[19] = Field(
+        description="Package format, which SimpleDiagrams 5.2 and later read. document.json's "
         "schema_version is this minus one."
     )
     contains_legacy_source: Literal[False]
@@ -253,6 +301,7 @@ class CharacterStyle(WireModel):
     is_italic: bool
     is_underlined: bool
     color_hex: Color
+    highlight_hex: Color | None = Field(default=None, description="A highlight behind these characters.")
 
     @model_validator(mode="after")
     def _check_font_family(self) -> CharacterStyle:
@@ -286,7 +335,7 @@ class ParagraphRun(WireModel):
 
 
 class TextContent(WireModel):
-    """The label of an element or connector. Every key except background_hex is required.
+    """The label of an element or connector. Every key is required.
 
     Runs are only allowed over plain ASCII text. The app requires each run to
     start and end between whole user-perceived characters, which for accented
@@ -298,7 +347,6 @@ class TextContent(WireModel):
     character_runs: list[CharacterRun]
     base_alignment: TextAlignment
     paragraph_runs: list[ParagraphRun]
-    background_hex: Color | None = None
 
     @model_validator(mode="after")
     def _check_runs(self) -> TextContent:
@@ -549,8 +597,24 @@ class Attachment(WireModel):
 
 
 # ---------------------------------------------------------------------------
-# Complex shapes: shapes the app draws from a few stored values
+# Complex shapes: one structure, read against the complex-shape catalogue
 # ---------------------------------------------------------------------------
+
+
+Word = Annotated[
+    str,
+    StringConstraints(pattern=r"^[a-z][a-z0-9]*(_[a-z0-9]+)*$", max_length=32),
+    Field(description="A machine word: lower-case letters and digits in groups joined by single underscores."),
+]
+SettingValue = bool | float | Word | Point | Attachment
+
+
+def _refuse_null(data: Any, info: ValidationInfo) -> Any:
+    """The app refuses `null` anywhere in a complex shape's record but its texts, where
+    elsewhere it reads one as absent. Only a file can hold one: a builder's None is left out."""
+    if info.mode == "json" and isinstance(data, dict) and None in data.values():
+        raise ValueError("a complex shape's record holds no null; leave the key out")
+    return data
 
 
 class HolderMember(WireModel):
@@ -561,109 +625,331 @@ class HolderMember(WireModel):
     id: UUIDString
 
 
-class Lane(WireModel):
-    """One lane of a swimlanes shape. Its id is unique within its shape."""
+class PartStyle(WireModel):
+    """A part's own paint. A missing channel follows the element's style, and a texture
+    comes only with its colour."""
 
-    id: UUIDString
-    title: TextContent
-    size: Share
-    members: Annotated[list[HolderMember], Field(max_length=MAX_ELEMENTS)]
+    fill_hex: Color | None = None
+    fill_texture: Texture | None = None
+    stroke_hex: Color | None = None
+    stroke_texture: Texture | None = None
+    line_width: LineWidth | None = None
+
+    _no_null = model_validator(mode="before")(_refuse_null)
+
+    @model_validator(mode="after")
+    def _check_channels(self) -> PartStyle:
+        if not any(value is not None for value in self.__dict__.values()):
+            raise ValueError("a part's style holds at least one channel")
+        if (self.fill_texture and not self.fill_hex) or (self.stroke_texture and not self.stroke_hex):
+            raise ValueError("a part's texture comes only with its colour")
+        return self
 
 
-# The keys each type of complex shape may carry beyond `type` and `hand_drawn`, and the
-# ones it must, as the app reads and writes them.
-COMPLEX_SHAPE_KEYS: dict[str, frozenset[str]] = {
-    "container": frozenset({"members", "title_style"}),
-    "swimlanes": frozenset({"direction", "lanes", "title_strip_size", "title_band_size"}),
-    "table": frozenset({"row_sizes", "column_sizes", "cells", "header_row"}),
-    "callout": frozenset({"tail_tip", "tail_attachment"}),
-    "lifeline": frozenset({"head_style", "ends_in_destroy_mark"}),
+class Part(WireModel):
+    """One piece of a complex shape a person can touch: a lane, a row, a section, a step.
+
+    Every part has a `role`; which of the other keys it holds is the catalogue entry's to
+    say. A place a person chose for a part's words (`text_layout`) is not written by this
+    profile.
+    """
+
+    role: Word
+    id: UUIDString | None = None
+    text: TextContent | None = None
+    style: PartStyle | None = None
+    size: Share | None = None
+    members: Annotated[list[HolderMember], Field(max_length=MAX_HOLDER_MEMBERS)] | None = None
+    cells: Annotated[list[TextContent], Field(max_length=MAX_TABLE_COLUMNS)] | None = None
+    marks: Annotated[list[Word], Field(max_length=MAX_FIELD_MARKS)] | None = None
+    point_ids: (
+        Annotated[list[Annotated[int, Field(ge=FIRST_PART_POINT, le=INT64_MAX)]], Field(max_length=2)] | None
+    ) = None
+
+    _no_null = model_validator(mode="before")(_refuse_null)
+
+    @property
+    def texts(self) -> list[TextContent]:
+        """The words this part holds."""
+        return ([self.text] if self.text is not None else []) + list(self.cells or [])
+
+
+def _word_in(*words: str) -> Callable[[SettingValue], bool]:
+    return lambda value: value in words and isinstance(value, str)
+
+
+def _is_boolean(value: SettingValue) -> bool:
+    return isinstance(value, bool)
+
+
+def _is_number(value: SettingValue) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _number_from(low: float, high: float) -> Callable[[SettingValue], bool]:
+    return lambda value: _is_number(value) and low <= value <= high
+
+
+def _is_band_width(value: SettingValue) -> bool:
+    """A multiple of 10 from 10 to 10,000."""
+    return _is_number(value) and 10 <= value <= 10_000 and value % 10 == 0
+
+
+def _is_point(value: SettingValue) -> bool:
+    return isinstance(value, Point)
+
+
+def _is_attachment(value: SettingValue) -> bool:
+    return isinstance(value, Attachment) and not value.on_line
+
+
+class _Role(NamedTuple):
+    """What a catalogue entry declares for one role of part."""
+
+    name: str
+    fewest: int
+    most: int
+    required: frozenset[str]
+    optional: frozenset[str] = frozenset()
+    points: int = 0
+
+
+class _Entry(NamedTuple):
+    """What the complex-shape catalogue declares for one type at version 1."""
+
+    settings: dict[str, Callable[[SettingValue], bool]]
+    roles: tuple[_Role, ...] = ()
+    optional_settings: frozenset[str] = frozenset()
+    holds_members: bool = False
+    has_own_text: bool = True
+    # The numbers from 0 to 7 of a shape that places its own points; None for a shape whose
+    # element lists its points as any element does.
+    own_points: frozenset[int] | None = None
+
+
+_LABELLED = frozenset({"id", "text"})
+_PAINTABLE = frozenset({"style"})
+_EIGHT = frozenset(range(8))
+_ROW = frozenset({"id", "size", "cells"})
+
+CATALOGUE: dict[str, _Entry] = {
+    "container": _Entry(
+        settings={"layout": _word_in("free", "proportional"), "title_style": _word_in("band", "corner_tag")},
+        holds_members=True,
+    ),
+    "swimlanes": _Entry(
+        settings={
+            "direction": _word_in("horizontal", "vertical"),
+            "title_strip_size": _number_from(SWIMLANES_STRIP, MAX_SWIMLANES_STRIP),
+            "title_band_size": _number_from(SWIMLANES_STRIP, MAX_SWIMLANES_STRIP),
+        },
+        roles=(_Role("lane", 1, MAX_LANES, frozenset({"id", "text", "size", "members"})),),
+    ),
+    "table": _Entry(
+        settings={"header_row": _is_boolean},
+        roles=(
+            _Role("column", 1, MAX_TABLE_COLUMNS, frozenset({"size"})),
+            _Role("row", 1, MAX_TABLE_ROWS, frozenset({"size", "cells"})),
+        ),
+        has_own_text=False,
+    ),
+    "entity_table": _Entry(
+        settings={},
+        roles=(
+            _Role("column", 2, 2, frozenset({"size"})),
+            _Role("header", 1, 1, _ROW),
+            _Role("field", 1, MAX_ENTITY_FIELDS, _ROW | {"marks", "point_ids"}, points=2),
+        ),
+        has_own_text=False,
+        own_points=_EIGHT,
+    ),
+    "callout": _Entry(
+        settings={"tail_tip": _is_point, "tail_attachment": _is_attachment},
+        optional_settings=frozenset({"tail_tip", "tail_attachment"}),
+    ),
+    "lifeline": _Entry(settings={"head_style": _word_in("box", "actor"), "ends_in_destroy_mark": _is_boolean}),
+    "ring": _Entry(
+        settings={"ring_width": lambda value: value == "full" or _is_band_width(value)},
+        roles=(_Role("section", 1, 12, _LABELLED | {"point_ids"}, _PAINTABLE, points=1),),
+        has_own_text=False,
+        own_points=_EIGHT,
+    ),
+    "flow": _Entry(
+        settings={
+            "base_shape": _word_in(*FLOW_BASE_SHAPES),
+            "direction": _word_in("across", "down"),
+            "spacing": _word_in("gap", "touch", "overlap"),
+            "pointer": _is_boolean,
+        },
+        roles=(_Role("step", 2, 12, _LABELLED | {"point_ids"}, _PAINTABLE, points=2),),
+        has_own_text=False,
+        own_points=_EIGHT,
+    ),
+    "pyramid": _Entry(
+        settings={"form": _word_in("pyramid", "funnel")},
+        roles=(_Role("layer", 2, 8, _LABELLED | {"point_ids"}, _PAINTABLE, points=2),),
+        has_own_text=False,
+        own_points=frozenset({2, 3}),
+    ),
+    "cycle": _Entry(
+        settings={
+            "ring_width": _is_band_width,
+            "direction": _word_in("clockwise", "anticlockwise"),
+            "arrow_style": _word_in("arrow", "chevron"),
+        },
+        roles=(_Role("step", 3, 8, _LABELLED | {"point_ids"}, _PAINTABLE, points=1),),
+        has_own_text=False,
+        own_points=_EIGHT,
+    ),
+    "gauge": _Entry(
+        settings={
+            "minimum": _number_from(-1_000_000, 1_000_000),
+            "maximum": _number_from(-1_000_000, 1_000_000),
+            "value": _number_from(-1_000_000, 1_000_000),
+            "auto_rotate_labels": _is_boolean,
+        },
+        roles=(
+            _Role("band", 1, 5, _LABELLED, _PAINTABLE),
+            _Role("needle", 1, 1, frozenset({"id"}), _PAINTABLE),
+        ),
+        own_points=_EIGHT,
+    ),
 }
-COMPLEX_SHAPE_REQUIRED_KEYS: dict[str, frozenset[str]] = {
-    "container": frozenset({"members"}),
-    "swimlanes": frozenset({"direction", "lanes"}),
-    "table": frozenset({"row_sizes", "column_sizes", "cells"}),
-    "callout": frozenset(),
-    "lifeline": frozenset(),
-}
-StripSize = Annotated[float, Field(ge=SWIMLANES_STRIP, le=MAX_SWIMLANES_STRIP, allow_inf_nan=False)]
+# The kinds whose words sit in parts of their own, each at most MAX_PART_TEXT characters.
+SHORT_TEXT_ROLES = frozenset({"section", "step", "layer", "band"})
+ComplexShapeType = Literal[
+    "container", "swimlanes", "table", "entity_table", "callout", "lifeline", "ring", "flow", "pyramid", "cycle", "gauge"
+]
 
 
 class ComplexShape(WireModel):
-    """The `complex_shape` record of an element of kind `complex_shape`.
+    """The `complex_shape` record of an element of kind `complex_shape`: a type and version,
+    its settings, its parts and, for a container, its members.
 
-    It holds only the keys its `type` uses. Each optional key is written only when it
-    differs from the default the app reads in its place: `hand_drawn` only as false,
-    `title_style` only as `corner_tag` (the default is the band), `header_row` only as
-    false, `head_style` only as `actor` (the default is a box) and `ends_in_destroy_mark`
-    only as true. A container's members and a table's sizes and cells are always written.
-
-    - container: `members`, in order; `title_style`.
-    - swimlanes: `direction`; `lanes`, each with an id unique in the shape, a title, a
-      size as a share of the whole, and members; the title strip's and band's thickness
-      when wider than 28.
-    - table: `row_sizes` and `column_sizes` as shares; `cells`, row by row, one text per
-      column; `header_row`.
-    - callout: `tail_tip`, the tail's tip in points from the frame's centre, along the
-      bubble's own axes before flipping; no tip means no tail. `tail_attachment` locks
-      the tail to another shape's anchor and needs a tip, saved where it is drawn.
-    - lifeline: `head_style`; `ends_in_destroy_mark`.
+    The structure is the same for every type, and nothing drawn is saved: SimpleDiagrams
+    draws the shape from these and the element's frame each time. Every setting its type
+    declares is written, even at its default, and a part's role says which keys it holds;
+    `_check_entry` holds a record to its type's entry, as the app does when it reads one.
+    `hand_drawn` is written only as false.
     """
 
-    type: Literal["container", "swimlanes", "table", "callout", "lifeline"]
+    type: ComplexShapeType
+    version: Literal[1]
+    settings: Annotated[dict[Word, SettingValue], Field(max_length=16)]
+    parts: Annotated[list[Part], Field(max_length=256)]
+    members: Annotated[list[HolderMember], Field(max_length=MAX_HOLDER_MEMBERS)] | None = None
     hand_drawn: Literal[False] | None = None
-    members: Annotated[list[HolderMember], Field(max_length=MAX_ELEMENTS)] | None = None
-    title_style: Literal["corner_tag"] | None = None
-    direction: Literal["horizontal", "vertical"] | None = None
-    lanes: Annotated[list[Lane], Field(min_length=1, max_length=MAX_LANES)] | None = None
-    title_strip_size: StripSize | None = None
-    title_band_size: StripSize | None = None
-    row_sizes: Annotated[list[Share], Field(min_length=1, max_length=MAX_TABLE_ROWS)] | None = None
-    column_sizes: Annotated[list[Share], Field(min_length=1, max_length=MAX_TABLE_COLUMNS)] | None = None
-    cells: (
-        Annotated[
-            list[Annotated[list[TextContent], Field(max_length=MAX_TABLE_COLUMNS)]],
-            Field(max_length=MAX_TABLE_ROWS),
-        ]
-        | None
-    ) = None
-    header_row: Literal[False] | None = None
-    tail_tip: Point | None = None
-    tail_attachment: Attachment | None = None
-    head_style: Literal["actor"] | None = None
-    ends_in_destroy_mark: Literal[True] | None = None
+
+    _no_null = model_validator(mode="before")(_refuse_null)
 
     @model_validator(mode="after")
-    def _check_type(self) -> ComplexShape:
-        present = {
-            key for key in frozenset().union(*COMPLEX_SHAPE_KEYS.values())
-            if getattr(self, key) is not None
-        }
-        stray = present - COMPLEX_SHAPE_KEYS[self.type]
-        if stray:
-            raise ValueError(f"a {self.type} does not take {', '.join(sorted(stray))}")
-        missing = COMPLEX_SHAPE_REQUIRED_KEYS[self.type] - present
-        if missing:
-            raise ValueError(f"a {self.type} needs {', '.join(sorted(missing))}")
-        for members in [self.members or []] + [lane.members for lane in self.lanes or []]:
-            listed = [(member.kind, member.id.upper()) for member in members]
-            if len(listed) != len(set(listed)):
-                raise ValueError(f"a {self.type} lists a member twice")
-        if self.lanes is not None and len({lane.id.upper() for lane in self.lanes}) != len(self.lanes):
-            raise ValueError("two lanes of one swimlanes share an id")
-        if self.type == "table":
-            rows, columns = len(self.row_sizes or []), len(self.column_sizes or [])
-            cells = self.cells or []
-            if len(cells) != rows or any(len(row) != columns for row in cells):
-                raise ValueError("a table has one row of cells per row size and one cell per column size")
-            if rows * columns > MAX_TABLE_CELLS:
-                raise ValueError(f"a table has at most {MAX_TABLE_CELLS} cells")
-        if self.tail_attachment is not None:
-            if self.tail_tip is None:
-                raise ValueError("a callout's locked tail also needs its tail_tip, where it is drawn")
-            if self.tail_attachment.on_line:
-                raise ValueError("a callout's tail locks to a connection point, never along a line")
+    def _check_entry(self) -> ComplexShape:
+        entry = CATALOGUE[self.type]
+        missing = set(entry.settings) - entry.optional_settings - set(self.settings)
+        stray = set(self.settings) - set(entry.settings)
+        if missing or stray:
+            raise ValueError(
+                f"a {self.type} holds the settings {', '.join(sorted(entry.settings)) or 'none'}; "
+                f"missing {sorted(missing)}, not its own {sorted(stray)}"
+            )
+        for name, value in self.settings.items():
+            if not entry.settings[name](value):
+                raise ValueError(f"a {self.type}'s {name} cannot be {value!r}")
+        if entry.holds_members != (self.members is not None):
+            raise ValueError(f"a {self.type} {'needs' if entry.holds_members else 'does not take'} members")
+        self._check_parts(entry)
+        # Across all of its lanes too: one shape in two lanes of one swimlanes is refused.
+        listed = [(member.kind, member.id.upper()) for member in self.all_members]
+        if len(listed) != len(set(listed)):
+            raise ValueError(f"a {self.type} lists a member twice")
+        getattr(self, f"_check_{self.type}", lambda: None)()
         return self
+
+    def _check_parts(self, entry: _Entry) -> None:
+        """The parts come in the entry's roles and order, each with exactly its role's keys."""
+        roles = {role.name: role for role in entry.roles}
+        order = [part.role for part in self.parts]
+        expected = [role.name for role in entry.roles for _ in range(order.count(role.name))]
+        if order != expected or not set(order) <= set(roles):
+            raise ValueError(f"a {self.type}'s parts come in the order {', '.join(roles) or 'of none at all'}")
+        for role in entry.roles:
+            if not role.fewest <= order.count(role.name) <= role.most:
+                raise ValueError(f"a {self.type} has {role.fewest} to {role.most} parts of role {role.name}")
+        for part in self.parts:
+            role = roles[part.role]
+            present = {key for key in Part.model_fields if key != "role" and getattr(part, key) is not None}
+            if present - role.required - role.optional or role.required - present:
+                raise ValueError(f"a {self.type}'s {part.role} holds {', '.join(sorted(role.required))}")
+            if len(part.point_ids or []) != role.points:
+                raise ValueError(f"a {self.type}'s {part.role} owns {role.points} connection points")
+            if part.role in SHORT_TEXT_ROLES and part.text is not None and len(part.text.string) > MAX_PART_TEXT:
+                raise ValueError(f"a {part.role}'s words hold at most {MAX_PART_TEXT} characters")
+        identities = [part.id.upper() for part in self.parts if part.id is not None]
+        if len(identities) != len(set(identities)):
+            raise ValueError(f"two parts of one {self.type} share an id")
+        points = [point for part in self.parts for point in part.point_ids or []]
+        if len(points) != len(set(points)):
+            raise ValueError(f"a {self.type} lists a connection point twice")
+
+    def _check_container(self) -> None:
+        if len(self.members or []) > MAX_HOLDER_MEMBERS:
+            raise ValueError(f"a container holds at most {MAX_HOLDER_MEMBERS} shapes")
+
+    def _check_swimlanes(self) -> None:
+        for lane in self.lanes:
+            assert lane.text is not None
+            if len(lane.text.string) > MAX_LANE_TITLE:
+                raise ValueError(f"a lane title holds at most {MAX_LANE_TITLE} characters")
+            if len(lane.text.character_runs) + len(lane.text.paragraph_runs) > MAX_LANE_TITLE_RUNS:
+                raise ValueError(f"a lane title has at most {MAX_LANE_TITLE_RUNS} runs")
+        if sum(len(lane.members or []) for lane in self.lanes) > MAX_SWIMLANES_MEMBERS:
+            raise ValueError(f"the lanes of one swimlanes hold at most {MAX_SWIMLANES_MEMBERS} shapes")
+
+    def _check_table(self) -> None:
+        columns = self.column_sizes
+        rows = self.cell_rows
+        if any(len(row) != len(columns) for row in rows):
+            raise ValueError("a table has one cell per column in every row")
+        if len(rows) * len(columns) > MAX_TABLE_CELLS:
+            raise ValueError(f"a table has at most {MAX_TABLE_CELLS} cells")
+        cells = [cell for row in rows for cell in row]
+        for cell in cells:
+            if len(cell.string) > MAX_CELL_CHARACTERS:
+                raise ValueError(f"a table cell holds at most {MAX_CELL_CHARACTERS} characters")
+            if len(cell.character_runs) + len(cell.paragraph_runs) > MAX_CELL_RUNS:
+                raise ValueError(f"a table cell has at most {MAX_CELL_RUNS} runs")
+        if sum(len(cell.string) for cell in cells) > MAX_TABLE_CHARACTERS:
+            raise ValueError(f"a table holds at most {MAX_TABLE_CHARACTERS} characters")
+        if sum(len(cell.character_runs) + len(cell.paragraph_runs) for cell in cells) > MAX_TABLE_RUNS:
+            raise ValueError(f"a table has at most {MAX_TABLE_RUNS} runs")
+
+    def _check_entity_table(self) -> None:
+        self._check_table()
+        for part in self.parts:
+            if part.role == "header" and (part.cells or [])[1:] and (part.cells or [])[1].string:
+                raise ValueError("an entity table's header holds its name and then an empty text")
+            for mark in part.marks or []:
+                if mark not in FIELD_MARKS:
+                    raise ValueError(f"an entity table's field cannot be marked {mark}")
+            if len(set(part.marks or [])) != len(part.marks or []):
+                raise ValueError("an entity table's field repeats a mark")
+
+    def _check_callout(self) -> None:
+        if "tail_attachment" in self.settings and "tail_tip" not in self.settings:
+            raise ValueError("a callout's locked tail also needs its tail_tip, where it is drawn")
+
+    def _check_flow(self) -> None:
+        takes_more = self.settings["base_shape"] in ("rectangle", "rounded_rectangle", "circle")
+        if not takes_more and (self.settings["spacing"] == "overlap" or self.settings["pointer"] is True):
+            raise ValueError(f"a {self.settings['base_shape']} flow has no overlap and no pointer")
+
+    def _check_gauge(self) -> None:
+        low, high, value = (float(self.settings[name]) for name in ("minimum", "maximum", "value"))  # type: ignore[arg-type]
+        if not low < high or not low <= value <= high:
+            raise ValueError("a gauge's minimum is below its maximum, and its value lies between them")
+
+    def _of_role(self, role: str) -> list[Part]:
+        return [part for part in self.parts if part.role == role]
 
     @property
     def holds_shapes(self) -> bool:
@@ -673,14 +959,54 @@ class ComplexShape(WireModel):
     @property
     def all_members(self) -> list[HolderMember]:
         """What a container or every lane of swimlanes holds, in order."""
-        return list(self.members or []) + [member for lane in self.lanes or [] for member in lane.members]
+        return list(self.members or []) + [member for part in self.parts for member in part.members or []]
 
     @property
     def texts(self) -> list[TextContent]:
-        """The lane titles or table cells it holds besides its own text."""
-        if self.type == "swimlanes":
-            return [lane.title for lane in self.lanes or []]
-        return [cell for row in self.cells or [] for cell in row]
+        """The lane titles, cells and part labels it holds besides its own text."""
+        return [text for part in self.parts for text in part.texts]
+
+    @property
+    def lanes(self) -> list[Part]:
+        return self._of_role("lane")
+
+    @property
+    def column_sizes(self) -> list[float]:
+        return [part.size or 0.0 for part in self._of_role("column")]
+
+    @property
+    def row_parts(self) -> list[Part]:
+        """A table's rows, or an entity table's header and fields."""
+        return [part for part in self.parts if part.role in ("row", "header", "field")]
+
+    @property
+    def row_sizes(self) -> list[float]:
+        return [part.size or 0.0 for part in self.row_parts]
+
+    @property
+    def cell_rows(self) -> list[list[TextContent]]:
+        return [list(part.cells or []) for part in self.row_parts]
+
+    @property
+    def title_style(self) -> str:
+        return str(self.settings.get("title_style", "band"))
+
+    @property
+    def tail_tip(self) -> Point | None:
+        tip = self.settings.get("tail_tip")
+        return tip if isinstance(tip, Point) else None
+
+    @property
+    def tail_attachment(self) -> Attachment | None:
+        attachment = self.settings.get("tail_attachment")
+        return attachment if isinstance(attachment, Attachment) else None
+
+    @property
+    def own_point_ids(self) -> set[int] | None:
+        """The numbers of the connection points a shape that places its own has: its entry's
+        and its parts'. None for a shape whose element lists its points."""
+        own = CATALOGUE[self.type].own_points
+        return None if own is None else set(own) | {point for part in self.parts for point in part.point_ids or []}
 
 
 def _lengths(shares: list[float], length: float) -> list[float]:
@@ -692,8 +1018,8 @@ def _lengths(shares: list[float], length: float) -> list[float]:
 def lifeline_line(shape: ComplexShape, frame: Rect) -> tuple[float, float]:
     """Where a lifeline's dashed line starts and ends, in points down from its frame's top:
     from the bottom of its head to the frame's bottom, or to half a destroy mark above it."""
-    head = LIFELINE_HEAD_HEIGHT[shape.head_style or "box"]
-    inset = DESTROY_MARK_SIZE / 2 if shape.ends_in_destroy_mark else 0.0
+    head = LIFELINE_HEAD_HEIGHT[str(shape.settings["head_style"])]
+    inset = DESTROY_MARK_SIZE / 2 if shape.settings["ends_in_destroy_mark"] else 0.0
     start = min(head, frame.height)
     return start, max(start, frame.height - inset)
 
@@ -701,27 +1027,253 @@ def lifeline_line(shape: ComplexShape, frame: Rect) -> tuple[float, float]:
 def lifeline_smallest_height(shape: ComplexShape) -> float:
     """The shortest frame a lifeline may have: its head, the shortest line, and half a
     destroy mark when it ends in one."""
-    head = LIFELINE_HEAD_HEIGHT[shape.head_style or "box"]
-    return head + SHORTEST_LIFELINE_LINE + (DESTROY_MARK_SIZE / 2 if shape.ends_in_destroy_mark else 0.0)
+    head = LIFELINE_HEAD_HEIGHT[str(shape.settings["head_style"])]
+    return head + SHORTEST_LIFELINE_LINE + (DESTROY_MARK_SIZE / 2 if shape.settings["ends_in_destroy_mark"] else 0.0)
 
 
 def swimlane_frames(shape: ComplexShape, frame: Rect) -> list[Rect]:
     """Each lane's frame on the page, in lane order, for an unturned swimlanes: below the
     title band, sharing the rest by their shares, as the app draws them."""
-    band = min(shape.title_band_size or SWIMLANES_STRIP, frame.height)
-    lanes = shape.lanes or []
+    band = min(float(shape.settings["title_band_size"]), frame.height)  # type: ignore[arg-type]
+    lanes = shape.lanes
+    shares = [lane.size or 0.0 for lane in lanes]
     frames = []
-    if shape.direction == "horizontal":
+    if shape.settings["direction"] == "horizontal":
         y = frame.y + band
-        for size in _lengths([lane.size for lane in lanes], max(0.0, frame.height - band)):
+        for size in _lengths(shares, max(0.0, frame.height - band)):
             frames.append(Rect(x=frame.x, y=y, width=frame.width, height=max(size, 1e-9)))
             y += size
     else:
         x = frame.x
-        for size in _lengths([lane.size for lane in lanes], frame.width):
+        for size in _lengths(shares, frame.width):
             frames.append(Rect(x=x, y=frame.y + band, width=max(size, 1e-9), height=max(frame.height - band, 1e-9)))
             x += size
     return frames
+
+
+class FlowStep(NamedTuple):
+    """Where one step of a flow lies along it and across it, in points of the flow drawn
+    across: a flow running down is this reflected in the diagonal through the top left."""
+
+    x: float
+    y: float
+    length: float
+    thickness: float
+    pointer_depth: float
+    back: float
+    front: float
+
+
+def flow_steps(shape: ComplexShape, width: float, height: float) -> list[FlowStep]:
+    """Each step of a flow, worked out as the app lays them out."""
+    down = shape.settings["direction"] == "down"
+    length, thickness = (height, width) if down else (width, height)
+    base = str(shape.settings["base_shape"])
+    spacing = shape.settings["spacing"]
+    count = len(shape.parts)
+    points_the_way = base in ("chevron", "arrow_box", "block_arrow")
+
+    def point_depth(step_length: float) -> float:
+        return min(thickness * FLOW_POINT_DEPTH_SHARE, step_length / 2)
+
+    def advance(step_length: float) -> float:
+        nesting = point_depth(step_length) if base == "chevron" else 0.0
+        if spacing == "gap":
+            half = thickness / 2
+            gap = FLOW_POINTING_GAP if points_the_way else FLOW_PLAIN_GAP
+            if base == "chevron" and half > 0:
+                gap = FLOW_POINTING_GAP * math.hypot(point_depth(step_length), half) / half
+            return step_length - nesting + min(gap, step_length * FLOW_LARGEST_GAP_SHARE)
+        if spacing == "touch":
+            return step_length - nesting
+        return step_length - nesting - step_length * FLOW_OVERLAP_SHARE
+
+    low, high = 0.0, max(0.0, length)
+    for _ in range(64):
+        middle = (low + high) / 2
+        if middle + (count - 1) * advance(middle) <= length:
+            low = middle
+        else:
+            high = middle
+    share = low
+    if base == "circle":
+        side = min(share, thickness)
+        top = (thickness - side) / 2
+        if spacing == "gap":
+            pitch = (length - side) / (count - 1)
+            start = 0.0
+        else:
+            pitch = side if spacing == "touch" else side * (1 - FLOW_OVERLAP_SHARE)
+            start = (length - side - (count - 1) * pitch) / 2
+        boxes = [(start + index * pitch, top, side, side) for index in range(count)]
+        lead = start
+    else:
+        pitch = advance(share)
+        boxes = [(index * pitch, 0.0, share, thickness) for index in range(count)]
+        lead = 0.0
+    x, y, last_length, last_thickness = boxes[-1]
+    boxes[-1] = (length - lead - last_length, y, last_length, last_thickness)
+    steps = []
+    for index, (x, y, step_length, step_thickness) in enumerate(boxes):
+        depth = 0.0
+        if shape.settings["pointer"] is True and index < count - 1:
+            depth = min(
+                max(step_thickness * FLOW_POINTER_BASE_SHARE * FLOW_POINTER_DEPTH_SHARE, FLOW_SMALLEST_POINTER_DEPTH),
+                step_length * FLOW_LARGEST_POINTER_SHARE,
+            )
+        back = x + (point_depth(step_length) if base == "chevron" else 0.0)
+        steps.append(FlowStep(x, y, step_length, step_thickness, depth, back, x + step_length + depth))
+    return steps
+
+
+class PyramidLayer(NamedTuple):
+    """One layer of a pyramid or funnel, in points from the frame's top and middle line."""
+
+    top: float
+    bottom: float
+    top_half_width: float
+    bottom_half_width: float
+
+
+def pyramid_layers(shape: ComplexShape, width: float, height: float) -> list[PyramidLayer]:
+    """Each layer, top to bottom, as the app cuts the figure."""
+    count = len(shape.parts)
+    layer_height = (height - (count - 1) * PYRAMID_GAP) / count
+    gap = PYRAMID_GAP
+    if gap > layer_height * PYRAMID_LARGEST_GAP_SHARE:
+        layer_height = height / (count + (count - 1) * PYRAMID_LARGEST_GAP_SHARE)
+        gap = layer_height * PYRAMID_LARGEST_GAP_SHARE
+    half = width / 2
+
+    def reach(y: float) -> float:
+        if shape.settings["form"] == "pyramid":
+            return half * y / height
+        return half * (1 - (1 - FUNNEL_SPOUT_SHARE) * y / height)
+
+    layers = []
+    for index in range(count):
+        top = index * (layer_height + gap)
+        bottom = height if index == count - 1 else top + layer_height
+        layers.append(PyramidLayer(top, bottom, reach(top), reach(bottom)))
+    return layers
+
+
+class CycleBand(NamedTuple):
+    """A cycle's circle and band, in points; `share`, `gap` and `depth` are degrees."""
+
+    radius: float
+    outer: float
+    inner: float
+    share: float
+    gap: float
+    depth: float
+
+
+def cycle_band(shape: ComplexShape, width: float, height: float) -> CycleBand:
+    """A cycle's band and how its steps share it, as the app works them out."""
+    radius = min(width, height) / 2
+    arrow = shape.settings["arrow_style"] == "arrow"
+    overhang_share = CYCLE_HEAD_OVERHANG_SHARE if arrow else 0.0
+    band = min(
+        float(shape.settings["ring_width"]),  # type: ignore[arg-type]
+        CYCLE_LARGEST_REACH_SHARE * radius / (1 + 2 * overhang_share),
+    )
+    overhang = band * overhang_share
+    outer = radius - overhang
+    inner = outer - band
+    share = 360 / len(shape.parts)
+    middle = (outer + inner) / 2
+    share_length = middle * share * math.pi / 180
+    slope = 1.0 if arrow else math.hypot(0.5, CYCLE_POINT_DEPTH_SHARE) / 0.5
+    gap_length = min(CYCLE_GAP * slope, share_length * CYCLE_LARGEST_GAP_SHARE)
+    depth_length = min(
+        (band + 2 * overhang) * CYCLE_POINT_DEPTH_SHARE, (share_length - gap_length) * CYCLE_LARGEST_POINT_SHARE
+    )
+    return CycleBand(radius, outer, inner, share, gap_length / middle * 180 / math.pi, depth_length / middle * 180 / math.pi)
+
+
+def gauge_circle(width: float, height: float) -> tuple[float, float, float, float]:
+    """A gauge's half circle: its centre's x and y, its radius, and the caption room's bottom."""
+    radius = min(width / 2, height / (1 + GAUGE_CAPTION_ROOM_SHARE))
+    top = (height - radius * (1 + GAUGE_CAPTION_ROOM_SHARE)) / 2
+    return width / 2, top + radius, radius, top + radius + radius * GAUGE_CAPTION_ROOM_SHARE
+
+
+def gauge_caption_room(width: float, height: float) -> tuple[float, float]:
+    """The box a gauge's caption sits in: from its hub to the bottom of the caption's room, as
+    wide as its half circle less a margin each side."""
+    _, centre_y, radius, bottom = gauge_circle(width, height)
+    return 2 * radius - 2 * GAUGE_CAPTION_MARGIN, bottom - centre_y - radius * GAUGE_HUB_SHARE
+
+
+def _on_circle(cx: float, cy: float, distance: float, degrees: float) -> tuple[float, float]:
+    """The point at `distance` from a centre at `degrees`, clockwise on screen from three o'clock."""
+    turn = math.radians(degrees)
+    return cx + distance * math.cos(turn), cy + distance * math.sin(turn)
+
+
+def shape_points(shape: ComplexShape, width: float, height: float) -> dict[int, tuple[float, float]]:
+    """Where each connection point of a shape that places its own is drawn, as fractions of
+    its frame. The file lists none of these; the app works them out as it reads the document,
+    and draws a connector's end there, so a route is stored ending at the same place."""
+    cx, cy = width / 2, height / 2
+    points: dict[int, tuple[float, float]] = {}
+    if shape.type == "entity_table":
+        points = {anchor.id: (anchor.x * width, anchor.y * height) for anchor in standard_connection_points()}
+        top = 0.0
+        for part, size in zip(shape.row_parts, _lengths(shape.row_sizes, height), strict=True):
+            if part.point_ids:
+                points[part.point_ids[0]] = (0.0, top + size / 2)
+                points[part.point_ids[1]] = (width, top + size / 2)
+            top += size
+    elif shape.type == "ring":
+        radius = min(width, height) / 2
+        points = {point: _on_circle(cx, cy, radius, degrees) for point, degrees in RING_POINT_ANGLES.items()}
+        share = 360 / len(shape.parts)
+        for index, part in enumerate(shape.parts):
+            assert part.point_ids is not None
+            points[part.point_ids[0]] = _on_circle(cx, cy, radius, -90 + index * share + share / 2)
+    elif shape.type == "flow":
+        steps = flow_steps(shape, width, height)
+        down = shape.settings["direction"] == "down"
+        place = (lambda x, y: (y, x)) if down else (lambda x, y: (x, y))
+        for step, part in zip(steps, shape.parts, strict=True):
+            assert part.point_ids is not None
+            middle = step.y + step.thickness / 2
+            points[part.point_ids[0]] = place(step.back, middle)
+            points[part.point_ids[1]] = place(step.front, middle)
+        # The box around what is drawn: a row of circles may not fill its frame.
+        left = min(step.x for step in steps)
+        right = max(step.x + step.length for step in steps)
+        top = min(step.y for step in steps)
+        bottom = max(step.y + step.thickness for step in steps)
+        (x0, y0), (x1, y1) = place(left, top), place(right, bottom)
+        for anchor in standard_connection_points():
+            points[anchor.id] = (x0 + anchor.x * (x1 - x0), y0 + anchor.y * (y1 - y0))
+    elif shape.type == "pyramid":
+        points = {2: (cx, 0.0), 3: (cx, height)}
+        for layer, part in zip(pyramid_layers(shape, width, height), shape.parts, strict=True):
+            assert part.point_ids is not None
+            reach = (layer.top_half_width + layer.bottom_half_width) / 2
+            middle = (layer.top + layer.bottom) / 2
+            points[part.point_ids[0]] = (cx - reach, middle)
+            points[part.point_ids[1]] = (cx + reach, middle)
+    elif shape.type == "cycle":
+        band = cycle_band(shape, width, height)
+        points = {point: _on_circle(cx, cy, band.outer, degrees) for point, degrees in RING_POINT_ANGLES.items()}
+        mirrored = shape.settings["direction"] == "anticlockwise"
+        for index, part in enumerate(shape.parts):
+            assert part.point_ids is not None
+            back = -90 + index * band.share - band.share / 2 + band.gap / 2
+            tip = back + band.share - band.gap
+            angle = (back + tip - band.depth) / 2 if shape.settings["arrow_style"] == "arrow" else (back + tip) / 2 - band.depth
+            x, y = _on_circle(cx, cy, band.outer, angle)
+            points[part.point_ids[0]] = (width - x if mirrored else x, y)
+    elif shape.type == "gauge":
+        gx, gy, radius, bottom = gauge_circle(width, height)
+        points = {point: _on_circle(gx, gy, radius, RING_POINT_ANGLES[point]) for point in (0, 1, 2, 4, 6)}
+        points |= {3: (gx, bottom), 5: (gx - radius, bottom), 7: (gx + radius, bottom)}
+    return {point: (x / width, y / height) for point, (x, y) in points.items()}
 
 
 def _meets_smallest_sizes(shape: ComplexShape, width: float, height: float) -> bool:
@@ -731,15 +1283,15 @@ def _meets_smallest_sizes(shape: ComplexShape, width: float, height: float) -> b
     def at_least(value: float, minimum: float) -> bool:
         return value >= minimum * (1 - SMALLEST_SIZE_ALLOWANCE)
 
-    if shape.type == "table":
-        return all(at_least(row, MIN_TABLE_ROW_HEIGHT) for row in _lengths(shape.row_sizes or [], height)) and all(
-            at_least(column, MIN_TABLE_COLUMN_WIDTH) for column in _lengths(shape.column_sizes or [], width)
+    if shape.type in ("table", "entity_table"):
+        return all(at_least(row, MIN_TABLE_ROW_HEIGHT) for row in _lengths(shape.row_sizes, height)) and all(
+            at_least(column, MIN_TABLE_COLUMN_WIDTH) for column in _lengths(shape.column_sizes, width)
         )
     if shape.type == "swimlanes":
-        strip = shape.title_strip_size or SWIMLANES_STRIP
-        band = min(shape.title_band_size or SWIMLANES_STRIP, height)
-        shares = [lane.size for lane in shape.lanes or []]
-        if shape.direction == "horizontal":
+        strip = float(shape.settings["title_strip_size"])  # type: ignore[arg-type]
+        band = min(float(shape.settings["title_band_size"]), height)  # type: ignore[arg-type]
+        shares = [lane.size or 0.0 for lane in shape.lanes]
+        if shape.settings["direction"] == "horizontal":
             return at_least(width, strip) and all(
                 at_least(lane, SWIMLANES_STRIP) for lane in _lengths(shares, max(0.0, height - band))
             )
@@ -779,12 +1331,22 @@ class Element(WireModel):
             raise ValueError("complex_shape is required on kind 'complex_shape' and forbidden elsewhere")
         if shape is None:
             return self
+        entry = CATALOGUE[shape.type]
         if self.content.text_layout is not None:
             raise ValueError("a complex shape's text sits in a fixed place, so it has no text_layout")
         if shape.type != "callout" and (self.content.flip_horizontal or self.content.flip_vertical):
             raise ValueError(f"a {shape.type} cannot be flipped; only a callout can")
-        if shape.type == "table" and core.text_content.string:
-            raise ValueError("a table's text is all in its cells; its own text must be empty")
+        if not entry.has_own_text and core.text_content.string:
+            raise ValueError(f"a {shape.type}'s text is all in its parts; its own text must be empty")
+        if shape.type == "gauge" and len(core.text_content.string) > MAX_PART_TEXT:
+            raise ValueError(f"a gauge's caption holds at most {MAX_PART_TEXT} characters")
+        if entry.own_points is not None:
+            if core.connection_points:
+                raise ValueError(f"a {shape.type} places its own connection points, so its element lists none")
+            if self.content.preserves_aspect_ratio and shape.type != "entity_table":
+                raise ValueError(f"a {shape.type} says itself how it resizes; remove preserves_aspect_ratio")
+        if shape.settings.get("layout") == "proportional" and core.rotation_degrees % 360:
+            raise ValueError("a proportional container is never turned")
         if not _meets_smallest_sizes(shape, core.frame.width, core.frame.height):
             raise ValueError(
                 f"a {shape.type} {core.frame.width:g} by {core.frame.height:g} is smaller than its "
@@ -1054,7 +1616,7 @@ class Document(WireModel):
     """The whole of `document.json`: these nine keys, all required."""
 
     id: UUIDString
-    schema_version: Literal[17] = Field(description="17, for package format 18.")
+    schema_version: Literal[18] = Field(description="18, for package format 19.")
     revision: Annotated[int, Field(ge=0, le=MAX_REVISION)] = Field(
         description="Edit counter. A new document is 0."
     )
@@ -1096,7 +1658,10 @@ class Document(WireModel):
             for element in page.elements:
                 core = element.core
                 claim(core.id, "element")
-                anchors[core.id.upper()] = {anchor.id for anchor in core.connection_points}
+                placed_by_shape = element.complex_shape.own_point_ids if element.complex_shape else None
+                anchors[core.id.upper()] = (
+                    {anchor.id for anchor in core.connection_points} if placed_by_shape is None else placed_by_shape
+                )
                 is_lifeline = element.complex_shape is not None and element.complex_shape.type == "lifeline"
                 lines[core.id.upper()] = {LIFELINE_ATTACH_LINE} if is_lifeline else set()
                 node_total += len(core.path.nodes) if core.path else 0
@@ -1183,9 +1748,17 @@ class Document(WireModel):
         member is a shape that is in no group, or a whole group that is in no other group;
         never the holder itself, never swimlanes. A container or swimlanes is never in a
         group, and containers hold containers at most four deep, never in a loop. A callout's
-        tail locks to an anchor that another shape on the page has.
+        tail locks to an anchor that another shape on the page has. A page holds only so many
+        complex shapes.
         """
         shapes = {element.core.id.upper(): element.complex_shape for element in page.elements}
+        complex_shapes = [shape for shape in shapes.values() if shape is not None]
+        if len(complex_shapes) > MAX_PAGE_COMPLEX_SHAPES:
+            raise ValueError(f"{where}: a page holds at most {MAX_PAGE_COMPLEX_SHAPES} complex shapes")
+        if sum(shape.holds_shapes for shape in complex_shapes) > MAX_PAGE_HOLDERS:
+            raise ValueError(f"{where}: a page holds at most {MAX_PAGE_HOLDERS} containers and swimlanes")
+        if sum(len(text.string) for shape in complex_shapes for text in shape.texts) > MAX_PAGE_PART_CHARACTERS:
+            raise ValueError(f"{where}: a page's complex shapes hold at most {MAX_PAGE_PART_CHARACTERS} characters")
         grouped_elements: set[str] = set()
         grouped_groups: set[str] = set()
         for group in page.content.groups:
@@ -1310,11 +1883,12 @@ def character_style(
     is_underlined: bool = False,
     color_hex: str = "#212529",
     font_family: str | None = None,
+    highlight_hex: str | None = None,
 ) -> CharacterStyle:
     """A text style starting from the app's standard one."""
     return CharacterStyle(
         font_family=font_family, font_size=font_size, weight=weight, is_italic=is_italic,
-        is_underlined=is_underlined, color_hex=color_hex,
+        is_underlined=is_underlined, color_hex=color_hex, highlight_hex=highlight_hex,
     )
 
 
@@ -1325,13 +1899,11 @@ def text_content(
     base_alignment: str = "center",
     character_runs: list[CharacterRun] | None = None,
     paragraph_runs: list[ParagraphRun] | None = None,
-    background_hex: str | None = None,
 ) -> TextContent:
     """Centred text in one style, which is what a label normally is."""
     return TextContent(
         string=string, base_style=base_style or character_style(), base_alignment=base_alignment,
         character_runs=character_runs or [], paragraph_runs=paragraph_runs or [],
-        background_hex=background_hex,
     )
 
 
@@ -1377,6 +1949,140 @@ def element(
         shape_data_values=[],
         complex_shape=complex_shape,
     )
+
+
+def _record(
+    type: ComplexShapeType, settings: dict[str, Any], parts: list[Part] | None = None, *,
+    members: list[HolderMember] | None = None, hand_drawn: bool | None = None,
+) -> ComplexShape:
+    return ComplexShape(
+        type=type, version=1, settings=settings, parts=parts or [], members=members,
+        hand_drawn=False if hand_drawn is False else None,
+    )
+
+
+def container_shape(
+    members: list[HolderMember], *, title_style: str = "band", layout: str = "free", hand_drawn: bool | None = None
+) -> ComplexShape:
+    """A container's record: what it holds, where its title sits, and its layout."""
+    return _record("container", {"layout": layout, "title_style": title_style}, members=members, hand_drawn=hand_drawn)
+
+
+def swimlanes_shape(
+    lanes: list[Part], *, direction: str = "horizontal", title_strip_size: float = SWIMLANES_STRIP,
+    title_band_size: float = SWIMLANES_STRIP, hand_drawn: bool | None = None,
+) -> ComplexShape:
+    """A swimlanes record, with lanes made by `lane`."""
+    settings = {"direction": direction, "title_strip_size": title_strip_size, "title_band_size": title_band_size}
+    return _record("swimlanes", settings, lanes, hand_drawn=hand_drawn)
+
+
+def lane(id: str, title: TextContent, size: float, members: list[HolderMember]) -> Part:
+    """One lane of swimlanes: its title, its share of the whole, and what it holds."""
+    return Part(role="lane", id=id, text=title, size=size, members=members)
+
+
+def table_shape(
+    row_sizes: list[float], column_sizes: list[float], cells: list[list[TextContent]], *,
+    header_row: bool = True, hand_drawn: bool | None = None,
+) -> ComplexShape:
+    """A table's record: all its columns, then all its rows with their cells."""
+    parts = [Part(role="column", size=size) for size in column_sizes]
+    parts += [Part(role="row", size=size, cells=row) for size, row in zip(row_sizes, cells, strict=True)]
+    return _record("table", {"header_row": header_row}, parts, hand_drawn=hand_drawn)
+
+
+class EntityField(NamedTuple):
+    """One field of an entity table."""
+
+    id: str
+    name: TextContent
+    type: TextContent
+    size: float
+    marks: list[str]
+
+
+def entity_table_shape(
+    column_sizes: list[float], header_id: str, name: TextContent, header_size: float, empty: TextContent,
+    fields: list[EntityField], *, hand_drawn: bool | None = None,
+) -> ComplexShape:
+    """An entity table's record. Each field owns the next two free points, its left and right ends."""
+    parts = [Part(role="column", size=size) for size in column_sizes]
+    parts.append(Part(role="header", id=header_id, size=header_size, cells=[name, empty]))
+    parts += [
+        Part(
+            role="field", id=field.id, size=field.size, cells=[field.name, field.type], marks=field.marks,
+            point_ids=[FIRST_PART_POINT + 2 * index, FIRST_PART_POINT + 2 * index + 1],
+        )
+        for index, field in enumerate(fields)
+    ]
+    return _record("entity_table", {}, parts, hand_drawn=hand_drawn)
+
+
+def callout_shape(
+    tail_tip: Point | None = None, tail_attachment: Attachment | None = None, *, hand_drawn: bool | None = None
+) -> ComplexShape:
+    """A callout's record: no tip means no tail."""
+    settings = {
+        name: value for name, value in (("tail_tip", tail_tip), ("tail_attachment", tail_attachment))
+        if value is not None
+    }
+    return _record("callout", settings, hand_drawn=hand_drawn)
+
+
+def lifeline_shape(
+    head_style: str = "box", ends_in_destroy_mark: bool = False, *, hand_drawn: bool | None = None
+) -> ComplexShape:
+    """A lifeline's record."""
+    return _record(
+        "lifeline", {"head_style": head_style, "ends_in_destroy_mark": ends_in_destroy_mark}, hand_drawn=hand_drawn
+    )
+
+
+def labelled_part(
+    role: str, id: str, text: TextContent, style: PartStyle | None = None, points: int = 0, index: int = 0
+) -> Part:
+    """A section, step, layer or band: its words, its paint, and the points it owns, the
+    next `points` free numbers for the part at `index`."""
+    owned = [FIRST_PART_POINT + points * index + offset for offset in range(points)] if points else None
+    return Part(role=role, id=id, text=text, style=style, point_ids=owned)
+
+
+def ring_shape(sections: list[Part], ring_width: float | str = 40, *, hand_drawn: bool | None = None) -> ComplexShape:
+    """A ring's record; `ring_width` is the word `full` for a solid disc."""
+    return _record("ring", {"ring_width": ring_width}, sections, hand_drawn=hand_drawn)
+
+
+def flow_shape(
+    steps: list[Part], *, base_shape: str = "chevron", direction: str = "across", spacing: str = "gap",
+    pointer: bool = False, hand_drawn: bool | None = None,
+) -> ComplexShape:
+    """A flow's record."""
+    settings = {"base_shape": base_shape, "direction": direction, "spacing": spacing, "pointer": pointer}
+    return _record("flow", settings, steps, hand_drawn=hand_drawn)
+
+
+def pyramid_shape(layers: list[Part], *, form: str = "pyramid", hand_drawn: bool | None = None) -> ComplexShape:
+    """A pyramid's or funnel's record, its layers from the top."""
+    return _record("pyramid", {"form": form}, layers, hand_drawn=hand_drawn)
+
+
+def cycle_shape(
+    steps: list[Part], *, ring_width: float = 50, direction: str = "clockwise", arrow_style: str = "arrow",
+    hand_drawn: bool | None = None,
+) -> ComplexShape:
+    """A cycle's record."""
+    settings = {"ring_width": ring_width, "direction": direction, "arrow_style": arrow_style}
+    return _record("cycle", settings, steps, hand_drawn=hand_drawn)
+
+
+def gauge_shape(
+    bands: list[Part], needle_id: str, *, minimum: float = 0, maximum: float = 100, value: float = 50,
+    auto_rotate_labels: bool = True, hand_drawn: bool | None = None,
+) -> ComplexShape:
+    """A gauge's record: its bands from the minimum to the maximum, then its needle."""
+    settings = {"minimum": minimum, "maximum": maximum, "value": value, "auto_rotate_labels": auto_rotate_labels}
+    return _record("gauge", settings, [*bands, Part(role="needle", id=needle_id)], hand_drawn=hand_drawn)
 
 
 def connection(

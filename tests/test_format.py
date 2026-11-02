@@ -45,17 +45,17 @@ def _rejects(document: dict) -> str:
 def test_versions_are_the_pinned_pair() -> None:
     """The package and document counters differ by one; mixing them up is the
     commonest reason the app refuses a hand-written file. Every document is the
-    package SimpleDiagrams 5.1.0 writes."""
-    assert (wire.FORMAT_VERSION, wire.SCHEMA_VERSION) == (18, 17)
-    manifest = {"format": "com.simplediagrams.document", "format_version": 18, "contains_legacy_source": False}
+    package SimpleDiagrams 5.2 writes."""
+    assert (wire.FORMAT_VERSION, wire.SCHEMA_VERSION) == (19, 18)
+    manifest = {"format": "com.simplediagrams.document", "format_version": 19, "contains_legacy_source": False}
     assert wire.dump(wire.manifest()) == manifest
     assert wire.dump(wire.manifest(fixtures.full_profile_document())) == manifest
     for missing in manifest:
         with pytest.raises(ValidationError):
             wire.Manifest.model_validate({key: value for key, value in manifest.items() if key != missing})
     with pytest.raises(ValidationError):
-        wire.Manifest.model_validate(manifest | {"format_version": 15})
-    for older in (14, 15, 18):
+        wire.Manifest.model_validate(manifest | {"format_version": 18})
+    for older in (15, 17, 19):
         document = _dumped()
         document["schema_version"] = older
         assert "schema_version" in _rejects(document)
@@ -67,6 +67,14 @@ def test_full_profile_round_trips_unchanged() -> None:
     document = fixtures.full_profile_document()
     again = wire.Document.model_validate_json(json.dumps(wire.dump(document)))
     assert again == document
+
+
+def test_a_whole_text_background_is_no_longer_written() -> None:
+    """Format 19 has no background_hex, and a writer must not write one; a highlight behind
+    the words takes its place."""
+    document = _dumped()
+    _core(document)["text_content"]["background_hex"] = "#FFF3BF"
+    assert "Extra inputs" in _rejects(document)
 
 
 def test_top_level_has_exactly_the_nine_required_keys() -> None:
@@ -202,7 +210,7 @@ def test_text_runs_are_only_allowed_over_plain_ascii() -> None:
 
 # Keys the app reads only when present, as (key, parent key or None for any).
 OPTIONAL = {
-    ("font_family", None), ("background_hex", None), ("rotation_degrees", "text_layout"),
+    ("font_family", None), ("highlight_hex", None), ("rotation_degrees", "text_layout"),
     ("fill_texture", None), ("stroke_texture", None), ("stroke_pattern_override", None),
     ("control_point", None), ("second_control_point", None), ("text_layout", None),
     ("note_style", None), ("preserves_aspect_ratio", None), ("start_attachment", None),

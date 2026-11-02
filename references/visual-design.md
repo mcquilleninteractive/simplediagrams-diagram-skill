@@ -12,7 +12,12 @@ A diagram works when a reader can answer "what are the parts, and how do they re
    | A process or sequence of steps | One line of flow, left to right; decisions branch off it |
    | A system's parts and what calls what | Layers: callers on one side, what they depend on on the other |
    | A hierarchy (org chart, breakdown) | Tree, top to bottom, children centred under the parent |
-   | A cycle | Ring, clockwise |
+   | A cycle | The `cycle` shape, clockwise |
+   | A few stages in order, with no branches | The `flow` shape |
+   | Stages narrowing down, or ranks from base to apex | The `pyramid` shape, as a funnel or a pyramid |
+   | Shares of a whole | The `ring` shape |
+   | One number in its range | The `gauge` shape |
+   | The tables of a database | `entity_table` shapes, with relationships between their fields |
    | A comparison | Columns with matching rows |
 
 3. **Count the nodes.** Five to nine reads at a glance. Past about fifteen, split by page: an overview whose nodes are each a later page.

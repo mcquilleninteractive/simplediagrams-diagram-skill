@@ -43,8 +43,16 @@ CATALOG_VERSION = 1
 NATIVE_KINDS = ("rectangle", "ellipse", "note", "text")
 # Shapes SimpleDiagrams draws itself from a few stored values (complex shapes). Containers
 # and swimlanes hold other shapes.
-COMPLEX_KINDS = ("container", "swimlanes", "table", "callout", "lifeline")
+COMPLEX_KINDS = (
+    "container", "swimlanes", "table", "entity_table", "callout", "lifeline",
+    "ring", "flow", "pyramid", "cycle", "gauge",
+)
 HOLDER_KINDS = ("container", "swimlanes")
+# The kinds whose words are in parts, each with a label and optionally its own paint. A gauge
+# also has its own text, a caption.
+PART_FIELD = {"ring": "sections", "flow": "steps", "pyramid": "layers", "cycle": "steps", "gauge": "bands"}
+# How many parts of each kind the app draws, fewest and most.
+PART_COUNTS = {"ring": (1, 12), "flow": (2, 12), "pyramid": (2, 8), "cycle": (3, 8), "gauge": (1, 5)}
 # What the app itself gives each kind when a person draws one.
 DEFAULT_STYLE: dict[str, tuple[str, str, float]] = {
     "rectangle": ("#D8ECFF", "#343A40", 2),
@@ -63,7 +71,37 @@ DEFAULT_SIZE: dict[str, tuple[float, float]] = {
     "container": (320, 200),
     "swimlanes": (600, 328),
     "callout": (180, 80),
+    "ring": (200, 200),
+    "cycle": (240, 240),
+    "gauge": (200, 140),
 }
+# The size and paint of each look's tile in the app's Notes and Cards library.
+NOTE_LOOKS: dict[str, tuple[float, float, str, str, float]] = {
+    "stickyNote": (180, 170, "#FFF1A8", "#8A7636", 2),
+    "indexCard": (250, 150, "#FFFFFF", "#CFE1FF", 1),
+    "tapedNote": (200, 150, "#FBF8F1", "#B8B0A0", 1),
+    "tag": (230, 100, "#F3E2B8", "#9C7F4A", 1),
+    "notebookPage": (200, 250, "#FFFFFF", "#AFC6E9", 1),
+    "pinnedNote": (180, 160, "#E6F0FC", "#9FB4CE", 1),
+}
+# The looks that set their words clear of a tape, hole, string or pin. A place written for the
+# words inside the note would replace that.
+DECORATED_NOTES = ("tapedNote", "tag", "notebookPage", "pinnedNote")
+# The smallest frame the app draws each kind at, with one number per part where it depends on
+# them. Below it the app shrinks the smallest drawing, so its points are not where the frame says.
+RING_SMALLEST = 24
+CYCLE_SMALLEST = 48
+GAUGE_SMALLEST = (40, 28)
+FLOW_SMALLEST_STEP = 16
+PYRAMID_SMALLEST = (24, 12)
+# How the builder sizes an entity table: as a new one is at its smallest, with a field's type
+# in smaller grey words beside its name, as the app starts one.
+ENTITY_SMALLEST_WIDTH = 220.0
+ENTITY_TYPE_SIZE_SHARE = 0.8
+ENTITY_TYPE_COLOR = "#6C757D"
+ENTITY_MARK_ROOM = 18  # a field's marks, stacked at the start of its name's cell
+# How far the builder enlarges a shape from its tile's size so that its words fit.
+GROWN_SCALES = (1.0, 1.25, 1.5, 1.75, 2.0, 2.5, 3.0, 4.0)
 # A lifeline's width, from the UML library's tiles, and its height with no messages.
 LIFELINE_WIDTH = {"box": 120.0, "actor": 100.0}
 LIFELINE_HEIGHT = 320.0
@@ -96,6 +134,8 @@ STANDARD_POINTS = {anchor.id: (anchor.x, anchor.y) for anchor in wire.standard_c
 # Rough advance of the app's standard font, as a fraction of the font size.
 AVERAGE_GLYPH_WIDTH = 0.56
 LINE_HEIGHT = 1.3
+# A line's own height with no room around it, as words sit in a box the app works out.
+TIGHT_LINE_HEIGHT = 1.1
 CHANNEL_SPACING = 16
 CHANNEL_MARGIN = 10
 STUB = 24
@@ -185,7 +225,7 @@ class PagePoint(SpecModel):
 class LaneSpec(SpecModel):
     """One lane of a swimlanes node: its title and the nodes it holds."""
 
-    title: Label = ""
+    title: Annotated[Label, StringConstraints(max_length=wire.MAX_LANE_TITLE)] = ""
     members: list[Key] = Field(
         default=[], max_length=MAX_NODES_PER_PAGE,
         description="Keys of the nodes in this lane. Each lies wholly inside the swimlanes, "
@@ -205,18 +245,56 @@ class DividerSpec(SpecModel):
     label: Label = Field(default="", description="A guard such as [else], shown on the line.")
 
 
+class PartSpec(SpecModel):
+    """One section, step, layer or band with paint of its own. A plain string is the same
+    with only a label."""
+
+    label: Label = ""
+    fill: wire.Color | None = None
+    stroke: wire.Color | None = None
+    line_width: float | None = Field(default=None, ge=0, le=10_000, allow_inf_nan=False)
+
+
+class FieldSpec(SpecModel):
+    """One field of an entity table: a row of its name and type."""
+
+    name: Label
+    type: Label = ""
+    marks: list[Literal["primary_key", "foreign_key", "unique", "indexed", "nullable"]] = Field(
+        default=[], max_length=wire.MAX_FIELD_MARKS,
+        description="What the field is, drawn as small icons beside its name.",
+    )
+
+
 # The node fields that belong to some kinds only.
 KIND_FIELDS: dict[str, tuple[str, ...]] = {
+    "note_style": ("note",),
     "members": ("container",),
     "title_style": ("container",),
+    "layout": ("container",),
     "messages": ("container",),
     "dividers": ("container",),
-    "direction": ("swimlanes",),
+    "direction": ("swimlanes", "flow", "cycle"),
     "lanes": ("swimlanes",),
     "cells": ("table",),
     "header_row": ("table",),
-    "column_widths": ("table",),
+    "column_widths": ("table", "entity_table"),
     "row_heights": ("table",),
+    "fields": ("entity_table",),
+    "sections": ("ring",),
+    "ring_width": ("ring", "cycle"),
+    "steps": ("flow", "cycle"),
+    "base_shape": ("flow",),
+    "spacing": ("flow",),
+    "pointer": ("flow",),
+    "layers": ("pyramid",),
+    "form": ("pyramid",),
+    "arrow_style": ("cycle",),
+    "bands": ("gauge",),
+    "minimum": ("gauge",),
+    "maximum": ("gauge",),
+    "value": ("gauge",),
+    "auto_rotate_labels": ("gauge",),
     "tail_to": ("callout",),
     "tail_point": ("callout",),
     "tail_at": ("callout",),
@@ -238,9 +316,9 @@ class NodeSpec(SpecModel):
     key: Key = Field(description="Your own name for this node, unique on the page.")
     shape: Selector = Field(
         description=(
-            "rectangle, ellipse, note or text for a plain drawn shape; container, "
-            "swimlanes, table, callout or lifeline for a shape SimpleDiagrams draws "
-            "itself; or '<library>/<item>' for a shape from a library packaged with "
+            "rectangle, ellipse, note or text for a plain drawn shape; container, swimlanes, "
+            "table, entity_table, callout, lifeline, ring, flow, pyramid, cycle or gauge for "
+            "a shape SimpleDiagrams draws itself; or '<library>/<item>' for a shape from a library packaged with "
             "SimpleDiagrams, for example 'basic/Cylinder'. Use a selector returned by "
             "find_shapes.py, which searches assets/built-in-shapes.json."
         )
@@ -269,6 +347,9 @@ class NodeSpec(SpecModel):
     stroke: wire.Color | None = None
     line_width: float | None = Field(default=None, ge=0, le=10_000, allow_inf_nan=False)
     text_color: wire.Color | None = None
+    highlight: wire.Color | None = Field(
+        default=None, description="A highlight colour behind the words, like a highlighter pen."
+    )
     font_size: float = Field(default=15, ge=1, le=720, allow_inf_nan=False)
     bold: bool = False
     rotation: float = Field(default=0, ge=-360, le=360, allow_inf_nan=False)
@@ -293,6 +374,11 @@ class NodeSpec(SpecModel):
         default=None,
         description="Complex shapes are drawn with gently uneven lines; false draws them exactly.",
     )
+    note_style: wire.NoteStyle | None = Field(
+        default=None,
+        description="note: its look, placed at that look's own size and colours unless the spec "
+        "sets them: stickyNote, indexCard, tapedNote, tag, notebookPage or pinnedNote.",
+    )
     members: list[Key] | None = Field(
         default=None, max_length=MAX_NODES_PER_PAGE,
         description="container: keys of the nodes it holds, each lying wholly inside it. "
@@ -303,6 +389,11 @@ class NodeSpec(SpecModel):
         description="container: 'band', the title across its top (the default), or "
         "'corner_tag', a UML frame's name tag in its top-left corner.",
     )
+    layout: Literal["free", "proportional"] | None = Field(
+        default=None,
+        description="container: 'free' keeps shapes where they are put (the default); with "
+        "'proportional', resizing it in the app spreads the shapes inside, keeping their sizes.",
+    )
     messages: list[Key] | None = Field(
         default=None, max_length=MAX_EDGES_PER_PAGE,
         description="container: keys of the messages a UML fragment (alt, loop, opt) encloses; "
@@ -312,10 +403,11 @@ class NodeSpec(SpecModel):
         default=None, max_length=MAX_EDGES_PER_PAGE,
         description="container with messages: dashed lines across it between operands, as UML's alt draws them.",
     )
-    direction: Literal["horizontal", "vertical"] | None = Field(
+    direction: Literal["horizontal", "vertical", "across", "down", "clockwise", "anticlockwise"] | None = Field(
         default=None,
         description="swimlanes: 'horizontal' lanes run across the page as rows (the default); "
-        "'vertical' lanes run down it as columns.",
+        "'vertical' lanes run down it as columns. flow: 'across' (the default) or 'down'. "
+        "cycle: 'clockwise' (the default) or 'anticlockwise'.",
     )
     lanes: list[LaneSpec] | None = Field(
         default=None, min_length=1, max_length=wire.MAX_LANES,
@@ -335,6 +427,62 @@ class NodeSpec(SpecModel):
     row_heights: list[Size] | None = Field(
         default=None, max_length=wire.MAX_TABLE_ROWS,
         description="table: each row's height; by default each is sized to its text.",
+    )
+    fields: list[FieldSpec] | None = Field(
+        default=None, min_length=1, max_length=wire.MAX_ENTITY_FIELDS,
+        description="entity_table: its fields, each owning connection points of its own; the "
+        "node's label is the entity's name.",
+    )
+    sections: list[Label | PartSpec] | None = Field(
+        default=None, min_length=1, max_length=12,
+        description="ring: its sections, clockwise from twelve o'clock.",
+    )
+    ring_width: int | Literal["full"] | None = Field(
+        default=None,
+        description="ring: how wide the band is in points, a multiple of 10 (40 by default), or "
+        "'full' for a solid pie. cycle: the same (50 by default), without 'full'.",
+    )
+    steps: list[Label | PartSpec] | None = Field(
+        default=None, min_length=2, max_length=12,
+        description="flow: its steps, first to last, 2 to 12. cycle: its steps from twelve "
+        "o'clock, 3 to 8.",
+    )
+    base_shape: Literal["chevron", "arrow_box", "block_arrow", "rectangle", "rounded_rectangle", "circle", "hexagon"] | None = Field(
+        default=None, description="flow: the shape every step takes; 'chevron' by default."
+    )
+    spacing: Literal["gap", "touch", "overlap"] | None = Field(
+        default=None,
+        description="flow: how neighbouring steps meet, 'gap' by default. Only rectangle, "
+        "rounded_rectangle and circle steps can overlap.",
+    )
+    pointer: bool | None = Field(
+        default=None,
+        description="flow: whether each step but the last has a small point at its front. Only "
+        "rectangle, rounded_rectangle and circle steps can.",
+    )
+    layers: list[Label | PartSpec] | None = Field(
+        default=None, min_length=2, max_length=8, description="pyramid: its layers from the top, 2 to 8."
+    )
+    form: Literal["pyramid", "funnel"] | None = Field(
+        default=None,
+        description="pyramid: 'pyramid', apex at the top (the default), or 'funnel', wide at the "
+        "top and narrowing to a spout.",
+    )
+    arrow_style: Literal["arrow", "chevron"] | None = Field(
+        default=None, description="cycle: each step a curved 'arrow' (the default) or a 'chevron'."
+    )
+    bands: list[Label | PartSpec] | None = Field(
+        default=None, min_length=1, max_length=5,
+        description="gauge: its bands from the minimum to the maximum, 1 to 5. The node's label is its caption.",
+    )
+    minimum: float | None = Field(default=None, ge=-1_000_000, le=1_000_000, allow_inf_nan=False, description="gauge: the range's left end, 0 by default.")
+    maximum: float | None = Field(default=None, ge=-1_000_000, le=1_000_000, allow_inf_nan=False, description="gauge: the range's right end, 100 by default.")
+    value: float | None = Field(
+        default=None, ge=-1_000_000, le=1_000_000, allow_inf_nan=False,
+        description="gauge: where the needle points; the middle of the range by default.",
+    )
+    auto_rotate_labels: bool | None = Field(
+        default=None, description="gauge: whether each band's words follow their band (the default) or stay level."
     )
     tail_to: Key | None = Field(
         default=None,
@@ -371,6 +519,11 @@ class NodeSpec(SpecModel):
                     if self.shape in HOLDER_KINDS
                     else ""
                 )
+            )
+        if self.note_style in DECORATED_NOTES and self.label_position in ("top", "bottom"):
+            raise ValueError(
+                f"node '{self.key}': a {self.note_style} keeps its words clear of its decorations; "
+                "remove label_position, or set it to above or below"
             )
         if self.shape == "text" and (self.flip_horizontal or self.flip_vertical):
             raise ValueError(f"node '{self.key}' is text, which has no artwork to flip; remove its flip")
@@ -411,6 +564,8 @@ class NodeSpec(SpecModel):
             if self.dividers and not self.messages:
                 raise ValueError(f"{where}: dividers go across a fragment, which needs messages")
         if self.shape == "swimlanes":
+            if self.direction not in (None, "horizontal", "vertical"):
+                raise ValueError(f"{where}: its direction is horizontal or vertical")
             if not self.lanes:
                 raise ValueError(f"{where} needs lanes")
             if self.fitted and any(lane.size is not None for lane in self.lanes):
@@ -432,6 +587,23 @@ class NodeSpec(SpecModel):
                 raise ValueError(f"{where}: column_widths needs one width per column, {columns}")
             if self.row_heights is not None and len(self.row_heights) != len(self.cells):
                 raise ValueError(f"{where}: row_heights needs one height per row, {len(self.cells)}")
+            if sum(len(cell) for row in self.cells for cell in row) > wire.MAX_TABLE_CHARACTERS:
+                raise ValueError(f"{where}: a table holds at most {wire.MAX_TABLE_CHARACTERS} characters")
+        if (self.shape in PART_FIELD or self.shape == "entity_table") and self.scale != 1:
+            raise ValueError(f"{where}: scale is for library shapes; give it a width or height")
+        if self.shape == "entity_table":
+            if self.align is not None:
+                raise ValueError(f"{where}: its words have fixed places, the name and type at each end of a row; remove align")
+            if not self.fields:
+                raise ValueError(f"{where} needs fields, each with a name and optionally a type and marks")
+            if self.column_widths is not None and len(self.column_widths) != 2:
+                raise ValueError(f"{where}: column_widths needs two widths, its names' and its types'")
+            if any(len(set(field.marks)) != len(field.marks) for field in self.fields):
+                raise ValueError(f"{where}: a field repeats a mark")
+            if len(self.label) + sum(len(field.name) + len(field.type) for field in self.fields) > wire.MAX_TABLE_CHARACTERS:
+                raise ValueError(f"{where}: an entity table holds at most {wire.MAX_TABLE_CHARACTERS} characters")
+        if self.shape in PART_FIELD:
+            self._check_parts(where)
         if self.shape == "callout":
             if self.tail_point is not None and self.tail_to is None:
                 raise ValueError(f"{where}: tail_point names a point of the node in tail_to")
@@ -439,6 +611,45 @@ class NodeSpec(SpecModel):
                 raise ValueError(f"{where}: give tail_to or tail_at, not both")
             if self.tail_to == self.key:
                 raise ValueError(f"{where}: a callout's tail cannot lock to the callout itself")
+
+    def _check_parts(self, where: str) -> None:
+        """The rules of the kinds whose words are in parts."""
+        field = PART_FIELD[self.shape]
+        parts = getattr(self, field) or []
+        fewest, most = PART_COUNTS[self.shape]
+        if not fewest <= len(parts) <= most:
+            raise ValueError(f"{where} needs {fewest} to {most} {field}, one for each")
+        for part in parts:
+            if len(part if isinstance(part, str) else part.label) > wire.MAX_PART_TEXT:
+                raise ValueError(f"{where}: one of its {field} is over {wire.MAX_PART_TEXT} characters")
+        if self.shape == "gauge":
+            if len(self.label) > wire.MAX_PART_TEXT:
+                raise ValueError(f"{where}: its caption is over {wire.MAX_PART_TEXT} characters")
+            low = 0 if self.minimum is None else self.minimum
+            high = 100 if self.maximum is None else self.maximum
+            if low >= high:
+                raise ValueError(f"{where}: its minimum {low:g} must be below its maximum {high:g}")
+            if self.value is not None and not low <= self.value <= high:
+                raise ValueError(f"{where}: its value {self.value:g} must lie from {low:g} to {high:g}")
+        elif self.label:
+            raise ValueError(f"{where}: its words are all in its {field}; remove label")
+        if self.ring_width is not None:
+            if self.ring_width == "full" and self.shape == "cycle":
+                raise ValueError(f"{where}: only a ring's band can be 'full'; give a number")
+            if self.ring_width != "full" and not (10 <= self.ring_width <= 10_000 and self.ring_width % 10 == 0):
+                raise ValueError(f"{where}: ring_width is a multiple of 10 from 10 to 10,000")
+        if self.shape == "flow":
+            if self.direction not in (None, "across", "down"):
+                raise ValueError(f"{where}: its direction is across or down")
+            if self.base_shape in ("chevron", "arrow_box", "block_arrow", "hexagon", None) and (
+                self.spacing == "overlap" or self.pointer
+            ):
+                raise ValueError(
+                    f"{where}: only rectangle, rounded_rectangle and circle steps overlap or have a "
+                    f"pointer, and these are {self.base_shape or 'chevron'}"
+                )
+        if self.shape == "cycle" and self.direction not in (None, "clockwise", "anticlockwise"):
+            raise ValueError(f"{where}: its direction is clockwise or anticlockwise")
 
 
 class EdgeSpec(SpecModel):
@@ -833,6 +1044,10 @@ class _Placed:
         }
         self.display_name = display_name or spec.key
 
+    def set_points(self, points: dict[int, tuple[float, float]]) -> None:
+        """The anchors of a shape that places its own, known once it has its parts."""
+        self.points = points
+
     def anchor(self, point_id: int) -> _Anchor:
         """Where a connection point is on the page, and the sides a route may leave it by."""
         fx, fy = self.points[point_id]
@@ -879,7 +1094,9 @@ def _node_size(node: NodeSpec, catalog_shape: CatalogShape | None) -> tuple[floa
         # width and scale change only its length. Its weight comes from the line width.
         length = node.width or catalog_shape.default_width * node.scale
         return (float(length), float(catalog_shape.default_height))
-    if catalog_shape is not None:
+    if node.note_style is not None:
+        natural = NOTE_LOOKS[node.note_style][:2]
+    elif catalog_shape is not None:
         natural = (catalog_shape.default_width * node.scale, catalog_shape.default_height * node.scale)
     elif node.shape == "text":
         text_width, text_height = estimate_text_size(node.label or " ", node.font_size, node.bold)
@@ -1159,7 +1376,7 @@ def _spread_channels(routes: list[tuple[_Route, tuple, tuple]]) -> None:
 def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Document:
     """Builds the exact document a spec describes.
 
-    The document is package format 18, which SimpleDiagrams 5.1.0 and later open. Its
+    The document is package format 19, which SimpleDiagrams 5.2 and later open. Its
     library shapes all come from the libraries packaged with the app, so it needs nothing
     installed.
 
@@ -1230,7 +1447,7 @@ class _PageCompiler:
     """Turns one page of a spec into a page of the document.
 
     Plain and library nodes are placed first, then lifelines and the messages between them,
-    then tables and callouts, then containers and swimlanes, innermost first, each placed
+    then tables, callouts and the shapes drawn from their parts, then containers and swimlanes, innermost first, each placed
     where the spec says or fitted around what it holds, and last the callouts' tails and
     the connectors. Elements are written in the spec's order.
     """
@@ -1270,6 +1487,10 @@ class _PageCompiler:
             elif node.shape == "callout":
                 width, height = DEFAULT_SIZE["callout"]
                 self._place_at_centre(node, node.width or width, node.height or height)
+            elif node.shape == "entity_table":
+                self._place_entity_table(node)
+            elif node.shape in PART_FIELD:
+                self._place_parts(node)
         for key in self._holders_innermost_first():
             self._place_holder(self.nodes[key])
         connections = self._connections()
@@ -1333,6 +1554,7 @@ class _PageCompiler:
             font_size=float(node.font_size),
             weight="bold" if node.bold else "medium",
             color_hex=node.text_color or "#212529",
+            highlight_hex=node.highlight,
         )
 
     def _place_plain(self, node: NodeSpec) -> None:
@@ -1344,8 +1566,8 @@ class _PageCompiler:
             library, separator, item = node.shape.partition("/")
             if not separator:
                 raise SpecError(
-                    f"node '{node.key}': shape '{node.shape}' is not rectangle, ellipse, note, "
-                    "text, container, swimlanes, table, callout, lifeline or '<library>/<item>'"
+                    f"node '{node.key}': shape '{node.shape}' is not rectangle, ellipse, note, text, "
+                    f"{', '.join(COMPLEX_KINDS)} or '<library>/<item>'"
                 )
             catalog_shape = self.catalog.resolve(library, item)
             if catalog_shape is None:
@@ -1406,6 +1628,185 @@ class _PageCompiler:
         text = wire.text_content(node.label, base_style=base_style, base_alignment=node.align or "center")
         label_area = outside_label_rect(placed.rect, text_layout, text) if text_layout is not None else None
         self.looks[node.key] = _Look(kind, catalog_shape, text, text_layout, label_area)
+
+    # -- Entity tables, rings, flows, pyramids, cycles and gauges --------------------------
+
+    def _place_entity_table(self, node: NodeSpec) -> None:
+        """An entity table sized to its text unless the spec sizes it, with each field's
+        connection points where the app works them out."""
+        assert node.fields is not None
+        style, size = self._text_style(node), node.font_size
+        type_style = wire.character_style(
+            font_size=max(1.0, float(size) * ENTITY_TYPE_SIZE_SHARE),
+            color_hex=node.text_color or ENTITY_TYPE_COLOR,
+            highlight_hex=node.highlight,
+        )
+        fields = node.fields
+        room = ENTITY_MARK_ROOM if any(field.marks for field in fields) else 0
+        names = max(estimate_text_size(field.name, size, node.bold)[0] for field in fields) + room + 28
+        types = max(estimate_text_size(field.type, type_style.font_size)[0] for field in fields) + 28
+        if node.column_widths:
+            names, types = float(node.column_widths[0]), float(node.column_widths[1])
+        total = names + types
+        if not node.column_widths:
+            # Room for the name across both columns, and no narrower than a new one, in the first.
+            names += max(total, estimate_text_size(node.label, size, True)[0] + 28, ENTITY_SMALLEST_WIDTH) - total
+        names, types = float(math.ceil(names)), float(math.ceil(types))
+
+        def row_height(*texts: str) -> float:
+            return float(math.ceil(max(text.count("\n") + 1 for text in texts) * size * LINE_HEIGHT + 14))
+
+        heights = [row_height(node.label), *(row_height(field.name, field.type) for field in fields)]
+        placed = self._place_at_centre(node, node.width or names + types, node.height or sum(heights))
+        self._check_tracks(node, placed, [names, types], heights)
+        record = wire.entity_table_shape(
+            [_snap(names), _snap(types)],
+            self._id(f"part:{node.key}:header"),
+            wire.text_content(node.label, base_style=style),
+            _snap(heights[0]),
+            wire.text_content("", base_style=style),
+            [
+                wire.EntityField(
+                    id=self._id(f"part:{node.key}:{index}"),
+                    name=wire.text_content(field.name, base_style=style, base_alignment="leading"),
+                    type=wire.text_content(field.type, base_style=type_style, base_alignment="trailing"),
+                    size=_snap(height),
+                    marks=list(field.marks),
+                )
+                for index, (field, height) in enumerate(zip(fields, heights[1:], strict=True))
+            ],
+            hand_drawn=node.hand_drawn,
+        )
+        self.records[node.key] = record
+        placed.set_points(wire.shape_points(record, placed.w, placed.h))
+
+    def _parts_of(self, node: NodeSpec) -> list[PartSpec]:
+        """The node's sections, steps, layers or bands, each as a part."""
+        return [
+            PartSpec(label=part) if isinstance(part, str) else part
+            for part in getattr(node, PART_FIELD[node.shape]) or []
+        ]
+
+    def _size_of_parts(self, node: NodeSpec, parts: list[PartSpec], scale: float) -> tuple[float, float]:
+        """A shape's size: as the spec says, else its tile's, or the size its steps need,
+        times `scale`."""
+        count = len(parts)
+        widest = max(estimate_text_size(part.label, node.font_size, node.bold)[0] for part in parts)
+        lines = max(part.label.count("\n") + 1 for part in parts) * node.font_size * LINE_HEIGHT
+        if node.shape in ("ring", "cycle"):
+            side = node.width or node.height or DEFAULT_SIZE[node.shape][0] * scale
+            return float(node.width or side), float(node.height or side)
+        if node.shape == "gauge":
+            width, height = DEFAULT_SIZE["gauge"]
+            if node.width and not node.height:
+                return float(node.width), float(node.width * height / width)
+            if node.height and not node.width:
+                return float(node.height * width / height), float(node.height)
+            return float(node.width or width * scale), float(node.height or height * scale)
+        if node.shape == "pyramid":
+            natural = (240.0 * scale, max(200.0, count * 60.0) * scale)
+        else:
+            base = node.base_shape or "chevron"
+            down = node.direction == "down"
+            thickness = max(160.0, widest + 40) if down else 80.0
+            depth = thickness * wire.FLOW_POINT_DEPTH_SHARE
+            cut = {"chevron": 2 * depth, "arrow_box": depth, "block_arrow": depth}.get(base, 0.0)
+            if base == "circle":
+                side = min(200.0, max(80.0, widest + 24)) * scale
+                along = count * side + (count - 1) * wire.FLOW_PLAIN_GAP
+                natural = (side, along) if down else (along, side)
+            elif down:
+                natural = (thickness, count * math.ceil(cut + 12 + lines + 8) * scale)
+            else:
+                natural = (count * math.ceil(max(120.0, min(240.0, widest + cut + 16)) * scale), thickness * scale)
+        return float(node.width or natural[0]), float(node.height or natural[1])
+
+    def _parts_record(self, node: NodeSpec, made: list[wire.Part], scale: float) -> wire.ComplexShape:
+        """The record of a ring, flow, pyramid, cycle or gauge. A band the spec leaves to the
+        builder grows with the shape, at the app's multiples of 10."""
+
+        def band(natural: int) -> int:
+            return round(natural * scale / 10) * 10
+
+        hand_drawn = node.hand_drawn
+        if node.shape == "ring":
+            return wire.ring_shape(made, band(40) if node.ring_width is None else node.ring_width, hand_drawn=hand_drawn)
+        if node.shape == "flow":
+            return wire.flow_shape(
+                made, base_shape=node.base_shape or "chevron", direction=node.direction or "across",
+                spacing=node.spacing or "gap", pointer=bool(node.pointer), hand_drawn=hand_drawn,
+            )
+        if node.shape == "pyramid":
+            return wire.pyramid_shape(made, form=node.form or "pyramid", hand_drawn=hand_drawn)
+        if node.shape == "cycle":
+            assert node.ring_width != "full"
+            return wire.cycle_shape(
+                made, ring_width=band(50) if node.ring_width is None else node.ring_width,
+                direction=node.direction or "clockwise", arrow_style=node.arrow_style or "arrow", hand_drawn=hand_drawn,
+            )
+        low = 0.0 if node.minimum is None else node.minimum
+        high = 100.0 if node.maximum is None else node.maximum
+        return wire.gauge_shape(
+            made, self._id(f"part:{node.key}:needle"), minimum=low, maximum=high,
+            value=(low + high) / 2 if node.value is None else node.value,
+            auto_rotate_labels=node.auto_rotate_labels is not False, hand_drawn=hand_drawn,
+        )
+
+    def _place_parts(self, node: NodeSpec) -> None:
+        """A ring, flow, pyramid, cycle or gauge, each part with what it owns and the shape
+        with its connection points where the app works them out. Unless the spec sizes it, the
+        shape takes the first size up from its tile's at which its words probably fit."""
+        parts = self._parts_of(node)
+        count = len(parts)
+        style = self._text_style(node)
+        role = {"ring": "section", "flow": "step", "pyramid": "layer", "cycle": "step", "gauge": "band"}[node.shape]
+        points = {"ring": 1, "flow": 2, "pyramid": 2, "cycle": 1, "gauge": 0}[node.shape]
+        made = [
+            wire.labelled_part(
+                role, self._id(f"part:{node.key}:{index}"),
+                wire.text_content(part.label, base_style=style, base_alignment=node.align or "center"),
+                (
+                    wire.PartStyle(fill_hex=part.fill, stroke_hex=part.stroke, line_width=part.line_width)
+                    if (part.fill, part.stroke, part.line_width) != (None, None, None)
+                    else None
+                ),
+                points, index,
+            )
+            for index, part in enumerate(parts)
+        ]
+        for scale in (1.0,) if node.width or node.height else GROWN_SCALES:
+            width, height = self._size_of_parts(node, parts, scale)
+            record = self._parts_record(node, made, scale)
+            labelled = [part for part in record.parts if part.text is not None]
+            rooms = _rooms_for_words(record, wire.Rect(x=0.0, y=0.0, width=width, height=height))
+            caption_fits = node.shape != "gauge" or not node.label or _words_fit(
+                wire.text_content(node.label, base_style=style), *wire.gauge_caption_room(width, height)
+            )
+            if caption_fits and all(
+                not part.text.string or any(_words_fit(part.text, *room) for room in options)
+                for part, options in zip(labelled, rooms, strict=True)
+                if part.text is not None
+            ):
+                break
+        smallest = {
+            "ring": (RING_SMALLEST, RING_SMALLEST),
+            "cycle": (CYCLE_SMALLEST, CYCLE_SMALLEST),
+            "gauge": GAUGE_SMALLEST,
+            "pyramid": (PYRAMID_SMALLEST[0], PYRAMID_SMALLEST[1] * count),
+            "flow": (
+                (FLOW_SMALLEST_STEP, FLOW_SMALLEST_STEP * count)
+                if node.direction == "down"
+                else (FLOW_SMALLEST_STEP * count, FLOW_SMALLEST_STEP)
+            ),
+        }[node.shape]
+        if width < smallest[0] or height < smallest[1]:
+            raise SpecError(
+                f"node '{node.key}': a {node.shape} like this is at least {smallest[0]:g} by "
+                f"{smallest[1]:g}, and this is {width:g} by {height:g}; make it larger"
+            )
+        placed = self._place_at_centre(node, width, height)
+        self.records[node.key] = record
+        placed.set_points(wire.shape_points(record, width, height))
 
     def _table_tracks(self, node: NodeSpec) -> tuple[list[float], list[float]]:
         """A table's column widths and row heights: as the spec gives them, or each sized
@@ -1733,11 +2134,11 @@ class _PageCompiler:
             # Room for the title on one line: in the band within its padding, or in the tag.
             width = max(frame.width, label_width + (12 + 16 + 24 if corner else 24 + 8))
             self._put(node, frame.x, frame.y, math.ceil(width), math.ceil(frame.height))
-        self.records[node.key] = wire.ComplexShape(
-            type="container",
-            hand_drawn=False if node.hand_drawn is False else None,
-            members=[unit.member for unit in units],
-            title_style="corner_tag" if corner else None,
+        self.records[node.key] = wire.container_shape(
+            [unit.member for unit in units],
+            title_style="corner_tag" if corner else "band",
+            layout=node.layout or "free",
+            hand_drawn=node.hand_drawn,
         )
 
     def _place_swimlanes(self, node: NodeSpec) -> None:
@@ -1795,19 +2196,18 @@ class _PageCompiler:
             self._place_given(node)
             sizes = [float(lane.size) if lane.size is not None else 1.0 for lane in node.lanes]
         style = self._text_style(node)
-        record = wire.ComplexShape(
-            type="swimlanes",
-            hand_drawn=False if node.hand_drawn is False else None,
-            direction="horizontal" if horizontal else "vertical",
-            lanes=[
-                wire.Lane(
-                    id=self._id(f"lane:{node.key}:{index}"),
-                    title=wire.text_content(lane.title, base_style=style),
-                    size=size,
-                    members=[unit.member for unit in units],
+        record = wire.swimlanes_shape(
+            [
+                wire.lane(
+                    self._id(f"lane:{node.key}:{index}"),
+                    wire.text_content(lane.title, base_style=style),
+                    size,
+                    [unit.member for unit in units],
                 )
                 for index, (lane, size, units) in enumerate(zip(node.lanes, sizes, lane_units, strict=True))
             ],
+            direction="horizontal" if horizontal else "vertical",
+            hand_drawn=node.hand_drawn,
         )
         placed = self.placed[node.key]
         lane_frames = wire.swimlane_frames(record, placed.rect)
@@ -1862,34 +2262,20 @@ class _PageCompiler:
             tip = CALLOUT_TAIL
         if node.tail_to is not None or node.tail_at is not None:
             tip = (-tip[0] if node.flip_horizontal else tip[0], -tip[1] if node.flip_vertical else tip[1])
-        return wire.ComplexShape(
-            type="callout",
-            hand_drawn=False if node.hand_drawn is False else None,
-            tail_tip=wire.Point(x=_snap(tip[0]), y=_snap(tip[1])),
-            tail_attachment=attachment,
+        return wire.callout_shape(
+            wire.Point(x=_snap(tip[0]), y=_snap(tip[1])), attachment, hand_drawn=node.hand_drawn
         )
 
     def _table(self, node: NodeSpec) -> wire.ComplexShape:
         assert node.cells is not None
         widths, heights = self._table_tracks(node)
-        placed = self.placed[node.key]
-        for name, tracks, length, smallest in (
-            ("column", widths, placed.w, wire.MIN_TABLE_COLUMN_WIDTH),
-            ("row", heights, placed.h, wire.MIN_TABLE_ROW_HEIGHT),
-        ):
-            if min(tracks) / sum(tracks) * length < smallest:
-                raise SpecError(
-                    f"node '{node.key}': a table {name} would be under {smallest:g} points; make the "
-                    "table larger, or leave out its width and height to size it to its cells"
-                )
+        self._check_tracks(node, self.placed[node.key], widths, heights)
         style = self._text_style(node)
         header = node.header_row is not False
-        return wire.ComplexShape(
-            type="table",
-            hand_drawn=False if node.hand_drawn is False else None,
-            row_sizes=[_snap(height) for height in heights],
-            column_sizes=[_snap(width) for width in widths],
-            cells=[
+        return wire.table_shape(
+            [_snap(height) for height in heights],
+            [_snap(width) for width in widths],
+            [
                 [
                     wire.text_content(
                         cell, base_style=style,
@@ -1899,8 +2285,22 @@ class _PageCompiler:
                 ]
                 for row, cells in enumerate(node.cells)
             ],
-            header_row=None if header else False,
+            header_row=header,
+            hand_drawn=node.hand_drawn,
         )
+
+    @staticmethod
+    def _check_tracks(node: NodeSpec, placed: _Placed, widths: list[float], heights: list[float]) -> None:
+        """A table or entity table is refused below the smallest row and column the app reads."""
+        for name, tracks, length, smallest in (
+            ("column", widths, placed.w, wire.MIN_TABLE_COLUMN_WIDTH),
+            ("row", heights, placed.h, wire.MIN_TABLE_ROW_HEIGHT),
+        ):
+            if min(tracks) / sum(tracks) * length < smallest:
+                raise SpecError(
+                    f"node '{node.key}': a table {name} would be under {smallest:g} points; make the "
+                    "table larger, or leave out its width and height to size it to its text"
+                )
 
     # -- Connectors ---------------------------------------------------------------------
 
@@ -2055,7 +2455,9 @@ class _PageCompiler:
                 elements.append(self._complex_element(node, placed, len(elements)))
                 continue
             look = self.looks[node.key]
-            fill, stroke, line_width = DEFAULT_STYLE[look.kind]
+            fill, stroke, line_width = (
+                NOTE_LOOKS[node.note_style][2:] if node.note_style is not None else DEFAULT_STYLE[look.kind]
+            )
             catalog_shape = look.catalog_shape
             elements.append(
                 wire.element(
@@ -2089,6 +2491,7 @@ class _PageCompiler:
                         else None
                     ),
                     text_layout=look.text_layout,
+                    note_style=node.note_style,
                 )
             )
         return elements
@@ -2098,11 +2501,8 @@ class _PageCompiler:
         if node.shape == "table":
             record = self._table(node)
         elif node.shape == "lifeline":
-            record = wire.ComplexShape(
-                type="lifeline",
-                hand_drawn=False if node.hand_drawn is False else None,
-                head_style="actor" if node.head == "actor" else None,
-                ends_in_destroy_mark=True if node.ends_in_destroy_mark else None,
+            record = wire.lifeline_shape(
+                "actor" if node.head == "actor" else "box", bool(node.ends_in_destroy_mark), hand_drawn=node.hand_drawn
             )
         elif node.shape == "callout":
             record = self._callout(node)
@@ -2118,15 +2518,25 @@ class _PageCompiler:
             flip_horizontal=node.flip_horizontal,
             flip_vertical=node.flip_vertical,
             z_index=z_index,
-            text=wire.text_content(node.label, base_style=self._text_style(node), base_alignment=alignment),
+            text=wire.text_content(
+                node.label if wire.CATALOGUE[record.type].has_own_text else "",
+                base_style=self._text_style(node), base_alignment=alignment,
+            ),
             style=wire.ElementStyle(
                 fill_hex=node.fill or fill,
                 stroke_hex=node.stroke or stroke,
                 line_width=float(node.line_width if node.line_width is not None else line_width),
             ),
             # A lifeline has one numbered point, the top of its head; messages attach along
-            # its line instead. Every other complex shape has the standard eight.
-            connection_points=[wire.ConnectionPointAnchor(id=2, x=0.5, y=0.0)] if node.shape == "lifeline" else None,
+            # its line instead. A shape that places its own lists none, and the app works them
+            # out as it reads the document. Every other complex shape has the standard eight.
+            connection_points=(
+                [wire.ConnectionPointAnchor(id=2, x=0.5, y=0.0)]
+                if node.shape == "lifeline"
+                else []
+                if wire.CATALOGUE[record.type].own_points is not None
+                else None
+            ),
             complex_shape=record,
         )
 
@@ -2251,21 +2661,115 @@ def _complex_text_findings(page_name: str, element: wire.Element, keys: dict[str
         findings.append(Finding(severity="warning", code="label-overflow", message=f"{page_name}: {message}"))
 
     name = _name(element, keys)
-    if shape.type == "container" and shape.title_style is None and width_of(core.text_content) > core.frame.width - 24:
+    if shape.type == "container" and shape.title_style == "band" and width_of(core.text_content) > core.frame.width - 24:
         warn(f"the title of {name} is wider than its band and will wrap out of it. Widen it or shorten the title.")
     if shape.type == "lifeline":
-        head = "box" if shape.head_style is None else "actor"
+        head = shape.settings["head_style"]
         if width_of(core.text_content) > core.frame.width - (12 if head == "box" else 0):
             warn(f"the name of lifeline {name} probably does not fit its head. Give it a width or a shorter name.")
     if shape.type == "swimlanes":
-        for lane, frame in zip(shape.lanes or [], wire.swimlane_frames(shape, core.frame), strict=True):
-            length = frame.height if shape.direction == "horizontal" else frame.width
-            if lane.title.string and width_of(lane.title) > length - 8:
+        for lane, frame in zip(shape.lanes, wire.swimlane_frames(shape, core.frame), strict=True):
+            assert lane.text is not None
+            length = frame.height if shape.settings["direction"] == "horizontal" else frame.width
+            if lane.text.string and width_of(lane.text) > length - 8:
                 warn(
-                    f"the lane title '{lane.title.string}' of {name} is longer than its "
+                    f"the lane title '{lane.text.string}' of {name} is longer than its "
                     f"{length:g}-point lane. Shorten it, or space the lane's rows further apart."
                 )
+    if (
+        shape.type == "gauge"
+        and core.text_content.string
+        and not _words_fit(core.text_content, *wire.gauge_caption_room(core.frame.width, core.frame.height))
+    ):
+        warn(
+            f"the caption '{core.text_content.string}' of a gauge probably does not fit below its needle. "
+            "Shorten it, lower font_size or make the gauge larger."
+        )
+    if shape.type in PART_FIELD:
+        labelled = [part for part in shape.parts if part.text is not None]
+        for part, rooms in zip(labelled, _rooms_for_words(shape, core.frame), strict=True):
+            assert part.text is not None
+            if part.text.string and not any(_words_fit(part.text, *room) for room in rooms):
+                warn(
+                    f"the words '{part.text.string}' probably do not fit their {part.role} of {name}. "
+                    "Make the shape larger, shorten them or lower font_size"
+                    + (", or widen its ring_width." if shape.type in ("ring", "cycle") else ".")
+                )
     return findings
+
+
+def _words_fit(text: wire.TextContent, width: float, height: float) -> bool:
+    """Whether words probably fit a box when wrapped at spaces, by the rough font measure."""
+    style = text.base_style
+    bold = style.weight == "bold"
+    size = style.font_size
+    if width <= 0 or height <= 0:
+        return False
+    longest = max(text.string.split(), key=len, default="")
+    if estimate_text_size(longest, size, bold)[0] > width:
+        return False
+    lines = sum(
+        max(1, math.ceil(estimate_text_size(line, size, bold)[0] / width)) for line in text.string.split("\n")
+    )
+    return lines * size * TIGHT_LINE_HEIGHT <= height
+
+
+def _box_on_band(outer: float, inner: float, half_angle: float, margin: float) -> tuple[float, float]:
+    """The largest box twice as wide as tall centred on a band's middle, inside a section of
+    it reaching `half_angle` degrees either way, keeping `margin` points inside it."""
+    middle = (outer + inner) / 2
+    low, high = 0.0, outer
+    for _ in range(30):
+        tall = (low + high) / 2
+        wide = 2 * tall
+        far = middle + tall / 2
+        near = middle - tall / 2
+        fits = math.hypot(wide / 2, far) <= outer - margin and near >= inner + margin
+        if fits and half_angle < 90 and near > 0:
+            fits = math.degrees(math.atan2(wide / 2, near)) <= half_angle - math.degrees(margin / max(middle, 1))
+        low, high = (tall, high) if fits else (low, tall)
+    return 2 * low, low
+
+
+def _rooms_for_words(shape: wire.ComplexShape, frame: wire.Rect) -> list[list[tuple[float, float]]]:
+    """For each labelled part in order, the boxes its words might sit in: rough, as the words'
+    measure is, but enough to say when a label cannot fit."""
+    width, height = frame.width, frame.height
+    labelled = [part for part in shape.parts if part.text is not None]
+    if shape.type == "ring":
+        radius = min(width, height) / 2
+        band = shape.settings["ring_width"]
+        inner = 0.0 if band == "full" else max(0.0, radius - float(band))  # type: ignore[arg-type]
+        return [[_box_on_band(radius, inner, 180 / len(labelled), 6)]] * len(labelled)
+    if shape.type == "cycle":
+        band = wire.cycle_band(shape, width, height)
+        return [[_box_on_band(band.outer, band.inner, (band.share - band.gap - band.depth) / 2, 6)]] * len(labelled)
+    if shape.type == "gauge":
+        _, _, radius, _ = wire.gauge_circle(width, height)
+        return [[_box_on_band(radius, radius * 0.75, 90 / len(labelled), 2)]] * len(labelled)
+    if shape.type == "pyramid":
+        rooms = []
+        for layer in wire.pyramid_layers(shape, width, height):
+            tall = layer.bottom - layer.top
+            narrow, wide = sorted((layer.top_half_width, layer.bottom_half_width))
+            rooms.append([
+                (2 * (narrow + (wide - narrow) * (1 - share)) - 12, tall * share - 12)
+                for share in (1.0, 0.75, 0.5, 0.33)
+            ])
+        return rooms
+    rooms = []
+    base = shape.settings["base_shape"]
+    down = shape.settings["direction"] == "down"
+    for step in wire.flow_steps(shape, width, height):
+        depth = min(step.thickness * wire.FLOW_POINT_DEPTH_SHARE, step.length / 2)
+        cut = {"chevron": 2 * depth, "arrow_box": depth, "block_arrow": depth}.get(str(base), 0.0)
+        along, across = step.length - cut - 12, step.thickness - 12
+        if base == "block_arrow":
+            across = step.thickness / 2 - 12
+        elif base == "circle":
+            along, across = step.length * 0.7 - 12, step.thickness * 0.7 - 12
+        rooms.append([(across, along) if down else (along, across)])
+    return rooms
 
 
 def lint(

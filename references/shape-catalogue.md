@@ -1,6 +1,6 @@
 # Search the packaged shapes
 
-The skill knows the shapes packaged with SimpleDiagrams 5.1.0: 534 shapes in
+The skill knows the shapes packaged with SimpleDiagrams 5.2.0: 534 shapes in
 eight libraries, including the 89 shapes of BPMN and the 8 of UML. They are
 listed in `assets/built-in-shapes.json`, with names, descriptions, keywords,
 natural sizes and exact placement references. Search it through the CLI instead
@@ -46,11 +46,15 @@ shapes; SKILL.md lists them.
 
 ## Shapes SimpleDiagrams draws itself
 
-Containers, swimlanes, tables, callouts and UML lifelines are not in the list:
-SimpleDiagrams draws them from a few settings, and a spec names them by kind
-(`"shape": "table"`) with their own fields, as SKILL.md describes. They cover
-BPMN's Pool and Expanded Sub-Process and UML's Class, Interface, Enumeration,
-Database Entity, System Boundary, Lifeline, Actor Lifeline, Frame and Alt, Loop
-and Opt fragments. A search with a word such as `pool`, `lane`, `class`,
-`entity`, `lifeline` or `fragment` adds a line naming the kind to use
-(`complex_shapes` in `--json` output).
+Containers, swimlanes, tables, entity tables, callouts, UML lifelines, rings,
+flows, pyramids and funnels, cycles and gauges are not in the list: SimpleDiagrams
+draws them from a few settings, and a spec names them by kind (`"shape": "flow"`)
+with their own fields, as SKILL.md describes. They cover BPMN's Pool and Expanded
+Sub-Process, UML's Class, Interface, Enumeration, Database Entity, System Boundary,
+Lifeline, Actor Lifeline, Frame and Alt, Loop and Opt fragments, and the app's
+Complex Shapes and Database sections. A search with a word such as `pool`, `class`,
+`database`, `lifeline`, `funnel`, `donut`, `chevron`, `cycle` or `gauge` adds a line
+naming the kind to use (`complex_shapes` in `--json` output).
+
+The Notes and Cards section is six looks of one plain `note`, chosen by its
+`note_style`, so its tiles are not in the list either.

@@ -54,7 +54,7 @@ def test_the_list_holds_only_the_shapes_packaged_with_the_app() -> None:
     """Every library is one SimpleDiagrams ships, named by the app's own identifiers, and
     nothing in the list points at the website, so no shape can need a download."""
     bundled = _bundled()
-    assert bundled["source_app_version"] == "5.1.0"
+    assert bundled["source_app_version"] == "5.2.0"
     assert [library["short_name"] for library in bundled["libraries"]] == [
         "basic", "basicClean", "3DBasicHatch", "wordBubbles", "biz", "uiFlow", "bpmn", "uml",
     ]

@@ -89,7 +89,7 @@ def test_the_build_copies_the_packaged_reference_and_round_trips(
     result = _run(capsys, "build_diagram.py", _one_node_spec(tmp_path, "basic/Square"), target)
     assert result.returncode == 0, result.stdout + result.stderr
     raw = json.loads((target / "document.json").read_text())
-    assert raw["schema_version"] == 17 and "required_libraries" not in raw
+    assert raw["schema_version"] == 18 and "required_libraries" not in raw
     document = wire.Document.model_validate_json((target / "document.json").read_text())
     assert not [finding for finding in lint(document) if finding.severity == "error"]
     reference = document.pages[0].elements[0].core.symbol_reference
@@ -109,5 +109,5 @@ def test_the_build_refuses_a_shape_it_does_not_package(
     target = tmp_path / "Circuit.simplediagram"
     result = _run(capsys, "build_diagram.py", _one_node_spec(tmp_path, "notebook/transformer"), target)
     assert result.returncode == 1
-    assert "not one of the shapes packaged with SimpleDiagrams 5.1.0" in result.stdout
+    assert "not one of the shapes packaged with SimpleDiagrams 5.2.0" in result.stdout
     assert not target.exists()
