@@ -4,7 +4,7 @@ Every document the skill writes is package format 19, the format SimpleDiagrams 
 
 | What | Current | Source |
 |---|---|---|
-| Skill | 0.6.0 | `.claude-plugin/plugin.json` |
+| Skill | 0.6.1 | `.claude-plugin/plugin.json` |
 | Package format | 19 | `FORMAT_VERSION` in `scripts/sd_format.py` |
 | Document schema | 18 | `SCHEMA_VERSION` in `scripts/sd_format.py` |
 | Complex-shape catalogue | Eleven types, each at version 1 | `CATALOGUE` in `scripts/sd_format.py` |

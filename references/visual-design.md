@@ -5,11 +5,18 @@ A diagram works when a reader can answer "what are the parts, and how do they re
 ## Before placing anything
 
 1. **Name the one question the diagram answers.** "How does an order get fulfilled?" is a diagram. "Our system" is not; it becomes several.
-2. **Choose the kind of diagram**, because it fixes the layout:
+2. **Choose the kind of diagram**, because it fixes the layout. Draw what the user asks for, or a notation their team already uses. Otherwise choose by subject:
 
-   | Subject | Layout |
+   | Subject | Kind and layout |
    |---|---|
-   | A process or sequence of steps | One line of flow, left to right; decisions branch off it |
+   | A process, for a general reader | Flowchart: one line of flow, left to right; decisions branch off it |
+   | A process handed between people or teams, for a general reader | Flowchart in `swimlanes`, one lane per role |
+   | A process whose events, messages, timers or parallel paths need an exact, standard meaning, or whose readers model in BPMN | BPMN: a pool as `swimlanes`, one lane per role, flowing left to right |
+   | Software steps with parallel paths | UML activity diagram, top to bottom, with fork and join bars |
+   | Messages between participants over time | UML sequence diagram: `lifeline` nodes on one row, messages running down the page |
+   | A thing's states and what moves it between them | UML state machine: a line of states, left to right, with one labelled connector per transition |
+   | What people or other systems can do with a system | UML use case diagram: actors outside a system boundary, use cases inside it |
+   | The kinds of thing in code or a domain, their fields and how they relate | UML class diagram: a `table` for each class, parents above their children |
    | A system's parts and what calls what | Layers: callers on one side, what they depend on on the other |
    | A hierarchy (org chart, breakdown) | Tree, top to bottom, children centred under the parent |
    | A cycle | The `cycle` shape, clockwise |
@@ -19,6 +26,8 @@ A diagram works when a reader can answer "what are the parts, and how do they re
    | One number in its range | The `gauge` shape |
    | The tables of a database | `entity_table` shapes, with relationships between their fields |
    | A comparison | Columns with matching rows |
+
+   A notation promises that each symbol means what its standard says. Use BPMN or UML when the readers know it or the meaning depends on it, not to make a diagram look rigorous: symbols a reader does not know make it harder to read than a plain flowchart.
 
 3. **Count the nodes.** Five to nine reads at a glance. Past about fifteen, split by page: an overview whose nodes are each a later page.
 

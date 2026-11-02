@@ -36,16 +36,22 @@ To install by copying, keep the folder name `simplediagrams-diagram-skill`.
 - "Diagram the architecture described in this repository's README."
 - "Make an org chart for this team."
 - "Turn this procedure into a flowchart."
+- "Model this approval process in BPMN, with a lane for each team."
+- "Draw a UML class diagram of the models in this folder."
+- "Draw a UML sequence diagram of how a login request travels through these services."
+- "Draw a state diagram of an order, from placed to delivered."
 - "Draw our sales funnel, with the stages from this report."
 - "Draw these database tables and the relationships between their fields."
 - "Redraw this whiteboard photo as a diagram."
 
 ## Scope
 
+- Draws the kind of diagram you ask for. If you name none, it chooses by subject: a flowchart, BPMN, or a UML class, sequence, activity, state or use case diagram, and a notation only when its readers know it or the meaning depends on it.
 - Creates new documents using native rectangles, ellipses, notes, text, connectors, and the eight bundled shape libraries, BPMN and UML included. A library shape gets the connection points and label placement its library gives it, as in the app.
 - Draws the complex shapes SimpleDiagrams draws itself: containers fitted around the shapes they hold, swimlanes and BPMN pools with members in each lane, tables such as UML class, interface and enumeration boxes, database tables with field marks and relationships ending on a field, process flows, pyramids and funnels, donut and pie charts, cycles, gauges, callouts whose tails lock to a shape, and UML sequence diagrams with lifelines, messages attached along them, destroy marks, frames and alt, loop and opt fragments.
 - Searches the packaged shapes by name, description and keyword, and places each by the app's own reference. Shapes from downloadable or personal libraries, embedded images and shape data are outside this authoring profile.
 - Redraws a pictured diagram as boxes and connectors. It does not trace artwork or handwriting or embed the picture. A connector can attach to any connection point a shape has.
+- Writes `.simplediagram` documents only. A BPMN diagram it draws is not a `.bpmn` file or a process an engine can run.
 - Never overwrites an existing document. Keep the JSON spec to rebuild under a new name.
 - The scripts make no network request and store nothing between runs; the AI service running the skill handles your files under its own policies.
 
@@ -63,7 +69,7 @@ The first command checks without writing. The second creates the package at a ne
 | Path | Purpose |
 |---|---|
 | `SKILL.md` | Agent instructions |
-| `references/visual-design.md` | Layout guidance |
+| `references/visual-design.md` | Choosing the kind of diagram, and layout guidance |
 | `references/from-an-image.md` | Redrawing a photo, scan, or screenshot of a diagram |
 | `references/shape-catalogue.md` | Searching and placing the packaged shapes |
 | `references/document-format.md` | Generated package structure |
