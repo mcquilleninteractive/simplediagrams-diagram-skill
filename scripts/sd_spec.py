@@ -1317,6 +1317,38 @@ def _orthogonal(a: tuple[float, float], side_a: str, b: tuple[float, float], sid
     return _Route([a, (leave, ay), (leave, arrive), (bx, arrive), b])
 
 
+def _on_its_frame_edge(anchor: _Anchor, shape: _Placed) -> bool:
+    """Whether `anchor` lies on the edge of `shape`'s frame on the side it leaves by, as on a
+    box, and not inside the frame, as on a slanted side, where the app's router would choose
+    its own side to leave by."""
+    side = anchor.exits[0]
+    edge = {
+        "left": (anchor.x, shape.x), "right": (anchor.x, shape.x + shape.w),
+        "top": (anchor.y, shape.y), "bottom": (anchor.y, shape.y + shape.h),
+    }[side]
+    return abs(edge[0] - edge[1]) < 0.01
+
+
+def _is_right_angle_connector(
+    points: list[tuple[float, float]], source: _Placed, target: _Placed,
+    start: _Anchor, end: _Anchor,
+) -> bool:
+    """Whether an orthogonal route between two shapes is saved as the app's right-angle
+    connector, which edits by its segments and stays square as its shapes move.
+
+    A route with corners always is: the app keeps those corners as a hand-adjusted route, so it
+    draws exactly the route worked out here. A straight two-point run is only when both of its
+    anchors lie on facing frame edges, since the app routes a two-point connector itself, and
+    from anchors like those it draws the same straight run. A loop from a shape to itself, and
+    a turned shape, keep a direct line.
+    """
+    if source is target or any(getattr(shape.spec, "rotation", 0) % 360 for shape in (source, target)):
+        return False
+    if len(points) > 2:
+        return True
+    return _on_its_frame_edge(start, source) and _on_its_frame_edge(end, target)
+
+
 def _without_repeats(points: list[tuple[float, float]]) -> list[tuple[float, float]]:
     """Drops points that coincide with the one before, which would draw nothing."""
     kept = [points[0]]
@@ -2380,6 +2412,7 @@ class _PageCompiler:
         connections: list[wire.Connection] = []
         for edge_index, edge in enumerate(edges):
             message = self.messages.get(edge_index)
+            right_angle = False
             if message is not None:
                 route_points = [(px, py, "straight") for px, py in message.points]
                 start_attachment, end_attachment = message.start, message.end
@@ -2387,7 +2420,9 @@ class _PageCompiler:
                 _, source, target, start_anchor, end_anchor, route = by_index[edge_index]
                 start, end = (start_anchor.x, start_anchor.y), (end_anchor.x, end_anchor.y)
                 if route is not None:
-                    route_points = [(px, py, "straight") for px, py in _without_repeats(route.points)]
+                    kept = _without_repeats(route.points)
+                    route_points = [(px, py, "straight") for px, py in kept]
+                    right_angle = _is_right_angle_connector(kept, source, target, start_anchor, end_anchor)
                 elif edge.route == "curved":
                     # One interior curve point bows the line to one side of the chord.
                     length = math.hypot(end[0] - start[0], end[1] - start[1]) or 1
@@ -2411,6 +2446,7 @@ class _PageCompiler:
                     start_ending=edge.start_ending,
                     end_ending=edge.end_ending,
                     label=self._edge_label(edge.label, beside_loop=message is not None and edge.source == edge.target),
+                    right_angle=right_angle,
                 )
             )
         for number, (key, at, label) in enumerate(self.dividers):

@@ -4,7 +4,7 @@ Every document the skill writes is package format 19, the format SimpleDiagrams 
 
 | What | Current | Source |
 |---|---|---|
-| Skill | 0.6.1 | `.claude-plugin/plugin.json` |
+| Skill | 0.6.2 | `.claude-plugin/plugin.json` |
 | Package format | 19 | `FORMAT_VERSION` in `scripts/sd_format.py` |
 | Document schema | 18 | `SCHEMA_VERSION` in `scripts/sd_format.py` |
 | Complex-shape catalogue | Eleven types, each at version 1 | `CATALOGUE` in `scripts/sd_format.py` |
@@ -21,7 +21,7 @@ A packaged shape may carry its library's `connection_points` (an empty list mean
 
 Shapes, text and connectors; shapes from the packaged libraries; notes in any of their six looks; a highlight behind a label; and all eleven complex shapes, which the app draws itself: containers, swimlanes, tables, entity tables, callouts, UML lifelines, rings, flows, pyramids and funnels, cycles and gauges. Lifeline messages attach anywhere along their lines, and a connector may end on a part such as a field or a step.
 
-Not offered by the skill, though the app reads them: shapes from downloadable libraries and the `required_libraries` list naming them, connectors that route themselves, a container's Automatic layout, a container wearing a drawing, swimlanes' title strips and band made wider than new ones, a place chosen by hand for a part's words or a gauge's caption, texture on a part, paint on a gauge's needle, styled stretches inside a label, the manifest's `app_version` and `app_build`, the optional list of readable `library_shape_names`, and connector ends attached along anything but a lifeline's line.
+Not offered by the skill, though the app reads them: shapes from downloadable libraries and the `required_libraries` list naming them, right-angle connectors left for the app to route around other shapes, a container's Automatic layout, a container wearing a drawing, swimlanes' title strips and band made wider than new ones, a place chosen by hand for a part's words or a gauge's caption, texture on a part, paint on a gauge's needle, styled stretches inside a label, the manifest's `app_version` and `app_build`, the optional list of readable `library_shape_names`, and connector ends attached along anything but a lifeline's line.
 
 ## Compatibility rules
 

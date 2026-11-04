@@ -10,7 +10,7 @@ Write a diagram spec and let `build_diagram.py` produce the document. This refer
 
 The **authoring profile**: shapes drawn by the app (`rectangle`, `ellipse`, `note`, `text`, `path`), shapes from the libraries packaged with the app (`symbol`), complex shapes (`complex_shape`), connectors, groups, guides, drawing order, grid and a solid page background.
 
-Not covered, and rejected by the skill's models although the app can read them: embedded images, embedded shape artwork (how the app stores a shape from a personal or downloaded library), the `required_libraries` list that names downloadable libraries, shape data, image backgrounds, print layout, content imported from older versions, an Automatic container layout, a container wearing a drawing, a place chosen by hand for a part's words, connectors that route themselves, and the optional list of readable `library_shape_names`. The skill places only shapes packaged with the app; its validator reports a reference to any other library shape as an error.
+Not covered, and rejected by the skill's models although the app can read them: embedded images, embedded shape artwork (how the app stores a shape from a personal or downloaded library), the `required_libraries` list that names downloadable libraries, shape data, image backgrounds, print layout, content imported from older versions, an Automatic container layout, a container wearing a drawing, a place chosen by hand for a part's words, right-angle connectors left for the app to route around other shapes, and the optional list of readable `library_shape_names`. The skill places only shapes packaged with the app; its validator reports a reference to any other library shape as an error.
 
 ## The package
 
@@ -212,7 +212,8 @@ The eight standard anchors, as fractions of the frame:
 }
 ```
 
-- `points` is the entire route, at least two. A right-angled connector here is simply points that form right angles. A point of kind `curve` between two others makes a smooth bend through it. The app also has connectors that route themselves (`routing: right_angle`); the skill does not write them, and draws its own right-angled routes instead.
+- `points` is the entire route, at least two. A point of kind `curve` between two others makes a smooth bend through it.
+- The outer record's `routing` is absent for a direct line, which passes through every point, and `right_angle` for the app's right-angle connector, which a person edits by its segments and which stays square as its shapes move. The skill writes `right_angle` for every orthogonal route it works out between two shapes: with more than two points the app keeps them as a hand-adjusted route, exactly as stored; with two, the app routes the connector itself, so a straight run is a right-angle connector only when both its anchors lie on facing frame edges, where the app draws it straight too, and otherwise stays a direct line. Every segment is horizontal or vertical and every point `straight`. A loop from a shape to itself, a connector to a turned shape, and straight or curved lines stay direct.
 - An attachment binds an end to an anchor on an element of the same page. The app then draws that end at the anchor wherever the shape moves. Still store the anchor's position as the end point.
 - An end may instead attach anywhere along a lifeline's dashed line: `{"element_id": "…", "attach_line_id": 0, "distance": 40}`, `distance` points down the line from the bottom of the head. An attachment holds `connection_point_id`, or `attach_line_id` with `distance`, never both.
 - An attachment to an element or anchor that does not exist stops the document opening.

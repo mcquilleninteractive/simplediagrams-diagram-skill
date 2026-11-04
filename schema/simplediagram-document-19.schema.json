@@ -293,7 +293,7 @@
   },
   "Connection": {
    "additionalProperties": false,
-   "description": "One entry in a page's `connections` array.",
+   "description": "One entry in a page's `connections` array.\n\n`routing` is absent for a direct line, which passes through every stored point, and\n`right_angle` for the app's right-angle connector. The skill writes `right_angle` only with\na route it worked out itself: corners that keep every segment horizontal or vertical, which\nthe app keeps as a hand-adjusted route, or, for two points, a straight run between anchors\non facing frame edges, which the app's own router also draws straight.",
    "properties": {
     "content": {
      "$ref": "#/$defs/ConnectionCore"
@@ -301,6 +301,20 @@
     "is_locked": {
      "title": "Is Locked",
      "type": "boolean"
+    },
+    "routing": {
+     "anyOf": [
+      {
+       "const": "right_angle",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "right_angle for a right-angle connector; absent for a direct line.",
+     "title": "Routing"
     }
    },
    "required": [

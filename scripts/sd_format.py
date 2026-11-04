@@ -32,6 +32,7 @@ from __future__ import annotations
 import math
 import unicodedata
 from collections.abc import Callable
+from itertools import pairwise
 from typing import Annotated, Any, Literal, NamedTuple
 
 from pydantic import (
@@ -1413,10 +1414,32 @@ class ConnectionCore(WireModel):
 
 
 class Connection(WireModel):
-    """One entry in a page's `connections` array."""
+    """One entry in a page's `connections` array.
+
+    `routing` is absent for a direct line, which passes through every stored point, and
+    `right_angle` for the app's right-angle connector. The skill writes `right_angle` only with
+    a route it worked out itself: corners that keep every segment horizontal or vertical, which
+    the app keeps as a hand-adjusted route, or, for two points, a straight run between anchors
+    on facing frame edges, which the app's own router also draws straight.
+    """
 
     content: ConnectionCore
     is_locked: bool
+    routing: Literal["right_angle"] | None = Field(
+        default=None,
+        description="right_angle for a right-angle connector; absent for a direct line.",
+    )
+
+    @model_validator(mode="after")
+    def _right_angle_runs_square(self) -> Connection:
+        if self.routing == "right_angle":
+            points = self.content.points
+            for a, b in pairwise(points):
+                if abs(a.x - b.x) > 0.01 and abs(a.y - b.y) > 0.01:
+                    raise ValueError("a right-angle connector's segments must be horizontal or vertical")
+            if any(point.kind != "straight" for point in points):
+                raise ValueError("a right-angle connector's points are all straight")
+        return self
 
 
 # ---------------------------------------------------------------------------
@@ -2099,8 +2122,10 @@ def connection(
     stroke_texture: str | None = None,
     label: ConnectorLabel | None = None,
     is_locked: bool = False,
+    right_angle: bool = False,
 ) -> Connection:
-    """A connector in the app's standard gray, with an arrow at its end."""
+    """A connector in the app's standard gray, with an arrow at its end; a right-angle
+    connector when `right_angle`, else a direct line."""
     return Connection(
         content=ConnectionCore(
             id=id, points=points, start_attachment=start_attachment, end_attachment=end_attachment,
@@ -2108,6 +2133,7 @@ def connection(
             start_ending=start_ending, end_ending=end_ending, stroke_texture=stroke_texture, label=label,
         ),
         is_locked=is_locked,
+        routing="right_angle" if right_angle else None,
     )
 
 

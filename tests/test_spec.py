@@ -200,6 +200,52 @@ def test_straight_and_curved_routes() -> None:
     assert [p.kind for p in curved.pages[0].connections[0].content.points] == ["straight", "curve", "straight"]
 
 
+def test_orthogonal_routes_are_right_angle_connectors() -> None:
+    """An orthogonal connector between two shapes is saved as the app's right-angle connector,
+    so a person edits it by its segments and it stays square as its shapes move: with its
+    corners kept when it turns, and as a straight run between facing boxes."""
+    for col, row, corners in [(1, 1, True), (1, 0, False), (0, 1, False)]:
+        document = compile_spec(_spec([_box("a", 0, 0), _box("b", col, row)], [{"source": "a", "target": "b"}]))
+        connection = document.pages[0].connections[0]
+        assert connection.routing == "right_angle", (col, row)
+        assert (len(connection.content.points) > 2) == corners, (col, row)
+        assert wire.dump(document)["pages"][0]["content"]["content"]["connections"][0]["routing"] == "right_angle"
+
+
+def test_other_connectors_stay_direct_lines() -> None:
+    """Only a route the builder worked out square is a right-angle connector: a straight or
+    curved line, a loop from a shape to itself and a connector to a turned shape stay direct,
+    and the file leaves `routing` out for them."""
+    nodes = [_box("a", 0, 0), _box("b", 1, 1)]
+    for route in ("straight", "curved"):
+        document = compile_spec(_spec(nodes, [{"source": "a", "target": "b", "route": route}]))
+        assert document.pages[0].connections[0].routing is None, route
+        assert "routing" not in wire.dump(document)["pages"][0]["content"]["content"]["connections"][0]
+    loop = compile_spec(
+        _spec([_box("a", 0, 0)], [{"source": "a", "target": "a", "source_point": 1, "target_point": 3}])
+    )
+    assert loop.pages[0].connections[0].routing is None
+    turned = compile_spec(_spec([_box("a", 0, 0, rotation=30), _box("b", 1, 1)], [{"source": "a", "target": "b"}]))
+    assert turned.pages[0].connections[0].routing is None
+
+
+def test_a_right_angle_connector_runs_square() -> None:
+    """The file model refuses a right-angle connector with a slanted segment or a curve point,
+    which the app would not draw as stored."""
+    def connector(points: list[tuple[float, float, str]]) -> wire.Connection:
+        return wire.connection(
+            id="00000000-0000-4000-8000-000000000001",
+            points=[wire.ConnectorPoint(x=x, y=y, kind=kind) for x, y, kind in points],
+            right_angle=True,
+        )
+
+    assert connector([(0, 0, "straight"), (100, 0, "straight"), (100, 50, "straight")]).routing == "right_angle"
+    with pytest.raises(ValidationError, match="horizontal or vertical"):
+        connector([(0, 0, "straight"), (100, 40, "straight")])
+    with pytest.raises(ValidationError, match="all straight"):
+        connector([(0, 0, "straight"), (100, 0, "curve"), (100, 50, "straight")])
+
+
 def test_short_outside_label_uses_the_shapes_own_label() -> None:
     """A label that fits the shape's width stays part of the shape, placed
     below it across the full width; the default stays inside."""
