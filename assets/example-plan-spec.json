@@ -1,0 +1,31 @@
+{
+ "spec_version": 1,
+ "name": "Launch plan",
+ "pages": [
+  {
+   "name": "Plan",
+   "nodes": [
+    {"key": "plan", "shape": "gantt", "label": "Launch plan", "x": 380, "y": 220, "skip_weekends": true, "plan": [
+      {"label": "Plan", "tasks": [
+        {"label": "Research", "start": "2026-11-09", "days": 5, "done": true},
+        {"label": "Sketches", "key": "sketches", "days": 5}
+      ]},
+      {"label": "Build", "tasks": [
+        {"label": "Prototype", "after": "sketches", "days": 10, "critical": true},
+        {"label": "Testing", "days": 5},
+        {"label": "Launch", "milestone": true}
+      ]}
+    ]},
+    {"key": "why", "shape": "note", "note_style": "documentation", "lists": true, "x": 860, "y": 220,
+     "label": "Before launch\n1. Sign off the prototype\n  - Design\n  - Legal\n2. Brief support\n3. Tell customers"},
+    {"key": "board", "shape": "audience", "x": 380, "y": 480, "groups": [
+      5, {"seats": 3, "fill": "#F59F00"}, 1
+    ]},
+    {"key": "caption", "shape": "text", "label": "Steering group: for, against, undecided", "x": 380, "y": 580}
+   ],
+   "edges": [
+    {"source": "why", "target": "plan", "route": "straight", "pattern": "dotted", "end_ending": "none"}
+   ]
+  }
+ ]
+}

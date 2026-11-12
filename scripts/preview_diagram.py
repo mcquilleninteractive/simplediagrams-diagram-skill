@@ -11,7 +11,8 @@ Each shape is drawn as its frame with its label, and each connector as its
 stored route. A complex shape is drawn as its parts: a container's title, lanes
 and their titles, a table's cells, a callout's tail, a lifeline's head and line,
 and the sections, steps, layers and bands of a ring, flow, pyramid, cycle or gauge,
-with each step or layer as a plain outline. This shows spacing, alignment, crossings
+with each step or layer as a plain outline; an audience as its arch, and a Gantt chart
+as its bars. A collapsed note is drawn as its small icon. This shows spacing, alignment, crossings
 and label fit. It does not draw
 the library artwork, fonts or hand-drawn line style; only SimpleDiagrams does
 that.
@@ -99,12 +100,30 @@ def _page_svg(page: wire.Page) -> str:
                 f'<text x="{x:g}" y="{y - 5:g}" font-size="12" '
                 f'text-anchor="middle" fill="#495057">{escape(core.label.content.string)}</text>'
             )
+        for end_label, at, towards in (
+            (connection.start_label, core.points[0], core.points[1]),
+            (connection.end_label, core.points[-1], core.points[-2]),
+        ):
+            if end_label is not None:
+                # Beside its end, a little way along the line and off it.
+                length = max(1e-9, ((towards.x - at.x) ** 2 + (towards.y - at.y) ** 2) ** 0.5)
+                x = at.x + (towards.x - at.x) / length * 18 - (towards.y - at.y) / length * 12
+                y = at.y + (towards.y - at.y) / length * 18 + (towards.x - at.x) / length * 12
+                parts.append(_text(x, y, end_label.content.string, 11))
     for element in drawn:
         core = element.core
         frame = core.frame
         if element.complex_shape is not None:
             if not element.complex_shape.holds_shapes:
                 parts.extend(_complex_svg(element))
+            continue
+        if element.content.collapsed:
+            # A collapsed note shows as a small icon at the top right of its frame.
+            side = min(28.0, frame.width, frame.height)
+            parts.append(
+                f'<rect x="{frame.x + frame.width - side:g}" y="{frame.y:g}" width="{side:g}" height="{side:g}" '
+                f'rx="3" fill="{core.style.fill_hex[:7]}" stroke="{core.style.stroke_hex[:7]}" stroke-width="1"/>'
+            )
             continue
         fill = core.style.fill_hex[:7] if len(core.style.fill_hex) == 7 else "none"
         stroke = core.style.stroke_hex[:7] if core.kind != "text" else "none"
@@ -261,7 +280,8 @@ def _words(part: wire.Part, x: float, y: float) -> str:
 
 
 def _parts_svg(element: wire.Element, fill: str, stroke: str) -> list[str]:
-    """A ring, flow, pyramid, cycle or gauge as plain outlines of its parts with their words."""
+    """A ring, flow, pyramid, cycle, gauge, audience or Gantt chart as plain outlines of its
+    parts with their words."""
     core, shape = element.core, element.complex_shape
     assert shape is not None
     f = core.frame
@@ -283,25 +303,29 @@ def _parts_svg(element: wire.Element, fill: str, stroke: str) -> list[str]:
             parts.append(f'<polygon points="{points}" fill="{_part_fill(part, fill)}" {stroke}/>')
             parts.append(_words(part, cx, f.y + (layer.top + layer.bottom) / 2))
     elif shape.type in ("ring", "cycle"):
+        thin: list[int] = []
         if shape.type == "ring":
-            outer = min(f.width, f.height) / 2
-            band = shape.settings["ring_width"]
-            inner = 0.0 if band == "full" else max(0.0, outer - float(band))
-            first = -90.0
+            # The circle as the app draws it: smaller while a thin section's name is outside it.
+            outer = wire.ring_radius(shape, f.width, f.height)
+            inner = wire.ring_hole(shape, outer)
+            thin = wire.ring_thin_sections(shape, f.width, f.height)
+            sections = wire.ring_sections(shape)
+            angles, whole = sections.angles, len(shape.parts) == 1 and sections.whole
         else:
             band_shape = wire.cycle_band(shape, f.width, f.height)
             outer, inner = band_shape.outer, band_shape.inner
-            first = -90.0 - band_shape.share / 2
-        share = 360 / len(shape.parts)
+            share = 360 / len(shape.parts)
+            angles = [(-90.0 - band_shape.share / 2 + index * share, share) for index in range(len(shape.parts))]
+            whole = False
         mirror = -1 if shape.settings.get("direction") == "anticlockwise" else 1
-        for index, part in enumerate(shape.parts):
-            start = math.radians(first + index * share)
-            end = math.radians(first + (index + 1) * share)
+        for index, (part, (first, share)) in enumerate(zip(shape.parts, angles, strict=True)):
+            start = math.radians(first)
+            end = math.radians(first + share)
             middle = (start + end) / 2
             corner = lambda radius, angle: (cx + mirror * radius * math.cos(angle), cy + radius * math.sin(angle))
             sweep = 1 if mirror > 0 else 0
             big = 1 if share > 180 else 0
-            if len(shape.parts) == 1:
+            if whole:
                 parts.append(f'<circle cx="{cx:g}" cy="{cy:g}" r="{outer:g}" fill="{_part_fill(part, fill)}" {stroke}/>')
                 if inner > 0:
                     parts.append(f'<circle cx="{cx:g}" cy="{cy:g}" r="{inner:g}" fill="#ffffff" {stroke}/>')
@@ -312,8 +336,50 @@ def _parts_svg(element: wire.Element, fill: str, stroke: str) -> list[str]:
                     f'L{c[0]:g} {c[1]:g}A{inner:g} {inner:g} 0 {big} {1 - sweep} {d[0]:g} {d[1]:g}Z" '
                     f'fill="{_part_fill(part, fill)}" {stroke}/>'
                 )
-            x, y = corner((outer + inner) / 2, middle)
+            # A thin section's name is set just outside the circle.
+            x, y = corner(outer + 14 if index in thin else (outer + inner) / 2, middle)
             parts.append(_words(part, x, y))
+    elif shape.type == "audience":
+        ax, ay, radius, opening = wire.audience_arch(f.width, f.height)
+        ax, ay = f.x + ax, f.y + ay
+        seats = [int(part.size or 0) for part in shape.parts]
+        taken = 0
+        for part, count in zip(shape.parts, seats, strict=True):
+            # Each group is a wedge of the arch from its left end, by its share of the seats.
+            start = math.pi + math.pi * taken / sum(seats)
+            taken += count
+            end = math.pi + math.pi * taken / sum(seats)
+            corner = lambda distance, angle: (ax + distance * math.cos(angle), ay + distance * math.sin(angle))
+            a, b, c, d = corner(radius, start), corner(radius, end), corner(opening, end), corner(opening, start)
+            parts.append(
+                f'<path d="M{a[0]:g} {a[1]:g}A{radius:g} {radius:g} 0 0 1 {b[0]:g} {b[1]:g}'
+                f'L{c[0]:g} {c[1]:g}A{opening:g} {opening:g} 0 0 0 {d[0]:g} {d[1]:g}Z" fill="{_part_fill(part, fill)}" {stroke}/>'
+            )
+        if shape.settings["show_total"] is True:
+            parts.append(_text(ax, ay - 2, str(sum(seats)), core.text_content.base_style.font_size))
+    elif shape.type == "gantt":
+        size = core.text_content.base_style.font_size
+        parts.append(f'<rect x="{f.x:g}" y="{f.y:g}" width="{f.width:g}" height="{f.height:g}" fill="{fill}" {stroke}/>')
+        parts.append(_text(cx, f.y + wire.GANTT_MARGIN + wire.GANTT_TITLE_HEIGHT / 2 + size * 0.35, core.text_content.string, size))
+        tasks = shape._of_role("task")
+        bars = wire.gantt_bars(shape, f.width, f.height)
+        row = 0
+        for section in shape._of_role("section"):
+            own = bars[row : row + int(section.size or 0)]
+            parts.append(_words(section, f.x + (wire.GANTT_MARGIN + wire.gantt_time_area(f.width)[0]) / 2, f.y + (own[0][1] + own[-1][1] + own[-1][3]) / 2))
+            for task, (x, y, width, height) in zip(tasks[row : row + len(own)], own, strict=True):
+                colour = _part_fill(task, _part_fill(section, fill))
+                if "milestone" in (task.marks or []):
+                    mx, my = f.x + x + width / 2, f.y + y + height / 2
+                    parts.append(
+                        f'<polygon points="{f.x + x:g},{my:g} {mx:g},{f.y + y:g} {f.x + x + width:g},{my:g} {mx:g},{f.y + y + height:g}" '
+                        f'fill="{colour}" {stroke}/>'
+                    )
+                else:
+                    parts.append(f'<rect x="{f.x + x:g}" y="{f.y + y:g}" width="{width:g}" height="{height:g}" fill="{colour}" {stroke}/>')
+                if task.text is not None and task.text.string:
+                    parts.append(_text(f.x + x + width + 6, f.y + y + height / 2 + size * 0.35, task.text.string, size, anchor="start"))
+            row += len(own)
     elif shape.type == "gauge":
         gx, gy, radius, bottom = wire.gauge_circle(f.width, f.height)
         gx, gy, bottom = f.x + gx, f.y + gy, f.y + bottom

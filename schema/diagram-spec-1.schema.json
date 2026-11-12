@@ -62,6 +62,20 @@
      "title": "Label",
      "type": "string"
     },
+    "source_label": {
+     "default": "",
+     "description": "Words beside the source end, such as a UML multiplicity or role name.",
+     "maxLength": 200,
+     "title": "Source Label",
+     "type": "string"
+    },
+    "target_label": {
+     "default": "",
+     "description": "Words beside the target end.",
+     "maxLength": 200,
+     "title": "Target Label",
+     "type": "string"
+    },
     "route": {
      "default": "orthogonal",
      "description": "orthogonal: horizontal and vertical runs only. straight: one direct line. curved: one direct line with a gentle bow.",
@@ -306,6 +320,66 @@
    "title": "GridLayout",
    "type": "object"
   },
+  "GroupSpec": {
+   "additionalProperties": false,
+   "description": "One group of an audience with paint of its own. A plain number is the same with\nonly its seats.",
+   "properties": {
+    "seats": {
+     "description": "How many seats the group has.",
+     "maximum": 1000,
+     "minimum": 1,
+     "title": "Seats",
+     "type": "integer"
+    },
+    "fill": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Fill"
+    },
+    "stroke": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Stroke"
+    },
+    "line_width": {
+     "anyOf": [
+      {
+       "maximum": 10000,
+       "minimum": 0,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Line Width"
+    }
+   },
+   "required": [
+    "seats"
+   ],
+   "title": "GroupSpec",
+   "type": "object"
+  },
   "LaneSpec": {
    "additionalProperties": false,
    "description": "One lane of a swimlanes node: its title and the nodes it holds.",
@@ -357,7 +431,7 @@
      "type": "string"
     },
     "shape": {
-     "description": "rectangle, ellipse, note or text for a plain drawn shape; container, swimlanes, table, entity_table, callout, lifeline, ring, flow, pyramid, cycle or gauge for a shape SimpleDiagrams draws itself; or '<library>/<item>' for a shape from a library packaged with SimpleDiagrams, for example 'basic/Cylinder'. Use a selector returned by find_shapes.py, which searches assets/built-in-shapes.json.",
+     "description": "rectangle, ellipse, note or text for a plain drawn shape; container, swimlanes, table, entity_table, callout, lifeline, ring, flow, pyramid, cycle, gauge, audience or gantt for a shape SimpleDiagrams draws itself; or '<library>/<item>' for a shape from a library packaged with SimpleDiagrams, for example 'basic/Cylinder'. Use a selector returned by find_shapes.py, which searches assets/built-in-shapes.json.",
      "maxLength": 512,
      "minLength": 1,
      "title": "Shape",
@@ -368,6 +442,19 @@
      "maxLength": 2000,
      "title": "Label",
      "type": "string"
+    },
+    "lists": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Whether the label's lines that begin '- ' are bulleted list items and those that begin with a number and '. ' numbered ones, each two spaces of indent one level deeper, three levels at most. The marks are not kept as text: SimpleDiagrams draws the bullets and counts the numbers. For a plain or library shape, a note or text.",
+     "title": "Lists"
     },
     "col": {
      "anyOf": [
@@ -623,7 +710,10 @@
         "tapedNote",
         "tag",
         "notebookPage",
-        "pinnedNote"
+        "pinnedNote",
+        "documentation",
+        "textAnnotation",
+        "umlNote"
        ],
        "type": "string"
       },
@@ -632,8 +722,21 @@
       }
      ],
      "default": null,
-     "description": "note: its look, placed at that look's own size and colours unless the spec sets them: stickyNote, indexCard, tapedNote, tag, notebookPage or pinnedNote.",
+     "description": "note: its look, placed at that look's own size and colours unless the spec sets them: stickyNote, indexCard, tapedNote, tag, notebookPage, pinnedNote, documentation (a plain sheet for longer writing), textAnnotation (BPMN's, words beside a bracket) or umlNote (a page with a turned corner).",
      "title": "Note Style"
+    },
+    "collapsed": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "note: whether it is shown as a small icon, which a person opens to read it. The node's position is then the icon's; opened, the note reaches left and down from it. Connect a collapsed note with route 'straight'.",
+     "title": "Collapsed"
     },
     "members": {
      "anyOf": [
@@ -796,6 +899,24 @@
      "description": "table: whether the first row is drawn as a header (the default).",
      "title": "Header Row"
     },
+    "uml_box": {
+     "anyOf": [
+      {
+       "enum": [
+        "class",
+        "interface",
+        "enumeration"
+       ],
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "table: the kind of UML box it stands for, so SimpleDiagrams treats it as one. It changes nothing drawn: write the «interface» or «enumeration» line in its first cell.",
+     "title": "Uml Box"
+    },
     "column_widths": {
      "anyOf": [
       {
@@ -866,7 +987,7 @@
          }
         ]
        },
-       "maxItems": 12,
+       "maxItems": 20,
        "minItems": 1,
        "type": "array"
       },
@@ -875,8 +996,77 @@
       }
      ],
      "default": null,
-     "description": "ring: its sections, clockwise from twelve o'clock.",
+     "description": "ring: its sections, clockwise from twelve o'clock, 1 to 20; each may hold a share, its percentage of the circle.",
      "title": "Sections"
+    },
+    "groups": {
+     "anyOf": [
+      {
+       "items": {
+        "anyOf": [
+         {
+          "type": "integer"
+         },
+         {
+          "$ref": "#/$defs/GroupSpec"
+         }
+        ]
+       },
+       "maxItems": 20,
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "audience: its groups from the left end of the arch to the right, 1 to 20, each a number of seats; at most 1,000 seats in all.",
+     "title": "Groups"
+    },
+    "show_total": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "audience: whether the total of its seats is drawn in its middle (the default).",
+     "title": "Show Total"
+    },
+    "plan": {
+     "anyOf": [
+      {
+       "items": {
+        "$ref": "#/$defs/SectionSpec"
+       },
+       "maxItems": 20,
+       "minItems": 1,
+       "type": "array"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "gantt: its sections from the top down, 1 to 20, each with its tasks; at most 60 tasks in all. The node's label is the chart's title.",
+     "title": "Plan"
+    },
+    "skip_weekends": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "gantt: whether Saturdays and Sundays are left out of a task's days, and a task that follows another and would start on one starts on the Monday. A start the spec gives stays where it is.",
+     "title": "Skip Weekends"
     },
     "ring_width": {
      "anyOf": [
@@ -1331,9 +1521,223 @@
      ],
      "default": null,
      "title": "Line Width"
+    },
+    "share": {
+     "anyOf": [
+      {
+       "maximum": 100,
+       "minimum": 1,
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "ring: the section's share of the circle, a whole percentage. The shares of one ring add up to at most 100; sections without one share equally what is left.",
+     "title": "Share"
     }
    },
    "title": "PartSpec",
+   "type": "object"
+  },
+  "SectionSpec": {
+   "additionalProperties": false,
+   "description": "One section of a Gantt chart: a name, the tasks in it from the top down, and the\npaint of those tasks.",
+   "properties": {
+    "label": {
+     "default": "",
+     "maxLength": 500,
+     "title": "Label",
+     "type": "string"
+    },
+    "tasks": {
+     "items": {
+      "$ref": "#/$defs/TaskSpec"
+     },
+     "maxItems": 60,
+     "minItems": 1,
+     "title": "Tasks",
+     "type": "array"
+    },
+    "fill": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Fill"
+    },
+    "stroke": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Stroke"
+    },
+    "line_width": {
+     "anyOf": [
+      {
+       "maximum": 10000,
+       "minimum": 0,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Line Width"
+    }
+   },
+   "required": [
+    "tasks"
+   ],
+   "title": "SectionSpec",
+   "type": "object"
+  },
+  "TaskSpec": {
+   "additionalProperties": false,
+   "description": "One task of a Gantt chart: a bar of `days` days, or with `milestone` a diamond on\none day.",
+   "properties": {
+    "label": {
+     "default": "",
+     "maxLength": 500,
+     "title": "Label",
+     "type": "string"
+    },
+    "key": {
+     "anyOf": [
+      {
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Your own name for this task, unique in its chart, for another task's `after`.",
+     "title": "Key"
+    },
+    "start": {
+     "anyOf": [
+      {
+       "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "The day it starts, as YYYY-MM-DD, from 1900-01-01 to 2199-12-31. The first task needs one.",
+     "title": "Start"
+    },
+    "after": {
+     "anyOf": [
+      {
+       "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,63}$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Key of the task it starts after, instead of `start`. With neither, it starts when the task above it ends.",
+     "title": "After"
+    },
+    "days": {
+     "anyOf": [
+      {
+       "maximum": 3650,
+       "minimum": 1,
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "description": "Its length in days; every task but a milestone needs one.",
+     "title": "Days"
+    },
+    "milestone": {
+     "default": false,
+     "description": "A single day, drawn as a diamond; it takes no days.",
+     "title": "Milestone",
+     "type": "boolean"
+    },
+    "done": {
+     "default": false,
+     "description": "Finished, drawn paler.",
+     "title": "Done",
+     "type": "boolean"
+    },
+    "critical": {
+     "default": false,
+     "description": "On the critical path, its outline drawn heavier.",
+     "title": "Critical",
+     "type": "boolean"
+    },
+    "fill": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Fill"
+    },
+    "stroke": {
+     "anyOf": [
+      {
+       "description": "#RRGGBB or #RRGGBBAA. Use #00000000 for transparent; names are invalid.",
+       "pattern": "^#(?:[0-9A-Fa-f]{6}|[0-9A-Fa-f]{8})$",
+       "type": "string"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Stroke"
+    },
+    "line_width": {
+     "anyOf": [
+      {
+       "maximum": 10000,
+       "minimum": 0,
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ],
+     "default": null,
+     "title": "Line Width"
+    }
+   },
+   "title": "TaskSpec",
    "type": "object"
   }
  },

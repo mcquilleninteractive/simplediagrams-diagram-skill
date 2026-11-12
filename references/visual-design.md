@@ -22,7 +22,9 @@ A diagram works when a reader can answer "what are the parts, and how do they re
    | A cycle | The `cycle` shape, clockwise |
    | A few stages in order, with no branches | The `flow` shape |
    | Stages narrowing down, or ranks from base to apex | The `pyramid` shape, as a funnel or a pyramid |
-   | Shares of a whole | The `ring` shape |
+   | Shares of a whole | The `ring` shape, each section with its `share` |
+   | A plan over time: tasks, their lengths and what follows what | The `gantt` shape |
+   | How a body of people divides: seats, votes, a panel | The `audience` shape |
    | One number in its range | The `gauge` shape |
    | The tables of a database | `entity_table` shapes, with relationships between their fields |
    | A comparison | Columns with matching rows |

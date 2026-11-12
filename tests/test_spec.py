@@ -73,7 +73,7 @@ def test_catalog_matches_what_the_compiler_writes() -> None:
     """Every catalogue shape must compile to a reference the catalogue itself
     resolves, or the app would draw placeholders."""
     catalog = Catalog.load()
-    assert len(catalog.shapes) == 534
+    assert len(catalog.shapes) == 535
     # One library per page: a page holds at most 300 shapes and the catalogue has more.
     by_library: dict[str, list] = {}
     for shape in catalog.shapes:
@@ -618,7 +618,7 @@ def test_a_shape_from_a_downloadable_library_is_refused() -> None:
     """The skill knows only the shapes packaged with SimpleDiagrams; a selector for any
     other library must stop the build and say so, never write a placeholder."""
     spec = _spec([{"key": "t", "shape": "notebook/transformer", "x": 0, "y": 0}])
-    with pytest.raises(SpecError, match="not one of the shapes packaged with SimpleDiagrams 5.2.0"):
+    with pytest.raises(SpecError, match="not one of the shapes packaged with SimpleDiagrams 5.4.0"):
         compile_spec(spec)
 
 
@@ -637,7 +637,7 @@ def test_lint_flags_a_reference_the_app_does_not_package() -> None:
     assert not [f for f in lint(document, catalog) if f.code == "unresolved-shape"]
     errors = [f for f in lint(document) if f.severity == "error"]
     assert [f.code for f in errors] == ["unresolved-shape"]
-    assert "not packaged with SimpleDiagrams 5.2.0" in errors[0].message
+    assert "not packaged with SimpleDiagrams 5.4.0" in errors[0].message
 
 
 # ---------------------------------------------------------------------------

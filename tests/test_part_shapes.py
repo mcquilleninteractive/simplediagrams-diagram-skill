@@ -1,9 +1,9 @@
-"""Tests for the shapes SimpleDiagrams 5.2 draws from their parts, and what else 5.2 added.
+"""Tests for the shapes SimpleDiagrams draws from their parts, and the limits it keeps.
 
 Rings, flows, pyramids and funnels, cycles, gauges and entity tables place their own
 connection points, which the file does not list, so these cover what each writes, the rules
 the app refuses a whole file for breaking, where a connector ends on one, and how much text
-5.2 reads before it refuses a document: a limit the skill must meet, since an agent would
+the app reads before it refuses a document: a limit the skill must meet, since an agent would
 otherwise hand over a document that does not open.
 """
 
@@ -408,7 +408,7 @@ def test_a_plain_note_is_unchanged() -> None:
 
 
 def test_a_highlight_goes_behind_the_words_wherever_they_are() -> None:
-    """Format 19's highlight belongs to a text's style, in a label and in a part alike."""
+    """A highlight belongs to a text's style, in a label and in a part alike."""
     document = _compile(
         {"key": "a", "shape": "rectangle", "label": "a", "highlight": "#FFF3BF", "col": 0, "row": 0},
         {"key": "b", "shape": "flow", "steps": ["x", "y"], "highlight": "#FFF3BF", "col": 0, "row": 1},
@@ -429,19 +429,19 @@ def test_a_proportional_container_says_so() -> None:
 
 
 # ---------------------------------------------------------------------------
-# How much SimpleDiagrams 5.2 reads
+# How much SimpleDiagrams reads
 # ---------------------------------------------------------------------------
 
 
 def test_a_lane_title_over_the_limit_is_refused_in_the_spec() -> None:
-    """5.2 refuses a whole document for one lane title over 1,000 characters."""
+    """The app refuses a whole document for one lane title over 1,000 characters."""
     failure = _rejected({"key": "s", "shape": "swimlanes", "x": 0, "y": 0, "lanes": [{"title": "L" * 1001}]})
     assert "lanes.0.title" in failure and "at most 1000" in failure
     DiagramSpec.model_validate({"name": "T", "pages": [{"nodes": [{"key": "s", "shape": "swimlanes", "x": 0, "y": 0, "lanes": [{"title": "L" * 1000}]}]}]})
 
 
 def test_a_table_over_the_limit_is_refused_in_the_spec() -> None:
-    """5.2 refuses a whole document for a table over 100,000 characters, though each cell is
+    """The app refuses a whole document for a table over 100,000 characters, though each cell is
     within its own 2,000."""
     cells = [["x" * 1900 for _ in range(10)] for _ in range(6)]
     assert "at most 100000 characters" in _rejected({"key": "t", "shape": "table", "col": 0, "row": 0, "cells": cells})
@@ -457,7 +457,7 @@ def test_a_table_over_the_limit_is_refused_in_the_spec() -> None:
     ],
 )
 def test_the_models_hold_a_lane_to_its_limits(change, message: str) -> None:
-    """The models, not only the spec, stand between a fault and a document 5.2 refuses."""
+    """The models, not only the spec, stand between a fault and a document the app refuses."""
     dumped = wire.dump(fixtures.complex_profile_document())
     swimlanes = next(e for e in dumped["pages"][0]["elements"] if e.get("complex_shape", {}).get("type") == "swimlanes")
     change(swimlanes["complex_shape"])
@@ -517,7 +517,7 @@ def test_the_models_hold_a_table_and_a_cell_to_their_limits() -> None:
 
 
 def test_a_page_holds_only_so_many_complex_shapes() -> None:
-    """5.2 refuses a document with a page over its limit, however small each shape is."""
+    """The app refuses a document with a page over its limit, however small each shape is."""
     style = wire.ElementStyle(fill_hex="#FFFFFF", stroke_hex="#000000", line_width=1.0)
     elements = [
         wire.element(

@@ -120,9 +120,41 @@ def every_kind_in_many_settings() -> list[dict]:
                 steps=[f"s{index}" for index in range(count)], width=width, height=height,
             )
     for count, band, (width, height) in itertools.product(
-        (1, 2, 3, 5, 12), (40, 10, 500, "full"), ((200, 200), (400, 200), (100, 300))
+        (1, 2, 3, 5, 12, 20), (40, 10, 500, "full"), ((200, 200), (400, 200), (100, 300))
     ):
         add(shape="ring", sections=[f"s{index}" for index in range(count)], ring_width=band, width=width, height=height)
+    # Rings whose sections hold shares: touching, some thin, some leaving a piece missing.
+    for shares, band, (width, height) in itertools.product(
+        ((100,), (40, 35, 25), (30, None, None), (3, None, 95), (50, 2, 2, 2), (1, 1, 1), (60, None), (5,) * 20),
+        (40, 10, "full"), ((200, 200), (400, 200), (60, 60)),
+    ):
+        sections = [{"label": f"s{index}", **({"share": share} if share else {})} for index, share in enumerate(shares)]
+        add(shape="ring", sections=sections, ring_width=band, width=width, height=height)
+    for groups, (width, height) in itertools.product(
+        ((1,), (50, 30, 20), (1000,), (1,) * 20), ((240, 140), (500, 140), (100, 300), (48, 28))
+    ):
+        add(shape="audience", groups=list(groups), width=width, height=height)
+    # Gantt charts: short and long plans, weekends skipped or not, milestones at either end,
+    # tasks that follow a named task, at several sizes; each picks its own axis step.
+    plans = (
+        [[{"label": "a", "start": "2026-11-09", "days": 5}]],
+        [[{"label": "a", "start": "2026-11-13", "days": 1}, {"label": "m", "milestone": True}, {"label": "b", "days": 3}]],
+        [
+            [{"label": "m", "start": "2026-11-14", "milestone": True}, {"label": "a", "key": "a", "days": 12}],
+            [{"label": "b", "after": "a", "days": 40}, {"label": "c", "start": "2026-10-01", "days": 7}, {"label": "d", "days": 90}],
+        ],
+        [[{"label": "a", "start": "2024-02-28", "days": 400}, {"label": "b", "days": 1200}, {"label": "c", "days": 3650}]],
+        [[{"label": f"t{index}", **({"start": "1999-12-30"} if index == 0 else {}), "days": 1 + index % 9} for index in range(60)]],
+    )
+    for plan, skip, (width, height) in itertools.product(
+        plans, (False, True), ((480, 220), (200, 800), (900, 300), (1600, 1000))
+    ):
+        tasks = sum(len(section) for section in plan)
+        if height >= wire.gantt_smallest_size(tasks)[1]:
+            add(
+                shape="gantt", label="G", skip_weekends=skip, width=width, height=height,
+                plan=[{"label": f"s{index}", "tasks": section} for index, section in enumerate(plan)],
+            )
     for count, form, (width, height) in itertools.product((2, 3, 8), ("pyramid", "funnel"), ((240, 200), (600, 80), (50, 400))):
         if height >= 12 * count:
             add(shape="pyramid", form=form, layers=[f"l{index}" for index in range(count)], width=width, height=height)
@@ -147,11 +179,26 @@ def over_the_limits() -> dict[str, dict]:
     and the app must too."""
     made: dict[str, dict] = {}
     base = wire.dump(fixtures.complex_profile_document())
+    plain = wire.dump(fixtures.full_profile_document())
 
-    def changed(change) -> dict:
-        document = json.loads(json.dumps(base))
+    def changed(change, source: dict = base) -> dict:
+        document = json.loads(json.dumps(source))
         change(document["pages"][0]["elements"])
         return document
+
+    def changed_connection(change) -> dict:
+        document = json.loads(json.dumps(plain))
+        change(document["pages"][0]["content"]["content"]["connections"][0])
+        return document
+
+    def element(elements: list, number: int) -> dict:
+        """The first level of the element the fixtures number `number`."""
+        return next(
+            item for item in elements if item["content"]["content"]["content"]["id"].endswith(f"{number:012X}")
+        )["content"]
+
+    def task(elements: list, place: int) -> dict:
+        return [part for part in of(elements, "gantt")["parts"] if part["role"] == "task"][place]
 
     def of(elements: list, kind: str) -> dict:
         return next(item for item in elements if item.get("complex_shape", {}).get("type") == kind)["complex_shape"]
@@ -177,6 +224,46 @@ def over_the_limits() -> dict[str, dict]:
 
     made["one shape in two lanes"] = changed(one_shape_in_two_lanes)
     made["a turned proportional container"] = changed(turned_proportional)
+    # What document formats 20 and 21 added.
+    made["a table without uml_box"] = changed(lambda elements: of(elements, "table")["settings"].pop("uml_box"))
+    made["a table with an unknown uml_box"] = changed(lambda elements: of(elements, "table")["settings"].update(uml_box="record"))
+    made["a ring's shares over 100"] = changed(lambda elements: of(elements, "ring")["parts"][1].update(size=71))
+    made["a ring's share that is not whole"] = changed(lambda elements: of(elements, "ring")["parts"][0].update(size=30.5))
+    made["an audience of 1,001 seats"] = changed(lambda elements: of(elements, "audience")["parts"][0].update(size=971))
+    made["an audience's group with words"] = changed(
+        lambda elements: of(elements, "audience")["parts"][0].update(text=of(elements, "ring")["parts"][0]["text"])
+    )
+    made["a Gantt chart whose sections' sizes do not add up"] = changed(
+        lambda elements: of(elements, "gantt")["parts"][0].update(size=3)
+    )
+    made["a task with a start and an after"] = changed(lambda elements: task(elements, 2).update(start="2026-11-20"))
+    made["a milestone with a length"] = changed(lambda elements: task(elements, 3).update(size=2))
+    made["a task without a length"] = changed(lambda elements: task(elements, 1).pop("size"))
+    made["a task after itself through another"] = changed(
+        lambda elements: task(elements, 0).update(after=[task(elements, 2)["id"]]) or task(elements, 0).pop("start")
+    )
+    made["a task after a section"] = changed(
+        lambda elements: task(elements, 2).update(after=[of(elements, "gantt")["parts"][0]["id"]])
+    )
+    made["a task marked active"] = changed(lambda elements: task(elements, 1).update(marks=["active"]))
+    made["a start that is not a real day"] = changed(lambda elements: task(elements, 0).update(start="2026-02-30"))
+    made["a task ending after 2199"] = changed(lambda elements: task(elements, 0).update(start="2199-12-30"))
+    made["a first task without a start"] = changed(lambda elements: task(elements, 0).pop("start"))
+    made["a list at level 4"] = changed(
+        lambda elements: element(elements, 7)["content"]["content"]["text_content"]["paragraph_runs"][0]["list"].update(level=4),
+        plain,
+    )
+    made["a list of an unknown kind"] = changed(
+        lambda elements: element(elements, 7)["content"]["content"]["text_content"]["paragraph_runs"][0]["list"].update(kind="dash"),
+        plain,
+    )
+    made["a collapsed rectangle"] = changed(lambda elements: element(elements, 2).update(collapsed=True), plain)
+    made["an end label of 201 characters"] = changed_connection(
+        lambda connection: connection["end_label"]["content"].update(string="x" * 201)
+    )
+    made["an end label at a negative distance"] = changed_connection(
+        lambda connection: connection["end_label"].update(distance=-1)
+    )
     return made
 
 

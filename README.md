@@ -1,8 +1,8 @@
 # Build SimpleDiagrams diagrams
 
-This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It uses the shapes packaged with SimpleDiagrams, the shapes the app draws itself (containers, swimlanes, tables and database tables, callouts, UML lifelines, process flows, pyramids and funnels, donut and pie charts, cycles and gauges) and a small JSON spec for nodes, labels, positions and connectors. The builder writes the document package and checks its structure and layout.
+This Agent Skill creates new editable `.simplediagram` documents from a description or from an image of a diagram. It uses the shapes packaged with SimpleDiagrams, the shapes the app draws itself (containers, swimlanes, tables and database tables, callouts, UML lifelines, process flows, pyramids and funnels, donut and pie charts, cycles, gauges, Gantt charts and audiences) and a small JSON spec for nodes, labels, positions and connectors. The builder writes the document package and checks its structure and layout.
 
-It writes document format 19, which needs SimpleDiagrams 5.2.0 or later for macOS. The skill carries the list of the 534 shapes packaged with SimpleDiagrams 5.2.0, in eight libraries, and makes no network request. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached. Download it only with uv 0.13.4 or later, or pip 26.2.2 or later: older versions still trust the certificate authority withdrawn after the October 2026 eMudhra (emSign) certificate incident, so a download could be tampered with.
+It writes document format 21, which needs SimpleDiagrams 5.4.0 or later for macOS. The skill carries the list of the 535 shapes packaged with SimpleDiagrams 5.4.0, in eight libraries, and makes no network request. Searching and building need Python 3.10+ and Pydantic 2; `uv run` may download Pydantic when it is not cached. Download it only with uv 0.13.4 or later, or pip 26.2.2 or later: older versions still trust the certificate authority withdrawn after the October 2026 eMudhra (emSign) certificate incident, so a download could be tampered with.
 
 See the [privacy policy](PRIVACY.md) for how the skill and your chosen AI application handle data.
 
@@ -42,13 +42,16 @@ To install by copying, keep the folder name `simplediagrams-diagram-skill`.
 - "Draw a state diagram of an order, from placed to delivered."
 - "Draw our sales funnel, with the stages from this report."
 - "Draw these database tables and the relationships between their fields."
+- "Draw a Gantt chart of this project plan, with its milestones."
+- "Draw a pie chart of where our revenue comes from, from these figures."
 - "Redraw this whiteboard photo as a diagram."
 
 ## Scope
 
 - Draws the kind of diagram you ask for. If you name none, it chooses by subject: a flowchart, BPMN, or a UML class, sequence, activity, state or use case diagram, and a notation only when its readers know it or the meaning depends on it.
 - Creates new documents using native rectangles, ellipses, notes, text, connectors, and the eight bundled shape libraries, BPMN and UML included. A library shape gets the connection points and label placement its library gives it, as in the app.
-- Draws the complex shapes SimpleDiagrams draws itself: containers fitted around the shapes they hold, swimlanes and BPMN pools with members in each lane, tables such as UML class, interface and enumeration boxes, database tables with field marks and relationships ending on a field, process flows, pyramids and funnels, donut and pie charts, cycles, gauges, callouts whose tails lock to a shape, and UML sequence diagrams with lifelines, messages attached along them, destroy marks, frames and alt, loop and opt fragments.
+- Writes bulleted and numbered lists in a label, notes in nine looks, among them Documentation, BPMN's Text Annotation and UML's Note, shown in full or collapsed to an icon, and a label beside each end of a connector, such as a UML multiplicity.
+- Draws the complex shapes SimpleDiagrams draws itself: containers fitted around the shapes they hold, swimlanes and BPMN pools with members in each lane, tables such as UML class, interface and enumeration boxes, database tables with field marks and relationships ending on a field, process flows, pyramids and funnels, donut and pie charts whose sections take their shares, cycles, gauges, Gantt charts of tasks, sections and milestones, audiences of seats in groups, callouts whose tails lock to a shape, and UML sequence diagrams with lifelines, messages attached along them, destroy marks, frames and alt, loop and opt fragments.
 - Searches the packaged shapes by name, description and keyword, and places each by the app's own reference. Shapes from downloadable or personal libraries, embedded images and shape data are outside this authoring profile.
 - Redraws a pictured diagram as boxes and connectors. It does not trace artwork or handwriting or embed the picture. A connector can attach to any connection point a shape has.
 - Writes `.simplediagram` documents only. A BPMN diagram it draws is not a `.bpmn` file or a process an engine can run.
@@ -73,10 +76,10 @@ The first command checks without writing. The second creates the package at a ne
 | `references/from-an-image.md` | Redrawing a photo, scan, or screenshot of a diagram |
 | `references/shape-catalogue.md` | Searching and placing the packaged shapes |
 | `references/document-format.md` | Generated package structure |
-| `assets/built-in-shapes.json` | The 534 packaged shapes, with their connection points and label placement |
+| `assets/built-in-shapes.json` | The 535 packaged shapes, with their connection points and label placement |
 | `assets/example-spec.json` | Example input |
 | `assets/example-bpmn-spec.json`, `assets/example-sequence-spec.json`, `assets/example-class-spec.json` | Examples with complex shapes: a BPMN pool with lanes, a UML sequence diagram, UML classes as tables |
-| `assets/example-business-spec.json`, `assets/example-database-spec.json` | Examples with the shapes drawn from their parts: a flow, a funnel, a pie, a cycle and a gauge; database tables with a relationship between two fields |
+| `assets/example-business-spec.json`, `assets/example-database-spec.json`, `assets/example-plan-spec.json` | Examples with the shapes drawn from their parts: a flow, a funnel, a pie, a cycle and a gauge; database tables with a relationship between two fields; a Gantt chart, a Documentation note with a list, and an audience |
 | `scripts/find_shapes.py` | Search the packaged shapes' names, descriptions and keywords |
 | `scripts/build_diagram.py` | Check a spec and build a new package |
 | `scripts/preview_diagram.py` | Render a new wireframe SVG from a spec |

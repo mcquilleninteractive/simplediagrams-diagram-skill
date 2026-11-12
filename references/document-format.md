@@ -1,8 +1,8 @@
-# The `.simplediagram` document format, version 19
+# The `.simplediagram` document format, version 21
 
-This describes what the skill writes. The exact statement of it is `scripts/sd_format.py` (Pydantic models) and the generated `schema/simplediagram-document-19.schema.json`; if this page and the models ever disagree, the models are right.
+This describes what the skill writes. The exact statement of it is `scripts/sd_format.py` (Pydantic models) and the generated `schema/simplediagram-document-21.schema.json`; if this page and the models ever disagree, the models are right.
 
-The skill writes package 19 / schema 18, the format SimpleDiagrams 5.2 writes, so every document needs SimpleDiagrams 5.2.0 or later. This page covers only what the skill writes.
+The skill writes package 21 / schema 20, the format SimpleDiagrams 5.4 writes, so every document needs SimpleDiagrams 5.4.0 or later. This page covers only what the skill writes.
 
 Write a diagram spec and let `build_diagram.py` produce the document. This reference explains the generated package and build diagnostics.
 
@@ -28,12 +28,12 @@ The app refuses the document if the folder has any other member, including `.DS_
 `manifest.json` is always exactly this:
 
 ```json
-{"format": "com.simplediagrams.document", "format_version": 19, "contains_legacy_source": false}
+{"format": "com.simplediagrams.document", "format_version": 21, "contains_legacy_source": false}
 ```
 
 ## Two version numbers
 
-`manifest.json` has `format_version` **19**. `document.json` has `schema_version` **18**. They are different counters and the second is always the first minus one. Writing 19 in both is refused.
+`manifest.json` has `format_version` **21**. `document.json` has `schema_version` **20**. They are different counters and the second is always the first minus one. Writing 21 in both is refused.
 
 ## Complex shapes
 
@@ -51,28 +51,33 @@ A complex shape is an element of kind `complex_shape` with a `complex_shape` rec
 |---|---|---|
 | `container` | `layout` (`free`, `proportional`), `title_style` (`band`, `corner_tag`) | None |
 | `swimlanes` | `direction` (`horizontal`, `vertical`), `title_strip_size`, `title_band_size` (28 to 10,000) | 1 to 50 `lane`: `id`, `text`, `size`, `members` |
-| `table` | `header_row` | 1 to 50 `column`: `size`; then 1 to 200 `row`: `size`, `cells` |
+| `table` | `header_row`; `uml_box` (`none`, `class`, `interface`, `enumeration`), which changes nothing drawn | 1 to 50 `column`: `size`; then 1 to 200 `row`: `size`, `cells` |
 | `entity_table` | None | 2 `column`: `size`; 1 `header`: `id`, `size`, `cells` (the name, then empty); 1 to 60 `field`: `id`, `size`, `cells` (name, type), `marks`, `point_ids` (2) |
 | `callout` | Optional `tail_tip` `{"x", "y"}`, points from the frame's centre along the bubble's own axes before flipping; optional `tail_attachment`, a numbered point of another shape, which needs `tail_tip` | None |
 | `lifeline` | `head_style` (`box`, `actor`), `ends_in_destroy_mark` | None |
-| `ring` | `ring_width`: a multiple of 10 up to 10,000, or `full` | 1 to 12 `section`: `id`, `text`, `point_ids` (1) |
+| `ring` | `ring_width`: a multiple of 10 up to 10,000, or `full` | 1 to 20 `section`: `id`, `text`, `point_ids` (1), and optionally `size`, its share of the circle, a whole percentage |
 | `flow` | `base_shape`, `direction` (`across`, `down`), `spacing` (`gap`, `touch`, `overlap`), `pointer` | 2 to 12 `step`: `id`, `text`, `point_ids` (2) |
 | `pyramid` | `form` (`pyramid`, `funnel`) | 2 to 8 `layer`: `id`, `text`, `point_ids` (2) |
 | `cycle` | `ring_width`, a number as above; `direction` (`clockwise`, `anticlockwise`); `arrow_style` (`arrow`, `chevron`) | 3 to 8 `step`: `id`, `text`, `point_ids` (1) |
 | `gauge` | `minimum`, `maximum`, `value`, `auto_rotate_labels` | 1 to 5 `band`: `id`, `text`; 1 `needle`: `id` |
+| `audience` | `show_total` | 1 to 20 `group`: `id`, `size` (its seats, a whole number from 1 to 1,000) |
+| `gantt` | `skip_weekends` | 1 to 20 `section`: `id`, `text`, `size` (how many of the tasks are its own); then 1 to 60 `task`: `id`, `text`, `point_ids` (2), and optionally `start` (a day, `YYYY-MM-DD`), `after` (a list of one task's id), `size` (its days, 1 to 3,650) and `marks` (`milestone`, `done`, `crit`) |
 
-A `section`, `step`, `layer`, `band` or `needle` may also hold a `style`, its own paint: any of `fill_hex`, `fill_texture`, `stroke_hex`, `stroke_texture` and `line_width`, at least one, a texture only beside its colour. A missing channel follows the element's, except that a part's own colour with no texture of its own is drawn flat, whatever texture the element has. The builder writes colours and a line width, never a part's texture.
+A `section`, `step`, `layer`, `band`, `needle`, `group` or `task` may also hold a `style`, its own paint: any of `fill_hex`, `fill_texture`, `stroke_hex`, `stroke_texture` and `line_width`, at least one, a texture only beside its colour. A missing channel follows the element's, except that a part's own colour with no texture of its own is drawn flat, whatever texture the element has. The builder writes colours and a line width, never a part's texture.
 
-A `size` is any number from 0.000001 to 1,000,000; a lane, row or column is its share of the whole. A word in a record is lower-case letters and digits in groups joined by single underscores, and a word its type does not list refuses the document. The app also holds:
+A `size` is any number from 0.000001 to 1,000,000; a lane, row or column is its share of the whole. A ring section's, a group's, a Gantt section's and a task's are whole numbers, written without a decimal point. A word in a record is lower-case letters and digits in groups joined by single underscores, and a word its type does not list refuses the document. The app also holds:
 
 - A `chevron`, `arrow_box`, `block_arrow` or `hexagon` flow has no `overlap` and no `pointer`. A gauge's `minimum` is below its `maximum`, and its `value` between them.
+- A ring's sections may hold shares or not, each on its own. With none they are equal. Otherwise those without one share equally what the others leave of 100, the first of them taking 1 more each until it is all shared; counted so, the shares add up to at most 100 and each is at least 1.
+- An audience's groups hold at most 1,000 seats in all.
+- A Gantt chart's sections' sizes add up to the number of its tasks. A task holds `start` or `after`, never both, and the first task one of them; with neither, a task starts when the task above it ends. `after` names another task of the chart, and following it never comes back to where it began. A task holds `size` exactly when it is not a `milestone`. Every task lies within 1900-01-01 to 2199-12-31. With `skip_weekends`, Saturdays and Sundays are not counted in a length, and a start worked out from another task that lands on one moves to the Monday.
 - A table or entity table is at least 16 points a column and 12 a row, and a table at most 2,000 cells. A lane is at least 28 thick, and swimlanes at least as long as their title strips. A lifeline is its head (40, or 72 for an actor), 20 points of line, and half a 24-point destroy mark when it has one.
-- A table, entity table, ring, flow, pyramid and cycle keep their own `text_content.string` empty. A gauge's own text is its caption.
+- A table, entity table, ring, flow, pyramid, cycle and audience keep their own `text_content.string` empty. A gauge's own text is its caption, and a Gantt chart's its title.
 - Only a callout is flipped.
 - Every member is on the same page and held once at most; a member is a shape in no group, or a whole group in no other group, never the holder, never swimlanes and never a connector. A container or swimlanes is in no group. Containers nest four deep at most, never in a loop.
 - A lifeline offers one numbered point, 2, at the top of its head, and one attach line, 0, its dashed line from the bottom of its head to the frame's bottom, or to half a destroy mark above it.
 
-**Points a shape places itself.** An entity table, ring, flow, pyramid, cycle and gauge list none: `"connection_points": []`. The app works them out as it reads the document, and the builder works out the same places, `shape_points` in the models, to end a connector there. A part owns the numbers from 8 up that its `point_ids` list; the first eight are the shape's, on its circle or the box around what it draws. A pyramid has only 2 and 3 of them, and a gauge's parts own none.
+**Points a shape places itself.** An entity table, ring, flow, pyramid, cycle, gauge, audience and Gantt chart list none: `"connection_points": []`. The app works them out as it reads the document, and the builder works out the same places, `shape_points` in the models, to end a connector there. A part owns the numbers from 8 up that its `point_ids` list; the first eight are the shape's, on its circle or the box around what it draws. A pyramid has only 2 and 3 of them, and a gauge's and an audience's parts own none. A ring's circle is the largest its frame holds, or seven tenths of that while any section is thin: one whose words would have less than a line's height and that is narrower along the middle of its band than the band is deep. The app sets a thin section's name outside the circle. A task's two points are the middles of the start and end of its bar, which depend on the days its chart's axis spans.
 
 **How much a shape and a page hold.** A document over any of these is refused whole. Characters are Unicode scalars.
 
@@ -83,7 +88,8 @@ A `size` is any number from 0.000001 to 1,000,000; a lane, row or column is its 
 | A lane title | 1,000 characters, 100 runs |
 | A table cell, in a table or an entity table | 2,000 characters, 200 runs |
 | All of one table's cells | 100,000 characters, 10,000 runs |
-| A section's, step's, layer's or band's words, or a gauge's caption | 500 characters |
+| A section's, step's, layer's, band's or task's words, a gauge's caption, or a Gantt chart's title | 500 characters |
+| A label beside a connector's end | 200 characters |
 | Complex shapes on one page | 2,000 |
 | Containers and swimlanes on one page | 500 |
 | All the part texts and cells of one page | 1,000,000 characters |
@@ -142,7 +148,7 @@ element
 ├─ complex_shape                         on kind complex_shape only
 └─ content
    ├─ flip_horizontal, flip_vertical     required booleans
-   ├─ text_layout, note_style, preserves_aspect_ratio    optional
+   ├─ text_layout, note_style, collapsed, preserves_aspect_ratio    optional
    └─ content
       ├─ is_locked                       required boolean
       └─ content
@@ -183,9 +189,13 @@ Text, with every key shown required:
 }
 ```
 
-A style may also hold `highlight_hex`, a color drawn behind its characters. Format 19 has no whole-text `background_hex`.
+A style may also hold `highlight_hex`, a color drawn behind its characters. Format 21 has no whole-text `background_hex`.
 
-Run ranges are counted in UTF-16 units and must start and end between whole user-perceived characters: not inside an emoji, an accented letter written as two code points, or a `\r\n` pair. That cannot be checked reliably outside the app, so this profile allows runs only when the text is plain ASCII. Leave both arrays empty otherwise; the text itself may contain any characters.
+Run ranges are counted in UTF-16 units and must start and end between whole user-perceived characters: not inside an emoji, an accented letter written as two code points, or a `\r\n` pair. That cannot be checked reliably outside the app, so this profile allows character runs only when the text is plain ASCII, and a paragraph run over other text only when it covers whole paragraphs, each with its line break, since a line break always lies between two characters. The text itself may contain any characters.
+
+**Lists.** A paragraph run may hold `list`, which makes its paragraphs the items of a list: `{"range": …, "alignment": "leading", "list": {"kind": "bullet" or "number", "level": 1 to 3}}`. Such a run covers whole paragraphs. Numbers are not stored: the app counts each numbered item from the items before it. The builder writes a list only in a shape's own label, from the lines a spec marks.
+
+**Notes.** A `note` may hold `note_style`, its look, and `collapsed`, written only as `true`, which shows it as a small icon at the top right of its frame; the frame stays the note's expanded frame.
 
 The eight standard anchors, as fractions of the frame:
 
@@ -218,6 +228,7 @@ The eight standard anchors, as fractions of the frame:
 - An end may instead attach anywhere along a lifeline's dashed line: `{"element_id": "…", "attach_line_id": 0, "distance": 40}`, `distance` points down the line from the bottom of the head. An attachment holds `connection_point_id`, or `attach_line_id` with `distance`, never both.
 - An attachment to an element or anchor that does not exist stops the document opening.
 - Optional: `label` (`{"content": text, "position": 0 to 1, "normal_offset": points}`) and `stroke_texture`.
+- Optional, on the outer record beside `routing`: `start_label` and `end_label`, text beside that end, each `{"content": text, "distance": points, "normal_offset": points}`. `distance` is measured along the line from the label's own end, and the text holds at most 200 characters. The builder writes the app's own starting place, 4 and -2.
 
 ## Rules that are easy to break
 
@@ -239,5 +250,5 @@ The eight standard anchors, as fractions of the frame:
 - **Stroke pattern**: `solid`, `dashed`, `dotted`.
 - **Font weight**: `regular`, `medium`, `bold`. **Alignment**: `leading`, `center`, `trailing`, `justified`.
 - **Label position**: `above`, `top`, `middle`, `bottom`, `below`.
-- **Note style**: `stickyNote`, `indexCard`, `tapedNote`, `tag`, `notebookPage`, `pinnedNote`.
+- **Note style**: `stickyNote`, `indexCard`, `tapedNote`, `tag`, `notebookPage`, `pinnedNote`, `documentation`, `textAnnotation`, `umlNote`. **List kind**: `bullet`, `number`.
 - **Textures**: `Horizontal`, `Vertical`, `Grid`, `SingleHatch`, `TripleHatch`, `PencilFill`, `PencilThinHoriztonalHatch` (spelt this way in the app), `PencilThinSquareHatch`, `PencilThinCrossHatch`, `PencilThinDiagonalHatch`, `WatercolorFill`, `Grain`, `PencilVerticalHatch`, `PencilTriangleHatch`, `PencilRandomHatch`, `PencilHorizontal`, `Chalk`.

@@ -45,17 +45,17 @@ def _rejects(document: dict) -> str:
 def test_versions_are_the_pinned_pair() -> None:
     """The package and document counters differ by one; mixing them up is the
     commonest reason the app refuses a hand-written file. Every document is the
-    package SimpleDiagrams 5.2 writes."""
-    assert (wire.FORMAT_VERSION, wire.SCHEMA_VERSION) == (19, 18)
-    manifest = {"format": "com.simplediagrams.document", "format_version": 19, "contains_legacy_source": False}
+    package SimpleDiagrams 5.4 writes."""
+    assert (wire.FORMAT_VERSION, wire.SCHEMA_VERSION) == (21, 20)
+    manifest = {"format": "com.simplediagrams.document", "format_version": 21, "contains_legacy_source": False}
     assert wire.dump(wire.manifest()) == manifest
     assert wire.dump(wire.manifest(fixtures.full_profile_document())) == manifest
     for missing in manifest:
         with pytest.raises(ValidationError):
             wire.Manifest.model_validate({key: value for key, value in manifest.items() if key != missing})
     with pytest.raises(ValidationError):
-        wire.Manifest.model_validate(manifest | {"format_version": 18})
-    for older in (15, 17, 19):
+        wire.Manifest.model_validate(manifest | {"format_version": 19})
+    for older in (17, 18, 19, 21):
         document = _dumped()
         document["schema_version"] = older
         assert "schema_version" in _rejects(document)
@@ -70,7 +70,7 @@ def test_full_profile_round_trips_unchanged() -> None:
 
 
 def test_a_whole_text_background_is_no_longer_written() -> None:
-    """Format 19 has no background_hex, and a writer must not write one; a highlight behind
+    """Format 21 has no background_hex, and a writer must not write one; a highlight behind
     the words takes its place."""
     document = _dumped()
     _core(document)["text_content"]["background_hex"] = "#FFF3BF"
@@ -216,6 +216,7 @@ OPTIONAL = {
     ("note_style", None), ("preserves_aspect_ratio", None), ("start_attachment", None),
     ("end_attachment", None), ("label", None), ("visible", None), ("appearance", None),
     ("color", "appearance"), ("export_frame", None), ("drawableOrder", None), ("guides", None),
+    ("list", None), ("collapsed", None), ("start_label", None), ("end_label", None),
 }
 
 

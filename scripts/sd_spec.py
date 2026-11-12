@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 import stat
 import sys
 import unicodedata
@@ -45,14 +46,16 @@ NATIVE_KINDS = ("rectangle", "ellipse", "note", "text")
 # and swimlanes hold other shapes.
 COMPLEX_KINDS = (
     "container", "swimlanes", "table", "entity_table", "callout", "lifeline",
-    "ring", "flow", "pyramid", "cycle", "gauge",
+    "ring", "flow", "pyramid", "cycle", "gauge", "audience", "gantt",
 )
 HOLDER_KINDS = ("container", "swimlanes")
 # The kinds whose words are in parts, each with a label and optionally its own paint. A gauge
 # also has its own text, a caption.
 PART_FIELD = {"ring": "sections", "flow": "steps", "pyramid": "layers", "cycle": "steps", "gauge": "bands"}
 # How many parts of each kind the app draws, fewest and most.
-PART_COUNTS = {"ring": (1, 12), "flow": (2, 12), "pyramid": (2, 8), "cycle": (3, 8), "gauge": (1, 5)}
+PART_COUNTS = {
+    "ring": (1, wire.MAX_RING_SECTIONS), "flow": (2, 12), "pyramid": (2, 8), "cycle": (3, 8), "gauge": (1, 5),
+}
 # What the app itself gives each kind when a person draws one.
 DEFAULT_STYLE: dict[str, tuple[str, str, float]] = {
     "rectangle": ("#D8ECFF", "#343A40", 2),
@@ -74,8 +77,10 @@ DEFAULT_SIZE: dict[str, tuple[float, float]] = {
     "ring": (200, 200),
     "cycle": (240, 240),
     "gauge": (200, 140),
+    "audience": (240, 140),
+    "gantt": (480, 220),
 }
-# The size and paint of each look's tile in the app's Notes and Cards library.
+# The size and paint of each look's tile in the app's Notes library.
 NOTE_LOOKS: dict[str, tuple[float, float, str, str, float]] = {
     "stickyNote": (180, 170, "#FFF1A8", "#8A7636", 2),
     "indexCard": (250, 150, "#FFFFFF", "#CFE1FF", 1),
@@ -83,15 +88,45 @@ NOTE_LOOKS: dict[str, tuple[float, float, str, str, float]] = {
     "tag": (230, 100, "#F3E2B8", "#9C7F4A", 1),
     "notebookPage": (200, 250, "#FFFFFF", "#AFC6E9", 1),
     "pinnedNote": (180, 160, "#E6F0FC", "#9FB4CE", 1),
+    "documentation": (300, 220, "#FFFFFF", "#C5CBD3", 1),
+    "textAnnotation": (120, 60, "#FFFFFF", "#212529", 1),
+    "umlNote": (120, 80, "#FFFFFF", "#212529", 1),
 }
-# The looks that set their words clear of a tape, hole, string or pin. A place written for the
-# words inside the note would replace that.
-DECORATED_NOTES = ("tapedNote", "tag", "notebookPage", "pinnedNote")
+# The looks that set their words clear of a tape, hole, string, pin, margin, bracket or turned
+# corner. A place written for the words inside the note would replace that.
+DECORATED_NOTES = (
+    "tapedNote", "tag", "notebookPage", "pinnedNote", "documentation", "textAnnotation", "umlNote",
+)
+# The looks whose words start at the leading edge, as the app's tiles place them.
+LEADING_NOTES = ("documentation", "textAnnotation", "umlNote")
+# A collapsed note is drawn as a square icon this size, at the top right of its frame.
+COLLAPSED_ICON = 28.0
+# The colours the app gives the groups of a new audience and the sections of a new Gantt
+# chart in turn, so each can be told apart.
+DISTINCT_COLOURS = (
+    "#6CA0BB", "#7BC690", "#ED692F", "#E92128", "#8567B7", "#FCAA1A", "#56CCC9", "#DF3A89",
+    "#83C341", "#464DA1", "#F9D84E", "#A58256", "#E57ACF", "#0B8436", "#C41E26", "#4E97D2",
+    "#929497", "#CCDD50", "#774896", "#58595B",
+)
+# A line of a label that is a list item: up to two levels of two-space indent, then "- " for
+# a bullet or a number and ". " for a numbered item, as the app writes a list as plain text.
+LIST_ITEM = re.compile(r"^((?:  ){0,2})(- |[0-9]{1,9}\. )(.*)$")
+# A line that looks meant as a list item but is not one: another mark, or another indent.
+NEARLY_LIST_ITEM = re.compile(r"^\s*(?:[-*+\u2022] |[0-9]{1,9}[.)] )")
 # The smallest frame the app draws each kind at, with one number per part where it depends on
 # them. Below it the app shrinks the smallest drawing, so its points are not where the frame says.
 RING_SMALLEST = 24
+# The name of a ring's thin section is set outside its circle: at the end of a line this long,
+# after this gap, in room for one line of words.
+RING_LEADER = 10.0
+RING_LEADER_GAP = 3.0
+RING_OUTSIDE_LINE = 20.0
 CYCLE_SMALLEST = 48
 GAUGE_SMALLEST = (40, 28)
+AUDIENCE_SMALLEST = (48, 28)
+# A Gantt chart's height beyond its rows (its margins, title and axis), and a row of its tile.
+GANTT_FIXED_HEIGHT = 2 * wire.GANTT_MARGIN + wire.GANTT_TITLE_HEIGHT + wire.GANTT_AXIS_HEIGHT
+GANTT_ROW = 32.0
 FLOW_SMALLEST_STEP = 16
 PYRAMID_SMALLEST = (24, 12)
 # How the builder sizes an entity table: as a new one is at its smallest, with a field's type
@@ -253,6 +288,63 @@ class PartSpec(SpecModel):
     fill: wire.Color | None = None
     stroke: wire.Color | None = None
     line_width: float | None = Field(default=None, ge=0, le=10_000, allow_inf_nan=False)
+    share: int | None = Field(
+        default=None, ge=1, le=wire.RING_WHOLE,
+        description="ring: the section's share of the circle, a whole percentage. The shares "
+        "of one ring add up to at most 100; sections without one share equally what is left.",
+    )
+
+
+class GroupSpec(SpecModel):
+    """One group of an audience with paint of its own. A plain number is the same with
+    only its seats."""
+
+    seats: int = Field(ge=1, le=wire.MAX_AUDIENCE_SEATS, description="How many seats the group has.")
+    fill: wire.Color | None = None
+    stroke: wire.Color | None = None
+    line_width: float | None = Field(default=None, ge=0, le=10_000, allow_inf_nan=False)
+
+
+Day = Annotated[str, StringConstraints(pattern=r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")]
+
+
+class TaskSpec(SpecModel):
+    """One task of a Gantt chart: a bar of `days` days, or with `milestone` a diamond on
+    one day."""
+
+    label: Annotated[Label, StringConstraints(max_length=wire.MAX_PART_TEXT)] = ""
+    key: Key | None = Field(
+        default=None, description="Your own name for this task, unique in its chart, for another task's `after`."
+    )
+    start: Day | None = Field(
+        default=None,
+        description="The day it starts, as YYYY-MM-DD, from 1900-01-01 to 2199-12-31. The first task needs one.",
+    )
+    after: Key | None = Field(
+        default=None,
+        description="Key of the task it starts after, instead of `start`. With neither, it "
+        "starts when the task above it ends.",
+    )
+    days: int | None = Field(
+        default=None, ge=1, le=wire.MAX_TASK_DAYS, description="Its length in days; every task but a milestone needs one."
+    )
+    milestone: bool = Field(default=False, description="A single day, drawn as a diamond; it takes no days.")
+    done: bool = Field(default=False, description="Finished, drawn paler.")
+    critical: bool = Field(default=False, description="On the critical path, its outline drawn heavier.")
+    fill: wire.Color | None = None
+    stroke: wire.Color | None = None
+    line_width: float | None = Field(default=None, ge=0, le=10_000, allow_inf_nan=False)
+
+
+class SectionSpec(SpecModel):
+    """One section of a Gantt chart: a name, the tasks in it from the top down, and the
+    paint of those tasks."""
+
+    label: Annotated[Label, StringConstraints(max_length=wire.MAX_PART_TEXT)] = ""
+    tasks: list[TaskSpec] = Field(min_length=1, max_length=wire.MAX_GANTT_TASKS)
+    fill: wire.Color | None = None
+    stroke: wire.Color | None = None
+    line_width: float | None = Field(default=None, ge=0, le=10_000, allow_inf_nan=False)
 
 
 class FieldSpec(SpecModel):
@@ -269,6 +361,12 @@ class FieldSpec(SpecModel):
 # The node fields that belong to some kinds only.
 KIND_FIELDS: dict[str, tuple[str, ...]] = {
     "note_style": ("note",),
+    "collapsed": ("note",),
+    "uml_box": ("table",),
+    "groups": ("audience",),
+    "show_total": ("audience",),
+    "plan": ("gantt",),
+    "skip_weekends": ("gantt",),
     "members": ("container",),
     "title_style": ("container",),
     "layout": ("container",),
@@ -317,13 +415,21 @@ class NodeSpec(SpecModel):
     shape: Selector = Field(
         description=(
             "rectangle, ellipse, note or text for a plain drawn shape; container, swimlanes, "
-            "table, entity_table, callout, lifeline, ring, flow, pyramid, cycle or gauge for "
-            "a shape SimpleDiagrams draws itself; or '<library>/<item>' for a shape from a library packaged with "
+            "table, entity_table, callout, lifeline, ring, flow, pyramid, cycle, gauge, audience "
+            "or gantt for a shape SimpleDiagrams draws itself; or '<library>/<item>' for a shape from a library packaged with "
             "SimpleDiagrams, for example 'basic/Cylinder'. Use a selector returned by "
             "find_shapes.py, which searches assets/built-in-shapes.json."
         )
     )
     label: Label = ""
+    lists: bool | None = Field(
+        default=None,
+        description="Whether the label's lines that begin '- ' are bulleted list items and "
+        "those that begin with a number and '. ' numbered ones, each two spaces of indent "
+        "one level deeper, three levels at most. The marks are not kept as text: "
+        "SimpleDiagrams draws the bullets and counts the numbers. For a plain or library "
+        "shape, a note or text.",
+    )
     col: GridPosition | None = None
     row: GridPosition | None = None
     x: PagePosition | None = None
@@ -377,7 +483,15 @@ class NodeSpec(SpecModel):
     note_style: wire.NoteStyle | None = Field(
         default=None,
         description="note: its look, placed at that look's own size and colours unless the spec "
-        "sets them: stickyNote, indexCard, tapedNote, tag, notebookPage or pinnedNote.",
+        "sets them: stickyNote, indexCard, tapedNote, tag, notebookPage, pinnedNote, "
+        "documentation (a plain sheet for longer writing), textAnnotation (BPMN's, words "
+        "beside a bracket) or umlNote (a page with a turned corner).",
+    )
+    collapsed: bool | None = Field(
+        default=None,
+        description="note: whether it is shown as a small icon, which a person opens to read "
+        "it. The node's position is then the icon's; opened, the note reaches left and down "
+        "from it. Connect a collapsed note with route 'straight'.",
     )
     members: list[Key] | None = Field(
         default=None, max_length=MAX_NODES_PER_PAGE,
@@ -420,6 +534,11 @@ class NodeSpec(SpecModel):
     header_row: bool | None = Field(
         default=None, description="table: whether the first row is drawn as a header (the default)."
     )
+    uml_box: Literal["class", "interface", "enumeration"] | None = Field(
+        default=None,
+        description="table: the kind of UML box it stands for, so SimpleDiagrams treats it as "
+        "one. It changes nothing drawn: write the «interface» or «enumeration» line in its first cell.",
+    )
     column_widths: list[Size] | None = Field(
         default=None, max_length=wire.MAX_TABLE_COLUMNS,
         description="table: each column's width; by default each is sized to its text.",
@@ -434,8 +553,28 @@ class NodeSpec(SpecModel):
         "node's label is the entity's name.",
     )
     sections: list[Label | PartSpec] | None = Field(
-        default=None, min_length=1, max_length=12,
-        description="ring: its sections, clockwise from twelve o'clock.",
+        default=None, min_length=1, max_length=wire.MAX_RING_SECTIONS,
+        description="ring: its sections, clockwise from twelve o'clock, 1 to 20; each may hold "
+        "a share, its percentage of the circle.",
+    )
+    groups: list[Annotated[int, Field(strict=True)] | GroupSpec] | None = Field(
+        default=None, min_length=1, max_length=wire.MAX_AUDIENCE_GROUPS,
+        description="audience: its groups from the left end of the arch to the right, 1 to 20, "
+        "each a number of seats; at most 1,000 seats in all.",
+    )
+    show_total: bool | None = Field(
+        default=None, description="audience: whether the total of its seats is drawn in its middle (the default)."
+    )
+    plan: list[SectionSpec] | None = Field(
+        default=None, min_length=1, max_length=wire.MAX_GANTT_SECTIONS,
+        description="gantt: its sections from the top down, 1 to 20, each with its tasks; at "
+        "most 60 tasks in all. The node's label is the chart's title.",
+    )
+    skip_weekends: bool | None = Field(
+        default=None,
+        description="gantt: whether Saturdays and Sundays are left out of a task's days, and a "
+        "task that follows another and would start on one starts on the Monday. A start the "
+        "spec gives stays where it is.",
     )
     ring_width: int | Literal["full"] | None = Field(
         default=None,
@@ -527,6 +666,11 @@ class NodeSpec(SpecModel):
             )
         if self.shape == "text" and (self.flip_horizontal or self.flip_vertical):
             raise ValueError(f"node '{self.key}' is text, which has no artwork to flip; remove its flip")
+        if self.lists and self.shape in COMPLEX_KINDS:
+            raise ValueError(
+                f"node '{self.key}': lists is for a plain or library shape, a note or text, and "
+                f"this is '{self.shape}'"
+            )
         for field, kinds in KIND_FIELDS.items():
             if getattr(self, field) is not None and self.shape not in kinds:
                 raise ValueError(
@@ -589,8 +733,20 @@ class NodeSpec(SpecModel):
                 raise ValueError(f"{where}: row_heights needs one height per row, {len(self.cells)}")
             if sum(len(cell) for row in self.cells for cell in row) > wire.MAX_TABLE_CHARACTERS:
                 raise ValueError(f"{where}: a table holds at most {wire.MAX_TABLE_CHARACTERS} characters")
-        if (self.shape in PART_FIELD or self.shape == "entity_table") and self.scale != 1:
+        if (self.shape in PART_FIELD or self.shape in ("entity_table", "audience", "gantt")) and self.scale != 1:
             raise ValueError(f"{where}: scale is for library shapes; give it a width or height")
+        if self.shape == "audience":
+            if not self.groups:
+                raise ValueError(f"{where} needs groups, each a number of seats")
+            if self.label:
+                raise ValueError(f"{where}: an audience has no words of its own, only its total; remove label")
+            seats = sum(group if isinstance(group, int) else group.seats for group in self.groups)
+            if any(isinstance(group, int) and not 1 <= group <= wire.MAX_AUDIENCE_SEATS for group in self.groups):
+                raise ValueError(f"{where}: a group has from 1 to {wire.MAX_AUDIENCE_SEATS} seats")
+            if seats > wire.MAX_AUDIENCE_SEATS:
+                raise ValueError(f"{where}: an audience holds at most {wire.MAX_AUDIENCE_SEATS} seats, and this has {seats}")
+        if self.shape == "gantt":
+            self._check_plan(where)
         if self.shape == "entity_table":
             if self.align is not None:
                 raise ValueError(f"{where}: its words have fixed places, the name and type at each end of a row; remove align")
@@ -612,6 +768,38 @@ class NodeSpec(SpecModel):
             if self.tail_to == self.key:
                 raise ValueError(f"{where}: a callout's tail cannot lock to the callout itself")
 
+    def _check_plan(self, where: str) -> None:
+        """The rules of a Gantt chart's sections and tasks that need no calendar."""
+        if not self.plan:
+            raise ValueError(f"{where} needs plan, its sections, each with a label and tasks")
+        if len(self.label) > wire.MAX_PART_TEXT:
+            raise ValueError(f"{where}: its title is over {wire.MAX_PART_TEXT} characters")
+        tasks = [task for section in self.plan for task in section.tasks]
+        if len(tasks) > wire.MAX_GANTT_TASKS:
+            raise ValueError(f"{where}: a Gantt chart holds at most {wire.MAX_GANTT_TASKS} tasks, and this has {len(tasks)}")
+        keys = [task.key for task in tasks if task.key is not None]
+        if len(keys) != len(set(keys)):
+            raise ValueError(f"{where}: two of its tasks share a key")
+        if tasks[0].start is None:
+            raise ValueError(f"{where}: its first task needs a start, a day written YYYY-MM-DD")
+        for task in tasks:
+            name = f"task '{task.label or task.key or ''}'"
+            if task.start is not None and task.after is not None:
+                raise ValueError(f"{where}: {name} has a start and an after; give one")
+            if task.after is not None and (task.after not in keys or task.after == task.key):
+                raise ValueError(f"{where}: {name} is after '{task.after}', which is not the key of another of its tasks")
+            if task.milestone and task.days is not None:
+                raise ValueError(f"{where}: {name} is a milestone, a single day; remove its days")
+            if not task.milestone and task.days is None:
+                raise ValueError(f"{where}: {name} needs days, its length, or milestone")
+            if task.start is not None:
+                try:
+                    day = wire.day_number(task.start)
+                except ValueError as failure:
+                    raise ValueError(f"{where}: {name}: {failure}") from failure
+                if not wire.GANTT_FIRST_DAY <= day <= wire.GANTT_LAST_DAY:
+                    raise ValueError(f"{where}: {name} starts outside 1900-01-01 to 2199-12-31")
+
     def _check_parts(self, where: str) -> None:
         """The rules of the kinds whose words are in parts."""
         field = PART_FIELD[self.shape]
@@ -622,6 +810,16 @@ class NodeSpec(SpecModel):
         for part in parts:
             if len(part if isinstance(part, str) else part.label) > wire.MAX_PART_TEXT:
                 raise ValueError(f"{where}: one of its {field} is over {wire.MAX_PART_TEXT} characters")
+        shares = [None if isinstance(part, str) else part.share for part in parts]
+        if any(share is not None for share in shares):
+            if self.shape != "ring":
+                raise ValueError(f"{where}: share is for a ring's sections")
+            given = sum(share for share in shares if share is not None)
+            if given + shares.count(None) > wire.RING_WHOLE:
+                raise ValueError(
+                    f"{where}: its shares add up to at most {wire.RING_WHOLE}, leaving at least 1 "
+                    f"for each section without one, and these make {given} with {shares.count(None)} without"
+                )
         if self.shape == "gauge":
             if len(self.label) > wire.MAX_PART_TEXT:
                 raise ValueError(f"{where}: its caption is over {wire.MAX_PART_TEXT} characters")
@@ -667,6 +865,12 @@ class EdgeSpec(SpecModel):
         "routed around the shape."
     )
     label: Label = ""
+    source_label: Annotated[Label, StringConstraints(max_length=wire.MAX_END_LABEL)] = Field(
+        default="", description="Words beside the source end, such as a UML multiplicity or role name."
+    )
+    target_label: Annotated[Label, StringConstraints(max_length=wire.MAX_END_LABEL)] = Field(
+        default="", description="Words beside the target end."
+    )
     route: Literal["orthogonal", "straight", "curved"] = Field(
         default="orthogonal",
         description=(
@@ -1044,6 +1248,18 @@ class _Placed:
         }
         self.display_name = display_name or spec.key
 
+    @property
+    def standing(self) -> _Placed:
+        """The node as it stands on the page, which connectors, callout tails and holders
+        go by: a collapsed note is its icon, with the standard eight points; any other node
+        is itself."""
+        if not self.spec.collapsed:
+            return self
+        icon = collapsed_icon(self.rect)
+        return _Placed(
+            self.spec, self.element_id, icon.x, icon.y, icon.width, icon.height, display_name=self.display_name
+        )
+
     def set_points(self, points: dict[int, tuple[float, float]]) -> None:
         """The anchors of a shape that places its own, known once it has its parts."""
         self.points = points
@@ -1405,10 +1621,52 @@ def _spread_channels(routes: list[tuple[_Route, tuple, tuple]]) -> None:
                 entry[0].move_channel(value)
 
 
+def list_text(label: str) -> tuple[str, list[wire.ParagraphRun]]:
+    """A label whose lines may be list items, as the text SimpleDiagrams keeps and the
+    paragraph runs that make its items: each line matching `LIST_ITEM` loses its mark and
+    indent and becomes an item of that kind and level, set from the leading edge. Items in a
+    row of one kind and level share a run. A last line with no words is never an item.
+
+    Raises:
+        SpecError: A line looks meant as an item but has another mark or indent, which
+            would otherwise be kept as words.
+    """
+    lines = label.split("\n")
+    kept: list[str] = []
+    marks: list[tuple[str, int] | None] = []
+    for line in lines:
+        found = LIST_ITEM.match(line)
+        if not found and NEARLY_LIST_ITEM.match(line):
+            raise SpecError(
+                f"the line '{line}' looks like a list item but is not one. Begin an item with "
+                "'- ' or a number and '. ', after no indent or two or four spaces, three levels at most."
+            )
+        kept.append(found.group(3) if found else line)
+        marks.append(("bullet" if found.group(2) == "- " else "number", len(found.group(1)) // 2 + 1) if found else None)
+    spans: list[tuple[tuple[str, int], int, int]] = []
+    offset = 0
+    for index, (line, mark) in enumerate(zip(kept, marks, strict=True)):
+        length = wire.utf16_length(line) + (1 if index < len(kept) - 1 else 0)
+        if mark is not None and length:
+            if spans and spans[-1][0] == mark and spans[-1][1] + spans[-1][2] == offset:
+                spans[-1] = (mark, spans[-1][1], spans[-1][2] + length)
+            else:
+                spans.append((mark, offset, length))
+        offset += length
+    runs = [
+        wire.ParagraphRun(
+            range=wire.TextRange(location=location, length=length), alignment="leading",
+            list=wire.ListMarker(kind=kind, level=level),
+        )
+        for (kind, level), location, length in spans
+    ]
+    return "\n".join(kept), runs
+
+
 def compile_spec(spec: DiagramSpec, catalog: Catalog | None = None) -> wire.Document:
     """Builds the exact document a spec describes.
 
-    The document is package format 19, which SimpleDiagrams 5.2 and later open. Its
+    The document is package format 21, which SimpleDiagrams 5.4 and later open. Its
     library shapes all come from the libraries packaged with the app, so it needs nothing
     installed.
 
@@ -1523,6 +1781,10 @@ class _PageCompiler:
                 self._place_entity_table(node)
             elif node.shape in PART_FIELD:
                 self._place_parts(node)
+            elif node.shape == "audience":
+                self._place_audience(node)
+            elif node.shape == "gantt":
+                self._place_gantt(node)
         for key in self._holders_innermost_first():
             self._place_holder(self.nodes[key])
         connections = self._connections()
@@ -1618,8 +1880,14 @@ class _PageCompiler:
 
         width, height = _node_size(node, catalog_shape)
         centre_x, centre_y = self._centre(node)
+        left, top = centre_x - width / 2, centre_y - height / 2
+        if node.collapsed:
+            # A collapsed note is drawn as an icon at the top right of its frame, so the
+            # node's position is the icon's, and the note opens leftwards and down from it.
+            side = min(COLLAPSED_ICON, width, height)
+            left, top = centre_x + side / 2 - width, centre_y - side / 2
         placed = self._put(
-            node, centre_x - width / 2, centre_y - height / 2, width, height,
+            node, left, top, width, height,
             points=(
                 {point_id: (x, y) for point_id, x, y in catalog_shape.connection_points}
                 if catalog_shape is not None and catalog_shape.connection_points is not None
@@ -1657,7 +1925,14 @@ class _PageCompiler:
                     height=max(0.001, (height - 2 * inset_y) / height),
                 )
             text_layout = wire.TextLayout(frame=frame, position=position)
-        text = wire.text_content(node.label, base_style=base_style, base_alignment=node.align or "center")
+        try:
+            words, items = list_text(node.label) if node.lists else (node.label, [])
+        except SpecError as failure:
+            raise SpecError(f"node '{node.key}': {failure}") from failure
+        text = wire.text_content(
+            words, base_style=base_style, paragraph_runs=items,
+            base_alignment=node.align or ("leading" if node.note_style in LEADING_NOTES else "center"),
+        )
         label_area = outside_label_rect(placed.rect, text_layout, text) if text_layout is not None else None
         self.looks[node.key] = _Look(kind, catalog_shape, text, text_layout, label_area)
 
@@ -1802,7 +2077,7 @@ class _PageCompiler:
                     if (part.fill, part.stroke, part.line_width) != (None, None, None)
                     else None
                 ),
-                points, index,
+                points, index, part.share,
             )
             for index, part in enumerate(parts)
         ]
@@ -1836,6 +2111,97 @@ class _PageCompiler:
                 f"node '{node.key}': a {node.shape} like this is at least {smallest[0]:g} by "
                 f"{smallest[1]:g}, and this is {width:g} by {height:g}; make it larger"
             )
+        placed = self._place_at_centre(node, width, height)
+        self.records[node.key] = record
+        placed.set_points(wire.shape_points(record, width, height))
+
+    @staticmethod
+    def _paint(part: PartSpec | GroupSpec | TaskSpec | SectionSpec, fill: str | None = None) -> wire.PartStyle | None:
+        """A part's own paint, with `fill` where the spec gives it none; nothing when it has neither."""
+        channels = (part.fill or fill, part.stroke, part.line_width)
+        if channels == (None, None, None):
+            return None
+        return wire.PartStyle(fill_hex=channels[0], stroke_hex=channels[1], line_width=channels[2])
+
+    def _place_audience(self, node: NodeSpec) -> None:
+        """An audience at its tile's proportions, larger for more seats unless the spec sizes
+        it, each group in a colour of its own as the app's are, with its points where the app
+        works them out."""
+        groups = [GroupSpec(seats=group) if isinstance(group, int) else group for group in node.groups or []]
+        tile_width, tile_height = DEFAULT_SIZE["audience"]
+        if node.width and not node.height:
+            width, height = float(node.width), float(node.width * tile_height / tile_width)
+        elif node.height and not node.width:
+            width, height = float(node.height * tile_width / tile_height), float(node.height)
+        else:
+            # The tile holds 100 seats; more are given room so their dots stay easy to see.
+            grown = min(3.0, max(1.0, math.sqrt(sum(group.seats for group in groups) / 100)))
+            width, height = float(node.width or tile_width * grown), float(node.height or tile_height * grown)
+        if width < AUDIENCE_SMALLEST[0] or height < AUDIENCE_SMALLEST[1]:
+            raise SpecError(
+                f"node '{node.key}': an audience is at least {AUDIENCE_SMALLEST[0]:g} by "
+                f"{AUDIENCE_SMALLEST[1]:g}, and this is {width:g} by {height:g}; make it larger"
+            )
+        record = wire.audience_shape(
+            [
+                wire.seat_group(
+                    self._id(f"part:{node.key}:{index}"), group.seats,
+                    self._paint(group, DISTINCT_COLOURS[index % len(DISTINCT_COLOURS)]),
+                )
+                for index, group in enumerate(groups)
+            ],
+            show_total=node.show_total is not False, hand_drawn=node.hand_drawn,
+        )
+        placed = self._place_at_centre(node, width, height)
+        self.records[node.key] = record
+        placed.set_points(wire.shape_points(record, width, height))
+
+    def _place_gantt(self, node: NodeSpec) -> None:
+        """A Gantt chart at its tile's width with a row of the tile's height for each task,
+        unless the spec sizes it; each section in a colour of its own, as the app's are, and
+        each task's two points where the app works them out."""
+        sections = node.plan or []
+        tasks = [task for section in sections for task in section.tasks]
+        style = self._text_style(node)
+        # A name starts at its leading edge, so it reads from the start of its bar, as the app's do.
+        names = node.align or "leading"
+        ids = [self._id(f"part:{node.key}:task:{index}") for index in range(len(tasks))]
+        by_key = {task.key: identifier for task, identifier in zip(tasks, ids, strict=True) if task.key is not None}
+        width = float(node.width or DEFAULT_SIZE["gantt"][0])
+        height = float(node.height or max(DEFAULT_SIZE["gantt"][1], GANTT_FIXED_HEIGHT + GANTT_ROW * len(tasks)))
+        smallest = wire.gantt_smallest_size(len(tasks))
+        if width < smallest[0] or height < smallest[1]:
+            raise SpecError(
+                f"node '{node.key}': a Gantt chart of {len(tasks)} tasks is at least {smallest[0]:g} by "
+                f"{smallest[1]:g}, and this is {width:g} by {height:g}; make it larger"
+            )
+        try:
+            record = wire.gantt_shape(
+                [
+                    wire.gantt_section(
+                        self._id(f"part:{node.key}:section:{index}"),
+                        wire.text_content(section.label, base_style=style, base_alignment=names), len(section.tasks),
+                        self._paint(section, DISTINCT_COLOURS[index % len(DISTINCT_COLOURS)]),
+                    )
+                    for index, section in enumerate(sections)
+                ],
+                [
+                    wire.GanttTask(
+                        id=identifier, name=wire.text_content(task.label, base_style=style, base_alignment=names),
+                        days=None if task.milestone else task.days, start=task.start,
+                        after=by_key[task.after] if task.after is not None else None,
+                        marks=(*(["done"] if task.done else []), *(["crit"] if task.critical else [])),
+                        style=self._paint(task),
+                    )
+                    for task, identifier in zip(tasks, ids, strict=True)
+                ],
+                skip_weekends=bool(node.skip_weekends), hand_drawn=node.hand_drawn,
+            )
+        except ValidationError as failure:
+            # What only the calendar can tell: tasks following one another in a loop, or days
+            # that run past the years a chart may show.
+            reason = failure.errors()[0]["msg"].removeprefix("Value error, ")
+            raise SpecError(f"node '{node.key}': {reason}") from failure
         placed = self._place_at_centre(node, width, height)
         self.records[node.key] = record
         placed.set_points(wire.shape_points(record, width, height))
@@ -2121,7 +2487,7 @@ class _PageCompiler:
 
     def _unit(self, key: str) -> _Unit:
         """What a holder holds for node `key`: its shape, with its label for fitting."""
-        placed = self.placed[key]
+        placed = self.placed[key].standing
         look = self.looks.get(key)
         frame = placed.rect
         member = wire.HolderMember(kind="element", id=placed.element_id)
@@ -2275,7 +2641,7 @@ class _PageCompiler:
         bubble = self.placed[node.key]
         attachment: wire.Attachment | None = None
         if node.tail_to is not None:
-            target = self.placed[node.tail_to]
+            target = self.placed[node.tail_to].standing
             where = f"node '{node.key}': the tail's target {target.display_name} ('{node.tail_to}')"
             if not target.points:
                 raise SpecError(f"{where} has no connection points; lock the tail to the shape it marks")
@@ -2318,6 +2684,7 @@ class _PageCompiler:
                 for row, cells in enumerate(node.cells)
             ],
             header_row=header,
+            uml_box=node.uml_box or "none",
             hand_drawn=node.hand_drawn,
         )
 
@@ -2338,7 +2705,7 @@ class _PageCompiler:
 
     def _connections(self) -> list[wire.Connection]:
         edges = self.page.edges
-        placed = self.placed
+        placed = {key: item.standing for key, item in self.placed.items()}
         # Containers, swimlanes and fragments are open: connectors run into them freely. A
         # lifeline is open but for its head.
         obstacles_by_key: dict[str, wire.Rect] = {}
@@ -2366,6 +2733,16 @@ class _PageCompiler:
                 (target, "target", edge.target_side, edge.target_point),
             ):
                 where = f"edge {edge.source} -> {edge.target}: {end.display_name} ('{end.spec.key}')"
+                if end.spec.collapsed and edge.route != "straight":
+                    raise SpecError(
+                        f"{where} is a collapsed note, drawn as a small icon, and SimpleDiagrams "
+                        "draws its connectors to that icon. Give the edge route 'straight'."
+                    )
+                if source is target and end.spec.shape == "gantt" and edge.route != "straight":
+                    raise SpecError(
+                        f"{where}: an edge between two tasks of one chart runs across the chart. "
+                        "Give the edge route 'straight'."
+                    )
                 if not end.points:
                     raise SpecError(
                         f"{where} has no connection points, because it is meant to sit on "
@@ -2447,6 +2824,8 @@ class _PageCompiler:
                     end_ending=edge.end_ending,
                     label=self._edge_label(edge.label, beside_loop=message is not None and edge.source == edge.target),
                     right_angle=right_angle,
+                    start_label=self._end_label(edge.source_label),
+                    end_label=self._end_label(edge.target_label),
                 )
             )
         for number, (key, at, label) in enumerate(self.dividers):
@@ -2479,6 +2858,13 @@ class _PageCompiler:
             content=wire.text_content(text, base_style=wire.character_style(font_size=13.0)),
             position=0.5, normal_offset=-_snap(width / 2 + 6) if beside_loop else 0.0,
         )
+
+    @staticmethod
+    def _end_label(text: str) -> wire.ConnectorEndLabel | None:
+        """A label beside a connector's end, in the words and at the place the app gives a new one."""
+        if not text:
+            return None
+        return wire.end_label(wire.text_content(text, base_style=wire.character_style(font_size=13.0, weight="regular")))
 
     # -- Elements -----------------------------------------------------------------------
 
@@ -2528,6 +2914,7 @@ class _PageCompiler:
                     ),
                     text_layout=look.text_layout,
                     note_style=node.note_style,
+                    collapsed=bool(node.collapsed),
                 )
             )
         return elements
@@ -2667,10 +3054,19 @@ def _own_end_inset(frame: wire.Rect, point: wire.ConnectorPoint) -> float:
     return max(3.0, inside + 0.5)
 
 
+def collapsed_icon(frame: wire.Rect) -> wire.Rect:
+    """Where a collapsed note is drawn: a small square at the top right of its frame."""
+    side = min(COLLAPSED_ICON, frame.width, frame.height)
+    return wire.Rect(x=frame.x + frame.width - side, y=frame.y, width=side, height=side)
+
+
 def _solid_part(element: wire.Element) -> wire.Rect:
-    """The part of a shape a connector should not cross: its frame, or a lifeline's head,
-    since the rest of a lifeline is open and its messages cross other lifelines' lines."""
+    """The part of a shape a connector should not cross: its frame, a collapsed note's icon,
+    or a lifeline's head, since the rest of a lifeline is open and its messages cross other
+    lifelines' lines."""
     frame = element.core.frame
+    if element.content.collapsed:
+        return collapsed_icon(frame)
     shape = element.complex_shape
     if shape is None or shape.type != "lifeline":
         return frame
@@ -2721,6 +3117,33 @@ def _complex_text_findings(page_name: str, element: wire.Element, keys: dict[str
             f"the caption '{core.text_content.string}' of a gauge probably does not fit below its needle. "
             "Shorten it, lower font_size or make the gauge larger."
         )
+    if shape.type == "gantt":
+        tasks = shape._of_role("task")
+        bars = wire.gantt_bars(shape, core.frame.width, core.frame.height)
+        left, right = wire.gantt_time_area(core.frame.width)
+        row = 0
+        for section in shape._of_role("section"):
+            assert section.text is not None
+            own = bars[row : row + int(section.size or 0)]
+            row += len(own)
+            tall = own[-1][1] + own[-1][3] - own[0][1]
+            if section.text.string and not _words_fit(section.text, left - wire.GANTT_MARGIN - 12, tall):
+                warn(
+                    f"the section name '{section.text.string}' of {name} probably does not fit its "
+                    "place beside its tasks. Shorten it, lower font_size or make the chart wider."
+                )
+        for task, (x, _, bar_width, _) in zip(tasks, bars, strict=True):
+            assert task.text is not None
+            # A name is set from the start of its bar to the chart's right edge, or after its
+            # diamond; near the right edge, before the bar instead, in a quarter of the chart.
+            after = right - ((x + bar_width if "milestone" in (task.marks or []) else x) + 6)
+            least = (right - left) * 0.25
+            room = after if after >= least else min(least, x - 6 - left)
+            if width_of(task.text) > room:
+                warn(
+                    f"the task name '{task.text.string}' of {name} probably does not fit beside its bar. "
+                    "Shorten it, lower font_size or make the chart wider."
+                )
     if shape.type in PART_FIELD:
         labelled = [part for part in shape.parts if part.text is not None]
         for part, rooms in zip(labelled, _rooms_for_words(shape, core.frame), strict=True):
@@ -2773,10 +3196,17 @@ def _rooms_for_words(shape: wire.ComplexShape, frame: wire.Rect) -> list[list[tu
     width, height = frame.width, frame.height
     labelled = [part for part in shape.parts if part.text is not None]
     if shape.type == "ring":
-        radius = min(width, height) / 2
-        band = shape.settings["ring_width"]
-        inner = 0.0 if band == "full" else max(0.0, radius - float(band))  # type: ignore[arg-type]
-        return [[_box_on_band(radius, inner, 180 / len(labelled), 6)]] * len(labelled)
+        # A thin section's name is set outside the circle on one line, from the end of a
+        # short line out through the section's middle to the side of the frame.
+        radius = wire.ring_radius(shape, width, height)
+        inner = wire.ring_hole(shape, radius)
+        thin = wire.ring_thin_sections(shape, width, height)
+        return [
+            [(width / 2 - (radius + RING_LEADER) * abs(math.cos(math.radians(first + share / 2))) - RING_LEADER_GAP, RING_OUTSIDE_LINE)]
+            if index in thin
+            else [_box_on_band(radius, inner, share / 2, 6)]
+            for index, (first, share) in enumerate(wire.ring_sections(shape).angles)
+        ]
     if shape.type == "cycle":
         band = wire.cycle_band(shape, width, height)
         return [[_box_on_band(band.outer, band.inner, (band.share - band.gap - band.depth) / 2, 6)]] * len(labelled)
@@ -2907,7 +3337,10 @@ def lint(
                     continue
                 if first.core.id.upper() in holders or second.core.id.upper() in holders:
                     continue
-                a, b = first.core.frame, second.core.frame
+                a, b = (
+                    collapsed_icon(each.core.frame) if each.content.collapsed else each.core.frame
+                    for each in (first, second)
+                )
                 overlap_x = min(a.x + a.width, b.x + b.width) - max(a.x, b.x)
                 overlap_y = min(a.y + a.height, b.y + b.height) - max(a.y, b.y)
                 if overlap_x > 1 and overlap_y > 1:
@@ -2929,6 +3362,9 @@ def lint(
                 if element.core.id.upper() in holders:
                     continue
                 is_end = element.core.id.upper() in attached
+                if is_end and element.complex_shape is not None and element.complex_shape.type == "gantt":
+                    # A task's points lie inside its chart, so a connector on one crosses the chart.
+                    continue
                 if is_end and element.core.rotation_degrees % 360 != 0:
                     warn(
                         "rotated-end",

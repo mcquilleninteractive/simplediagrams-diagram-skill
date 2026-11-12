@@ -1,11 +1,12 @@
-"""Exact models of a SimpleDiagrams document at package format 19, which SimpleDiagrams
-5.2 writes and reads.
+"""Exact models of a SimpleDiagrams document at package format 21, which SimpleDiagrams
+5.4 writes and reads.
 
-Every document the skill writes is package 19 / schema 18 and needs SimpleDiagrams 5.2
+Every document the skill writes is package 21 / schema 20 and needs SimpleDiagrams 5.4
 or later. Besides shapes, text and connectors it holds the shapes the app draws itself
 (complex shapes: containers, swimlanes, tables, entity tables, callouts, UML lifelines,
-rings, flows, pyramids and funnels, cycles and gauges), connector ends attached anywhere
-along a lifeline, and label regions that start outside their shape.
+rings, flows, pyramids and funnels, cycles, gauges, audiences and Gantt charts), connector
+ends attached anywhere along a lifeline, a label beside each end of a connector, lists in
+a text, collapsed notes, and label regions that start outside their shape.
 
 A `.simplediagram` document is a folder holding `manifest.json`,
 `document.json` and an `assets/` directory. These Pydantic models describe the
@@ -29,6 +30,7 @@ pinned. See VERSIONS.md before changing either.
 
 from __future__ import annotations
 
+import datetime
 import math
 import unicodedata
 from collections.abc import Callable
@@ -47,8 +49,8 @@ from pydantic import (
 )
 
 FORMAT_NAME = "com.simplediagrams.document"
-FORMAT_VERSION = 19
-SCHEMA_VERSION = 18
+FORMAT_VERSION = 21
+SCHEMA_VERSION = 20
 
 # The app's limits on complex shapes (ComplexShape.Limits and the drawing constants).
 MIN_SHARE = 0.000_001
@@ -59,7 +61,7 @@ MAX_TABLE_COLUMNS = 50
 MAX_TABLE_CELLS = 2_000
 MAX_HOLDER_NESTING = 4
 MAX_COMPLEX_SHAPE_TEXTS = 100_000
-# How much a complex shape and a page of them hold (document format 19, elements 12.11). A
+# How much a complex shape and a page of them hold (document format 21, elements 12.11). A
 # document over any of these is refused whole. Characters are Unicode scalars.
 MAX_HOLDER_MEMBERS = 1_000
 MAX_SWIMLANES_MEMBERS = 2_000
@@ -76,6 +78,22 @@ MAX_PART_TEXT = 500
 MAX_ENTITY_FIELDS = 60
 MAX_FIELD_MARKS = 8
 FIELD_MARKS = ("primary_key", "foreign_key", "unique", "indexed", "nullable")
+UML_BOXES = ("none", "class", "interface", "enumeration")
+MAX_END_LABEL = 200
+MAX_LIST_LEVEL = 3
+# A ring's shares are whole percentages that add up to at most this.
+RING_WHOLE = 100
+MAX_RING_SECTIONS = 20
+MAX_AUDIENCE_GROUPS = 20
+MAX_AUDIENCE_SEATS = 1_000
+MAX_GANTT_SECTIONS = 20
+MAX_GANTT_TASKS = 60
+MAX_TASK_DAYS = 3_650
+TASK_MARKS = ("milestone", "done", "crit")
+MAX_PART_AFTER = 8
+# The days a Gantt chart's tasks may fall on, 1900-01-01 to 2199-12-31, counted from 1970-01-01.
+GANTT_FIRST_DAY = -25_567
+GANTT_LAST_DAY = 84_005
 # The numbers from here up are the ones a shape's parts own.
 FIRST_PART_POINT = 8
 MIN_TABLE_COLUMN_WIDTH = 16.0
@@ -110,6 +128,29 @@ CYCLE_LARGEST_POINT_SHARE = 0.5
 GAUGE_CAPTION_ROOM_SHARE = 0.4
 GAUGE_HUB_SHARE = 0.05
 GAUGE_CAPTION_MARGIN = 6.0
+RING_GAP = 4.0
+RING_LARGEST_GAP_SHARE = 0.25
+RING_SMALLEST_HOLE = 0.5
+# A section whose label area is lower than this, and narrower than its band is deep, is thin:
+# the app sets its name outside the circle, which it then draws smaller by this share.
+RING_LEAST_LABEL_HEIGHT = 14.0
+RING_OUTSIDE_BAND = 0.3
+# The box a curved part's words sit in: this many times as wide as tall, this far inside.
+CURVED_LABEL_ASPECT = 2.0
+CURVED_LABEL_MARGIN = 6.0
+BOX_HALVINGS = 40
+AUDIENCE_OPENING_SHARE = 0.4
+GANTT_MARGIN = 8.0
+GANTT_TITLE_HEIGHT = 24.0
+GANTT_AXIS_HEIGHT = 20.0
+GANTT_COLUMN_SHARE = 0.2
+GANTT_COLUMN_WIDTHS = (48.0, 160.0)
+GANTT_BAR_SHARE = 0.6
+GANTT_MILESTONE_SHARE = 0.7
+GANTT_TICK_SPACING = 56.0
+GANTT_MOST_TICKS = 200
+# About how many days each step of a Gantt chart's axis spans: day, week, month, quarter, year.
+GANTT_STEP_DAYS = (1.0, 7.0, 30.44, 91.31, 365.25)
 # Where the eight numbered points of a ring or cycle lie, in degrees clockwise from three o'clock.
 RING_POINT_ANGLES = {0: 180.0, 1: 0.0, 2: -90.0, 3: 90.0, 4: -135.0, 5: 135.0, 6: -45.0, 7: 45.0}
 # The id of a lifeline's one attach line, its dashed line; attachments name it.
@@ -186,7 +227,10 @@ PointKind = Literal["straight", "curve"]
 FontWeight = Literal["regular", "medium", "bold"]
 TextAlignment = Literal["leading", "center", "trailing", "justified"]
 TextPosition = Literal["above", "top", "middle", "bottom", "below"]
-NoteStyle = Literal["stickyNote", "indexCard", "tapedNote", "tag", "notebookPage", "pinnedNote"]
+NoteStyle = Literal[
+    "stickyNote", "indexCard", "tapedNote", "tag", "notebookPage", "pinnedNote",
+    "documentation", "textAnnotation", "umlNote",
+]
 Ending = Literal[
     "none",
     "stop",
@@ -263,8 +307,8 @@ class Manifest(WireModel):
     """The whole of `manifest.json`. All three keys are required."""
 
     format: Literal["com.simplediagrams.document"]
-    format_version: Literal[19] = Field(
-        description="Package format, which SimpleDiagrams 5.2 and later read. document.json's "
+    format_version: Literal[21] = Field(
+        description="Package format, which SimpleDiagrams 5.4 and later read. document.json's "
         "schema_version is this minus one."
     )
     contains_legacy_source: Literal[False]
@@ -328,19 +372,38 @@ class CharacterRun(WireModel):
     style: CharacterStyle
 
 
+class ListMarker(WireModel):
+    """Makes the paragraphs of a paragraph run the items of a list. Numbers are not stored:
+    the app counts each numbered item from the items before it."""
+
+    kind: Literal["bullet", "number"]
+    level: Annotated[int, Field(ge=1, le=MAX_LIST_LEVEL)] = Field(
+        description="How far in the item is: 1 the outermost level, 3 the innermost."
+    )
+
+
 class ParagraphRun(WireModel):
-    """An alignment override for one span of the text."""
+    """An alignment override for one span of the text, whose paragraphs are list items
+    when it holds `list`."""
 
     range: TextRange
     alignment: TextAlignment
+    list: ListMarker | None = None
+
+
+def utf16_length(text: str) -> int:
+    """How many UTF-16 code units `text` takes, which is what a run's range counts."""
+    return len(text.encode("utf-16-le")) // 2
 
 
 class TextContent(WireModel):
     """The label of an element or connector. Every key is required.
 
-    Runs are only allowed over plain ASCII text. The app requires each run to
-    start and end between whole user-perceived characters, which for accented
-    letters, emoji and other combined characters cannot be checked here.
+    The app requires each run to start and end between whole user-perceived characters,
+    which for accented letters, emoji and other combined characters cannot be checked
+    here. So character runs are only allowed over plain ASCII text, and a paragraph run
+    over other text must cover whole paragraphs: a line break is always between two
+    characters. A run that makes list items covers whole paragraphs in any text.
     """
 
     string: str
@@ -356,12 +419,27 @@ class TextContent(WireModel):
             raise ValueError("too many text runs")
         if not (self.character_runs or self.paragraph_runs):
             return self
-        if not self.string.isascii() or "\r" in self.string:
+        plain = self.string.isascii() and "\r" not in self.string
+        if "\r" in self.string or (self.character_runs and not plain):
             raise ValueError(
-                "character_runs and paragraph_runs are only allowed when the text is plain "
-                "ASCII without carriage returns; leave both arrays empty otherwise"
+                "character_runs are only allowed when the text is plain ASCII, and no run "
+                "when it holds a carriage return; leave the arrays empty otherwise"
             )
-        total = len(self.string)
+        total = utf16_length(self.string)
+        # Where paragraphs begin and end, in UTF-16 units: the start, after each line break, the end.
+        edges = {0, total}
+        offset = 0
+        for character in self.string:
+            offset += 2 if ord(character) > 0xFFFF else 1
+            if character == "\n":
+                edges.add(offset)
+        for run in self.paragraph_runs:
+            whole = run.range.location in edges and run.range.location + run.range.length in edges
+            if not whole and (run.list is not None or not plain):
+                raise ValueError(
+                    "a paragraph run that makes list items, or lies over text that is not plain "
+                    "ASCII, covers whole paragraphs, each with its line break"
+                )
         for name, ranges in (
             ("character_runs", [run.range for run in self.character_runs]),
             ("paragraph_runs", [run.range for run in self.paragraph_runs]),
@@ -552,6 +630,11 @@ class ElementPresentation(WireModel):
     flip_vertical: bool
     text_layout: TextLayout | None = None
     note_style: NoteStyle | None = None
+    collapsed: Literal[True] | None = Field(
+        default=None,
+        description="A note shown as a small icon, keeping its frame for when it is expanded. "
+        "Written only as true.",
+    )
     preserves_aspect_ratio: bool | None = None
 
     @model_validator(mode="after")
@@ -559,6 +642,8 @@ class ElementPresentation(WireModel):
         kind = self.content.content.kind
         if self.note_style is not None and kind != "note":
             raise ValueError("note_style is only allowed on kind 'note'")
+        if self.collapsed is not None and kind != "note":
+            raise ValueError("collapsed is only allowed on kind 'note'")
         if self.text_layout is not None and kind == "path":
             raise ValueError("text_layout is not allowed on kind 'path'")
         return self
@@ -648,7 +733,8 @@ class PartStyle(WireModel):
 
 
 class Part(WireModel):
-    """One piece of a complex shape a person can touch: a lane, a row, a section, a step.
+    """One piece of a complex shape a person can touch: a lane, a row, a section, a step,
+    a group of seats, a task.
 
     Every part has a `role`; which of the other keys it holds is the catalogue entry's to
     say. A place a person chose for a part's words (`text_layout`) is not written by this
@@ -659,7 +745,17 @@ class Part(WireModel):
     id: UUIDString | None = None
     text: TextContent | None = None
     style: PartStyle | None = None
-    size: Share | None = None
+    size: Annotated[int, Field(ge=1, le=1_000_000)] | Share | None = Field(
+        default=None,
+        description="A lane's, row's or column's share of the whole, or the whole number its "
+        "type gives it: a ring section's percentage, a group's seats, a task's days.",
+    )
+    start: Annotated[str, StringConstraints(pattern=r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")] | None = Field(
+        default=None, description="The day the part begins, as YYYY-MM-DD: a real day, with no time."
+    )
+    after: Annotated[list[UUIDString], Field(min_length=1, max_length=MAX_PART_AFTER)] | None = Field(
+        default=None, description="The ids of the parts of the same shape it follows."
+    )
     members: Annotated[list[HolderMember], Field(max_length=MAX_HOLDER_MEMBERS)] | None = None
     cells: Annotated[list[TextContent], Field(max_length=MAX_TABLE_COLUMNS)] | None = None
     marks: Annotated[list[Word], Field(max_length=MAX_FIELD_MARKS)] | None = None
@@ -669,10 +765,31 @@ class Part(WireModel):
 
     _no_null = model_validator(mode="before")(_refuse_null)
 
+    @model_validator(mode="after")
+    def _check_time(self) -> Part:
+        if self.start is not None:
+            day_number(self.start)
+        followed = [identifier.upper() for identifier in self.after or []]
+        if len(followed) != len(set(followed)):
+            raise ValueError("a part's after names a part twice")
+        return self
+
     @property
     def texts(self) -> list[TextContent]:
         """The words this part holds."""
         return ([self.text] if self.text is not None else []) + list(self.cells or [])
+
+
+def day_number(day: str) -> int:
+    """A day written YYYY-MM-DD as the days from 1970-01-01 to it.
+
+    Raises:
+        ValueError: It is not a real day of the calendar.
+    """
+    try:
+        return datetime.date(int(day[:4]), int(day[5:7]), int(day[8:10])).toordinal() - 719_163
+    except ValueError as failure:
+        raise ValueError(f"{day} is not a real day written YYYY-MM-DD") from failure
 
 
 def _word_in(*words: str) -> Callable[[SettingValue], bool]:
@@ -713,10 +830,13 @@ class _Role(NamedTuple):
     required: frozenset[str]
     optional: frozenset[str] = frozenset()
     points: int = 0
+    # The least and most a part's size may be when it is a whole number its type counts in:
+    # a percentage, seats, tasks or days. None for a share of the whole, any positive number.
+    whole_sizes: tuple[int, int] | None = None
 
 
 class _Entry(NamedTuple):
-    """What the complex-shape catalogue declares for one type at version 1."""
+    """What the complex-shape catalogue declares for one type in document format 21."""
 
     settings: dict[str, Callable[[SettingValue], bool]]
     roles: tuple[_Role, ...] = ()
@@ -747,7 +867,7 @@ CATALOGUE: dict[str, _Entry] = {
         roles=(_Role("lane", 1, MAX_LANES, frozenset({"id", "text", "size", "members"})),),
     ),
     "table": _Entry(
-        settings={"header_row": _is_boolean},
+        settings={"header_row": _is_boolean, "uml_box": _word_in(*UML_BOXES)},
         roles=(
             _Role("column", 1, MAX_TABLE_COLUMNS, frozenset({"size"})),
             _Role("row", 1, MAX_TABLE_ROWS, frozenset({"size", "cells"})),
@@ -771,7 +891,12 @@ CATALOGUE: dict[str, _Entry] = {
     "lifeline": _Entry(settings={"head_style": _word_in("box", "actor"), "ends_in_destroy_mark": _is_boolean}),
     "ring": _Entry(
         settings={"ring_width": lambda value: value == "full" or _is_band_width(value)},
-        roles=(_Role("section", 1, 12, _LABELLED | {"point_ids"}, _PAINTABLE, points=1),),
+        roles=(
+            _Role(
+                "section", 1, MAX_RING_SECTIONS, _LABELLED | {"point_ids"}, _PAINTABLE | {"size"},
+                points=1, whole_sizes=(1, RING_WHOLE),
+            ),
+        ),
         has_own_text=False,
         own_points=_EIGHT,
     ),
@@ -815,11 +940,39 @@ CATALOGUE: dict[str, _Entry] = {
         ),
         own_points=_EIGHT,
     ),
+    "audience": _Entry(
+        settings={"show_total": _is_boolean},
+        roles=(
+            _Role(
+                "group", 1, MAX_AUDIENCE_GROUPS, frozenset({"id", "size"}), _PAINTABLE,
+                whole_sizes=(1, MAX_AUDIENCE_SEATS),
+            ),
+        ),
+        has_own_text=False,
+        own_points=_EIGHT,
+    ),
+    "gantt": _Entry(
+        settings={"skip_weekends": _is_boolean},
+        roles=(
+            _Role(
+                "section", 1, MAX_GANTT_SECTIONS, _LABELLED | {"size"}, _PAINTABLE,
+                whole_sizes=(1, MAX_GANTT_TASKS),
+            ),
+            _Role(
+                "task", 1, MAX_GANTT_TASKS, _LABELLED | {"point_ids"},
+                _PAINTABLE | {"start", "after", "size", "marks"}, points=2, whole_sizes=(1, MAX_TASK_DAYS),
+            ),
+        ),
+        own_points=_EIGHT,
+    ),
 }
 # The kinds whose words sit in parts of their own, each at most MAX_PART_TEXT characters.
-SHORT_TEXT_ROLES = frozenset({"section", "step", "layer", "band"})
+SHORT_TEXT_ROLES = frozenset({"section", "step", "layer", "band", "task"})
+# The kinds with a caption or title of their own of at most MAX_PART_TEXT characters.
+SHORT_OWN_TEXT = ("gauge", "gantt")
 ComplexShapeType = Literal[
-    "container", "swimlanes", "table", "entity_table", "callout", "lifeline", "ring", "flow", "pyramid", "cycle", "gauge"
+    "container", "swimlanes", "table", "entity_table", "callout", "lifeline", "ring", "flow", "pyramid", "cycle",
+    "gauge", "audience", "gantt",
 ]
 
 
@@ -850,19 +1003,19 @@ class ComplexShape(WireModel):
         stray = set(self.settings) - set(entry.settings)
         if missing or stray:
             raise ValueError(
-                f"a {self.type} holds the settings {', '.join(sorted(entry.settings)) or 'none'}; "
+                f"{_a(self.type)} holds the settings {', '.join(sorted(entry.settings)) or 'none'}; "
                 f"missing {sorted(missing)}, not its own {sorted(stray)}"
             )
         for name, value in self.settings.items():
             if not entry.settings[name](value):
-                raise ValueError(f"a {self.type}'s {name} cannot be {value!r}")
+                raise ValueError(f"{_a(self.type)}'s {name} cannot be {value!r}")
         if entry.holds_members != (self.members is not None):
-            raise ValueError(f"a {self.type} {'needs' if entry.holds_members else 'does not take'} members")
+            raise ValueError(f"{_a(self.type)} {'needs' if entry.holds_members else 'does not take'} members")
         self._check_parts(entry)
         # Across all of its lanes too: one shape in two lanes of one swimlanes is refused.
         listed = [(member.kind, member.id.upper()) for member in self.all_members]
         if len(listed) != len(set(listed)):
-            raise ValueError(f"a {self.type} lists a member twice")
+            raise ValueError(f"{_a(self.type)} lists a member twice")
         getattr(self, f"_check_{self.type}", lambda: None)()
         return self
 
@@ -872,25 +1025,33 @@ class ComplexShape(WireModel):
         order = [part.role for part in self.parts]
         expected = [role.name for role in entry.roles for _ in range(order.count(role.name))]
         if order != expected or not set(order) <= set(roles):
-            raise ValueError(f"a {self.type}'s parts come in the order {', '.join(roles) or 'of none at all'}")
+            raise ValueError(f"{_a(self.type)}'s parts come in the order {', '.join(roles) or 'of none at all'}")
         for role in entry.roles:
             if not role.fewest <= order.count(role.name) <= role.most:
-                raise ValueError(f"a {self.type} has {role.fewest} to {role.most} parts of role {role.name}")
+                raise ValueError(f"{_a(self.type)} has {role.fewest} to {role.most} parts of role {role.name}")
         for part in self.parts:
             role = roles[part.role]
             present = {key for key in Part.model_fields if key != "role" and getattr(part, key) is not None}
             if present - role.required - role.optional or role.required - present:
-                raise ValueError(f"a {self.type}'s {part.role} holds {', '.join(sorted(role.required))}")
+                raise ValueError(f"{_a(self.type)}'s {part.role} holds {', '.join(sorted(role.required))}")
             if len(part.point_ids or []) != role.points:
-                raise ValueError(f"a {self.type}'s {part.role} owns {role.points} connection points")
+                raise ValueError(f"{_a(self.type)}'s {part.role} owns {role.points} connection points")
             if part.role in SHORT_TEXT_ROLES and part.text is not None and len(part.text.string) > MAX_PART_TEXT:
                 raise ValueError(f"a {part.role}'s words hold at most {MAX_PART_TEXT} characters")
+            if role.whole_sizes is not None and part.size is not None:
+                low, high = role.whole_sizes
+                if not isinstance(part.size, int) or not low <= part.size <= high:
+                    raise ValueError(f"{_a(self.type)}'s {part.role} has a size that is a whole number from {low} to {high}")
         identities = [part.id.upper() for part in self.parts if part.id is not None]
         if len(identities) != len(set(identities)):
             raise ValueError(f"two parts of one {self.type} share an id")
+        for part in self.parts:
+            for followed in part.after or []:
+                if followed.upper() not in identities or (part.id is not None and followed.upper() == part.id.upper()):
+                    raise ValueError(f"{_a(self.type)}'s {part.role} follows a part that is not another part of the shape")
         points = [point for part in self.parts for point in part.point_ids or []]
         if len(points) != len(set(points)):
-            raise ValueError(f"a {self.type} lists a connection point twice")
+            raise ValueError(f"{_a(self.type)} lists a connection point twice")
 
     def _check_container(self) -> None:
         if len(self.members or []) > MAX_HOLDER_MEMBERS:
@@ -948,6 +1109,37 @@ class ComplexShape(WireModel):
         low, high, value = (float(self.settings[name]) for name in ("minimum", "maximum", "value"))  # type: ignore[arg-type]
         if not low < high or not low <= value <= high:
             raise ValueError("a gauge's minimum is below its maximum, and its value lies between them")
+
+    def _check_ring(self) -> None:
+        shares = ring_shares(self)
+        if shares is not None and (min(shares) < 1 or sum(shares) > RING_WHOLE):
+            raise ValueError(
+                f"a ring's shares add up to at most {RING_WHOLE}, and every section, those sharing "
+                "what the others leave too, counts at least 1"
+            )
+
+    def _check_audience(self) -> None:
+        if sum(int(part.size or 0) for part in self.parts) > MAX_AUDIENCE_SEATS:
+            raise ValueError(f"an audience holds at most {MAX_AUDIENCE_SEATS} seats in all")
+
+    def _check_gantt(self) -> None:
+        sections, tasks = self._of_role("section"), self._of_role("task")
+        if sum(int(section.size or 0) for section in sections) != len(tasks):
+            raise ValueError("a Gantt chart's sections' sizes add up to the number of its tasks")
+        ids = {task.id.upper() for task in tasks if task.id is not None}
+        for task in tasks:
+            marks = task.marks or []
+            if len(set(marks)) != len(marks) or not set(marks) <= set(TASK_MARKS):
+                raise ValueError(f"a task's marks are any of {', '.join(TASK_MARKS)}, each once")
+            if task.start is not None and task.after is not None:
+                raise ValueError("a task holds start or after, never both")
+            if len(task.after or [""]) != 1 or not {name.upper() for name in task.after or []} <= ids:
+                raise ValueError("a task's after names one other task of its chart")
+            if (task.size is None) != ("milestone" in marks):
+                raise ValueError("a task holds a size exactly when it is not a milestone")
+        if tasks[0].start is None and tasks[0].after is None:
+            raise ValueError("a Gantt chart's first task holds start or after")
+        gantt_spans(self)
 
     def _of_role(self, role: str) -> list[Part]:
         return [part for part in self.parts if part.role == role]
@@ -1008,6 +1200,11 @@ class ComplexShape(WireModel):
         and its parts'. None for a shape whose element lists its points."""
         own = CATALOGUE[self.type].own_points
         return None if own is None else set(own) | {point for part in self.parts for point in part.point_ids or []}
+
+
+def _a(kind: str) -> str:
+    """A complex shape's type as a message names it: 'a ring', 'an audience'."""
+    return {"audience": "an audience", "gantt": "a Gantt chart", "entity_table": "an entity table"}.get(kind, f"a {kind}")
 
 
 def _lengths(shares: list[float], length: float) -> list[float]:
@@ -1213,6 +1410,361 @@ def _on_circle(cx: float, cy: float, distance: float, degrees: float) -> tuple[f
     return cx + distance * math.cos(turn), cy + distance * math.sin(turn)
 
 
+def ring_shares(shape: ComplexShape) -> list[int] | None:
+    """The percentage each section of a ring counts as, or None for a ring whose sections
+    hold no share, which are equal. A section holding one counts as it; those without one
+    share equally what the others leave of 100, the first of them taking 1 more each until
+    it is all shared."""
+    saved = [part.size for part in shape.parts]
+    unsized = saved.count(None)
+    if unsized == len(saved):
+        return None
+    left = max(0, RING_WHOLE - sum(int(size) for size in saved if size is not None))
+    counted = []
+    extra = left % unsized if unsized else 0
+    for size in saved:
+        if size is None:
+            counted.append(left // unsized + (1 if extra > 0 else 0))
+            extra -= 1
+        else:
+            counted.append(int(size))
+    return counted
+
+
+class RingSections(NamedTuple):
+    """How a ring's sections share its circle: each one's first angle and its share, in
+    degrees clockwise on screen from three o'clock, and whether neighbours touch, as they do
+    once any section holds a share; sections without shares are parted by gaps."""
+
+    angles: list[tuple[float, float]]
+    touch: bool
+    whole: bool
+
+
+def ring_sections(shape: ComplexShape) -> RingSections:
+    """The angles of a ring's sections, clockwise from twelve o'clock, as the app works them out."""
+    count = len(shape.parts)
+    shares = ring_shares(shape)
+    if shares is None:
+        share = 360 / count
+        return RingSections([(-90 + index * share, share) for index in range(count)], False, True)
+
+    def angle(percent: int) -> float:
+        return -90 + percent * 360 / RING_WHOLE
+
+    angles, total = [], 0
+    for share in shares:
+        angles.append((angle(total), angle(total + share) - angle(total)))
+        total += share
+    return RingSections(angles, True, total == RING_WHOLE)
+
+
+# One stretch of a part's outline: ("line", x1, y1, x2, y2), or ("arc", cx, cy, radius, start,
+# end) with its angles in degrees clockwise on screen from three o'clock.
+_Stroke = tuple
+
+
+def _stroke_box(stroke: _Stroke) -> tuple[float, float, float, float]:
+    """The upright box around a stroke, as left, top, right, bottom: a line by its ends, an
+    arc by its ends and every point at a multiple of 90 degrees its sweep passes."""
+    if stroke[0] == "line":
+        xs, ys = (stroke[1], stroke[3]), (stroke[2], stroke[4])
+    else:
+        _, cx, cy, radius, start, end = stroke
+        low, high = min(start, end), max(start, end)
+        turns = [start, end] + [
+            quarter * 90.0 for quarter in range(math.ceil(low / 90), math.floor(high / 90) + 1)
+        ]
+        places = [_on_circle(cx, cy, radius, turn) for turn in turns]
+        xs, ys = [x for x, _ in places], [y for _, y in places]
+    return min(xs), min(ys), max(xs), max(ys)
+
+
+def _arc_cuts(stroke: _Stroke, left: float, right: float) -> list[tuple[float, float, bool]]:
+    """Where an arc is cut so that between two cuts its height runs one way only, and each
+    piece inside the slab from `left` to `right` is nearest a height at one of its ends: its
+    ends, its highest and lowest points, and where it crosses the slab's sides. Each cut is its
+    x, its y and whether it lies in the slab, in order along the arc, followed by the middle of
+    the piece between it and the next cut."""
+    _, cx, cy, radius, start, end = stroke
+    sweep = end - start
+
+    def along(degrees: float) -> float | None:
+        offset = math.fmod(degrees - start if sweep >= 0 else start - degrees, 360)
+        if offset < 0:
+            offset += 360
+        return offset if offset <= abs(sweep) else None
+
+    def at(offset: float) -> tuple[float, float]:
+        return _on_circle(cx, cy, radius, start + (offset if sweep >= 0 else -offset))
+
+    offsets: list[tuple[float, bool]] = [(0.0, False), (abs(sweep), False)]
+    offsets += [(offset, False) for offset in (along(90), along(270)) if offset is not None]
+    for side in (left, right):
+        cosine = (side - cx) / radius
+        if abs(cosine) <= 1:
+            degrees = math.degrees(math.acos(cosine))
+            offsets += [(offset, True) for offset in (along(degrees), along(-degrees)) if offset is not None]
+    offsets.sort(key=lambda cut: cut[0])
+    cuts = []
+    for index, (offset, on_side) in enumerate(offsets):
+        x, y = at(offset)
+        cuts.append((x, y, on_side or left <= x <= right))
+        if index + 1 < len(offsets) and offsets[index + 1][0] > offset:
+            middle_x, middle_y = at((offset + offsets[index + 1][0]) / 2)
+            cuts.append((middle_x, middle_y, left <= middle_x <= right))
+        else:
+            cuts.append((x, y, False))
+    return cuts
+
+
+def _clearance(strokes: list[tuple[_Stroke, tuple[float, float, float, float]]], px: float, py: float, half_width: float) -> float:
+    """How far above or below (px, py) an outline lets an upright box centred there reach: the
+    nearest any part of it within `half_width` either side comes to that height. Nothing when
+    the outline crosses that height there; infinity when no part of it lies there."""
+    left, right = px - half_width, px + half_width
+    nearest = math.inf
+
+    def take(y1: float, y2: float) -> None:
+        nonlocal nearest
+        if min(y1, y2) <= py <= max(y1, y2):
+            nearest = 0.0
+        else:
+            nearest = min(nearest, abs(y1 - py), abs(y2 - py))
+
+    for stroke, (box_left, box_top, box_right, box_bottom) in strokes:
+        if not (box_left <= right and box_right >= left):
+            continue
+        bound = box_top - py if box_top > py else (py - box_bottom if box_bottom < py else 0.0)
+        if not bound < nearest:
+            continue
+        if stroke[0] == "line":
+            _, x1, y1, x2, y2 = stroke
+            if x1 == x2:
+                take(y1, y2)
+                continue
+            ta, tb = (left - x1) / (x2 - x1), (right - x1) / (x2 - x1)
+            low, high = max(0.0, min(ta, tb)), min(1.0, max(ta, tb))
+            if low <= high:
+                take(y1 + low * (y2 - y1), y1 + high * (y2 - y1))
+            continue
+        # Cuts and the middles between them, alternately: a cut in the slab counts by itself,
+        # and a piece whose middle is in the slab by the heights of its two ends.
+        cuts = _arc_cuts(stroke, left, right)
+        for index in range(0, len(cuts), 2):
+            _, y, inside = cuts[index]
+            if inside:
+                take(y, y)
+            if cuts[index + 1][2] and index + 2 < len(cuts):
+                take(y, cuts[index + 2][1])
+    return nearest
+
+
+def _label_box_height(loops: list[_Stroke], px: float, py: float) -> float:
+    """The height of the box a curved part's words sit in: the largest box twice as wide as
+    tall centred on (px, py) that keeps a margin inside the part's outline, as the app finds it."""
+    boxed = [(stroke, _stroke_box(stroke)) for stroke in loops]
+    limit = (max(box[3] for _, box in boxed) - min(box[1] for _, box in boxed)) / 2
+
+    def fits(half_height: float) -> bool:
+        room = _clearance(boxed, px, py, CURVED_LABEL_ASPECT * half_height + CURVED_LABEL_MARGIN)
+        return math.isfinite(room) and room >= half_height + CURVED_LABEL_MARGIN
+
+    low = 0.0
+    if fits(0.0):
+        high = limit
+        if fits(high):
+            low = high
+        else:
+            for _ in range(BOX_HALVINGS):
+                middle = (low + high) / 2
+                if fits(middle):
+                    low = middle
+                else:
+                    high = middle
+    return 2 * low
+
+
+def ring_hole(shape: ComplexShape, radius: float) -> float:
+    """The radius of a ring's hole on a circle of `radius`: nothing for a pie, or for a hole
+    too small to see."""
+    setting = shape.settings["ring_width"]
+    band = radius if setting == "full" else min(float(setting), radius)  # type: ignore[arg-type]
+    return radius - band if radius - band >= RING_SMALLEST_HOLE else 0.0
+
+
+def ring_thin_sections(shape: ComplexShape, width: float, height: float) -> list[int]:
+    """The sections of a ring too thin for their names, by their place: the app sets those
+    names outside the circle, each on a short line. A section is thin when the box its words
+    would sit in is lower than a line of a label and it is narrower along the middle of its
+    band than the band is deep. Worked out on the largest circle the frame holds, from the
+    frame and the shares alone, as the app does."""
+    cx, cy = width / 2, height / 2
+    radius = min(width, height) / 2
+    hole = ring_hole(shape, radius)
+    middle = (radius + hole) / 2 if hole > 0 else radius / 2
+    sections = ring_sections(shape)
+    thin = []
+    for index, (first, share) in enumerate(sections.angles):
+        if not middle * math.radians(share) < radius - hole:
+            continue
+        if len(sections.angles) == 1 and sections.whole:
+            loops: list[_Stroke] = [("arc", cx, cy, radius, -90.0, 270.0)]
+            if hole > 0:
+                loops.append(("arc", cx, cy, hole, -90.0, 270.0))
+        else:
+            start, end = first, first + share
+            if not sections.touch:
+                length = middle * math.radians(share)
+                gap = math.degrees(min(RING_GAP, length * RING_LARGEST_GAP_SHARE) / middle)
+                start, end = first + gap / 2, first + share - gap / 2
+            outer_start, outer_end = _on_circle(cx, cy, radius, start), _on_circle(cx, cy, radius, end)
+            if hole > 0:
+                inner_start, inner_end = _on_circle(cx, cy, hole, start), _on_circle(cx, cy, hole, end)
+                loops = [
+                    ("arc", cx, cy, radius, start, end), ("line", *outer_end, *inner_end),
+                    ("arc", cx, cy, hole, end, start), ("line", *inner_start, *outer_start),
+                ]
+            else:
+                loops = [("line", cx, cy, *outer_start), ("arc", cx, cy, radius, start, end), ("line", *outer_end, cx, cy)]
+        if _label_box_height(loops, *_on_circle(cx, cy, middle, first + share / 2)) < RING_LEAST_LABEL_HEIGHT:
+            thin.append(index)
+    return thin
+
+
+def ring_radius(shape: ComplexShape, width: float, height: float) -> float:
+    """The radius of the circle a ring is drawn on: the largest its frame holds, or smaller
+    by a fixed share while any section is thin, which leaves room for the names outside."""
+    full = min(width, height) / 2
+    return full * (1 - RING_OUTSIDE_BAND) if ring_thin_sections(shape, width, height) else full
+
+
+def audience_arch(width: float, height: float) -> tuple[float, float, float, float]:
+    """An audience's arch: its centre's x and y, on its base line, its radius and its
+    opening's radius. The half circle is as large as fits the frame, and centred."""
+    radius = min(width / 2, height)
+    return width / 2, (height - radius) / 2 + radius, radius, AUDIENCE_OPENING_SHARE * radius
+
+
+def _is_weekend(day: int) -> bool:
+    """Whether a day, counted from 1970-01-01 (a Thursday), is a Saturday or a Sunday."""
+    return (day + 3) % 7 >= 5
+
+
+def gantt_spans(shape: ComplexShape) -> list[tuple[int, int]]:
+    """When each task of a Gantt chart runs, in their order: from the start of its first day
+    to the start of the day after its last, as days counted from 1970-01-01. A milestone's
+    end is its start.
+
+    A task starts on its `start`; or when the task it follows ends; or, with neither, when the
+    task above it ends. With `skip_weekends`, Saturdays and Sundays are not counted in a
+    length, and a start worked out from another task that lands on a weekend moves to the
+    Monday.
+
+    Raises:
+        ValueError: The tasks follow one another in a loop, the first has nothing to start
+            from, or a task's days fall outside 1900-01-01 to 2199-12-31.
+    """
+    tasks = shape._of_role("task")
+    skip = shape.settings["skip_weekends"] is True
+    place = {task.id.upper(): index for index, task in enumerate(tasks) if task.id is not None}
+    spans: list[tuple[int, int] | None] = [None] * len(tasks)
+
+    def end_of(start: int, days: int) -> int:
+        if not skip or days <= 0:
+            return start + days
+        # Any seven days in a row hold five weekdays, so whole weeks are counted at once.
+        weeks = (days - 1) // 5
+        day, left = start + weeks * 7, days - weeks * 5
+        while left > 0:
+            if not _is_weekend(day):
+                left -= 1
+            day += 1
+        return day
+
+    for root in range(len(tasks)):
+        waiting: list[int] = [root]
+        while waiting:
+            index = waiting[-1]
+            if spans[index] is not None:
+                waiting.pop()
+                continue
+            task = tasks[index]
+            followed = None
+            if task.start is None:
+                followed = place.get(task.after[0].upper()) if task.after else index - 1
+                if followed is None or followed < 0:
+                    raise ValueError("a Gantt chart's first task has no day to start on")
+                if spans[followed] is None:
+                    if followed in waiting:
+                        raise ValueError("a Gantt chart's tasks follow one another in a loop")
+                    waiting.append(followed)
+                    continue
+            if task.start is not None:
+                start = day_number(task.start)
+            else:
+                start = spans[followed][1]  # type: ignore[index]
+                if skip and _is_weekend(start):
+                    start += 2 if (start + 3) % 7 == 5 else 1
+            end = end_of(start, 0 if "milestone" in (task.marks or []) else int(task.size or 0))
+            last = end - 1 if end > start else start
+            if not (GANTT_FIRST_DAY <= start <= GANTT_LAST_DAY and GANTT_FIRST_DAY <= last <= GANTT_LAST_DAY):
+                raise ValueError("a Gantt chart's tasks lie within 1900-01-01 to 2199-12-31")
+            spans[index] = (start, end)
+            waiting.pop()
+    return [span for span in spans if span is not None]
+
+
+def gantt_time_area(width: float) -> tuple[float, float]:
+    """Where a Gantt chart's bars lie across it, as its left and right in points of the frame:
+    after the margin and the column of section names, to the margin on the right."""
+    column = min(max(width * GANTT_COLUMN_SHARE, GANTT_COLUMN_WIDTHS[0]), GANTT_COLUMN_WIDTHS[1])
+    return GANTT_MARGIN + column, width - GANTT_MARGIN
+
+
+def gantt_smallest_size(tasks: int) -> tuple[float, float]:
+    """The smallest frame the app draws a Gantt chart of `tasks` rows for."""
+    return 200.0, 2 * GANTT_MARGIN + GANTT_TITLE_HEIGHT + GANTT_AXIS_HEIGHT + max(1, tasks) * 12.0
+
+
+def gantt_bars(shape: ComplexShape, width: float, height: float) -> list[tuple[float, float, float, float]]:
+    """Each task's bar, or the square its milestone's diamond fills, as x, y, width and
+    height in points of the frame, laid out as the app lays a chart out: the title in a strip
+    across the top, the axis along the bottom, a row of the same height for every task, and
+    time from the first task's start to the last task's end with half an axis step's margin
+    each side."""
+    spans = gantt_spans(shape)
+    top = GANTT_MARGIN + GANTT_TITLE_HEIGHT
+    bottom = height - GANTT_MARGIN - GANTT_AXIS_HEIGHT
+    left, right = gantt_time_area(width)
+    row = (bottom - top) / max(1, len(spans))
+    # The axis takes the finest step whose labels do not crowd each other at this width.
+    first = float(min(start for start, _ in spans))
+    last = float(max(max(end, start + 1) for start, end in spans))
+    low, high = first - 183, last + 183
+    for number, days in enumerate(GANTT_STEP_DAYS):
+        steps = (last - first + days) / days
+        if (right - left) / steps >= GANTT_TICK_SPACING and (steps <= GANTT_MOST_TICKS or number == len(GANTT_STEP_DAYS) - 1):
+            low, high = first - days / 2, last + days / 2
+            break
+
+    def across(day: float) -> float:
+        return left + (day - low) / (high - low) * (right - left)
+
+    bars = []
+    for index, (task, (start, end)) in enumerate(zip(shape._of_role("task"), spans, strict=True)):
+        middle = top + (index + 0.5) * row
+        if "milestone" in (task.marks or []):
+            half = min(row * GANTT_MILESTONE_SHARE / 2, (right - left) / 2)
+            centre = min(max(across(start), left + half), right - half)
+            bars.append((centre - half, middle - half, 2 * half, 2 * half))
+        else:
+            half = row * GANTT_BAR_SHARE / 2
+            x = across(start)
+            bars.append((x, middle - half, max(x + 2, across(end)) - x, 2 * half))
+    return bars
+
+
 def shape_points(shape: ComplexShape, width: float, height: float) -> dict[int, tuple[float, float]]:
     """Where each connection point of a shape that places its own is drawn, as fractions of
     its frame. The file lists none of these; the app works them out as it reads the document,
@@ -1228,12 +1780,11 @@ def shape_points(shape: ComplexShape, width: float, height: float) -> dict[int, 
                 points[part.point_ids[1]] = (width, top + size / 2)
             top += size
     elif shape.type == "ring":
-        radius = min(width, height) / 2
+        radius = ring_radius(shape, width, height)
         points = {point: _on_circle(cx, cy, radius, degrees) for point, degrees in RING_POINT_ANGLES.items()}
-        share = 360 / len(shape.parts)
-        for index, part in enumerate(shape.parts):
+        for (first, share), part in zip(ring_sections(shape).angles, shape.parts, strict=True):
             assert part.point_ids is not None
-            points[part.point_ids[0]] = _on_circle(cx, cy, radius, -90 + index * share + share / 2)
+            points[part.point_ids[0]] = _on_circle(cx, cy, radius, first + share / 2)
     elif shape.type == "flow":
         steps = flow_steps(shape, width, height)
         down = shape.settings["direction"] == "down"
@@ -1274,6 +1825,19 @@ def shape_points(shape: ComplexShape, width: float, height: float) -> dict[int, 
         gx, gy, radius, bottom = gauge_circle(width, height)
         points = {point: _on_circle(gx, gy, radius, RING_POINT_ANGLES[point]) for point in (0, 1, 2, 4, 6)}
         points |= {3: (gx, bottom), 5: (gx - radius, bottom), 7: (gx + radius, bottom)}
+    elif shape.type == "audience":
+        ax, ay, radius, opening = audience_arch(width, height)
+        foot = (radius + opening) / 2
+        points = {point: _on_circle(ax, ay, radius, RING_POINT_ANGLES[point]) for point in (0, 1, 2, 4, 6)}
+        points |= {3: (ax, ay), 5: (ax - foot, ay), 7: (ax + foot, ay)}
+    elif shape.type == "gantt":
+        points = {anchor.id: (anchor.x * width, anchor.y * height) for anchor in standard_connection_points()}
+        for (x, y, bar_width, bar_height), part in zip(
+            gantt_bars(shape, width, height), shape._of_role("task"), strict=True
+        ):
+            assert part.point_ids is not None
+            points[part.point_ids[0]] = (x, y + bar_height / 2)
+            points[part.point_ids[1]] = (x + bar_width, y + bar_height / 2)
     return {point: (x / width, y / height) for point, (x, y) in points.items()}
 
 
@@ -1336,21 +1900,21 @@ class Element(WireModel):
         if self.content.text_layout is not None:
             raise ValueError("a complex shape's text sits in a fixed place, so it has no text_layout")
         if shape.type != "callout" and (self.content.flip_horizontal or self.content.flip_vertical):
-            raise ValueError(f"a {shape.type} cannot be flipped; only a callout can")
+            raise ValueError(f"{_a(shape.type)} cannot be flipped; only a callout can")
         if not entry.has_own_text and core.text_content.string:
-            raise ValueError(f"a {shape.type}'s text is all in its parts; its own text must be empty")
-        if shape.type == "gauge" and len(core.text_content.string) > MAX_PART_TEXT:
-            raise ValueError(f"a gauge's caption holds at most {MAX_PART_TEXT} characters")
+            raise ValueError(f"{_a(shape.type)}'s text is all in its parts; its own text must be empty")
+        if shape.type in SHORT_OWN_TEXT and len(core.text_content.string) > MAX_PART_TEXT:
+            raise ValueError(f"{_a(shape.type)}'s own words hold at most {MAX_PART_TEXT} characters")
         if entry.own_points is not None:
             if core.connection_points:
-                raise ValueError(f"a {shape.type} places its own connection points, so its element lists none")
+                raise ValueError(f"{_a(shape.type)} places its own connection points, so its element lists none")
             if self.content.preserves_aspect_ratio and shape.type != "entity_table":
-                raise ValueError(f"a {shape.type} says itself how it resizes; remove preserves_aspect_ratio")
+                raise ValueError(f"{_a(shape.type)} says itself how it resizes; remove preserves_aspect_ratio")
         if shape.settings.get("layout") == "proportional" and core.rotation_degrees % 360:
             raise ValueError("a proportional container is never turned")
         if not _meets_smallest_sizes(shape, core.frame.width, core.frame.height):
             raise ValueError(
-                f"a {shape.type} {core.frame.width:g} by {core.frame.height:g} is smaller than its "
+                f"{_a(shape.type)} {core.frame.width:g} by {core.frame.height:g} is smaller than its "
                 "lanes, rows, columns or line allow"
             )
         texts = [core.text_content, *shape.texts]
@@ -1392,6 +1956,25 @@ class ConnectorLabel(WireModel):
     normal_offset: Coordinate
 
 
+class ConnectorEndLabel(WireModel):
+    """Text beside one end of a connector, such as a UML multiplicity. It is placed by its
+    distance from that end, so it stays beside the end however long the line becomes."""
+
+    content: TextContent
+    distance: Annotated[float, Field(ge=0, le=MAX_DIMENSION, allow_inf_nan=False)] = Field(
+        description="Points along the line from the label's end to the nearest edge of its box."
+    )
+    normal_offset: Coordinate = Field(
+        description="Extra clear space between the line and the label; its sign is the side."
+    )
+
+    @model_validator(mode="after")
+    def _check_length(self) -> ConnectorEndLabel:
+        if len(self.content.string) > MAX_END_LABEL:
+            raise ValueError(f"a label beside a connector's end holds at most {MAX_END_LABEL} characters")
+        return self
+
+
 class ConnectionCore(WireModel):
     """A connector's route, attachments and paint.
 
@@ -1429,6 +2012,8 @@ class Connection(WireModel):
         default=None,
         description="right_angle for a right-angle connector; absent for a direct line.",
     )
+    start_label: ConnectorEndLabel | None = Field(default=None, description="Text beside the start.")
+    end_label: ConnectorEndLabel | None = Field(default=None, description="Text beside the end.")
 
     @model_validator(mode="after")
     def _right_angle_runs_square(self) -> Connection:
@@ -1639,7 +2224,7 @@ class Document(WireModel):
     """The whole of `document.json`: these nine keys, all required."""
 
     id: UUIDString
-    schema_version: Literal[18] = Field(description="18, for package format 19.")
+    schema_version: Literal[20] = Field(description="20, for package format 21.")
     revision: Annotated[int, Field(ge=0, le=MAX_REVISION)] = Field(
         description="Edit counter. A new document is 0."
     )
@@ -1947,6 +2532,7 @@ def element(
     flip_vertical: bool = False,
     text_layout: TextLayout | None = None,
     note_style: str | None = None,
+    collapsed: bool = False,
     preserves_aspect_ratio: bool | None = None,
     complex_shape: ComplexShape | None = None,
 ) -> Element:
@@ -1966,7 +2552,8 @@ def element(
                 is_locked=is_locked,
             ),
             flip_horizontal=flip_horizontal, flip_vertical=flip_vertical, text_layout=text_layout,
-            note_style=note_style, preserves_aspect_ratio=preserves_aspect_ratio,
+            note_style=note_style, collapsed=True if collapsed else None,
+            preserves_aspect_ratio=preserves_aspect_ratio,
         ),
         shape_data_definition_id=None,
         shape_data_values=[],
@@ -2007,12 +2594,13 @@ def lane(id: str, title: TextContent, size: float, members: list[HolderMember]) 
 
 def table_shape(
     row_sizes: list[float], column_sizes: list[float], cells: list[list[TextContent]], *,
-    header_row: bool = True, hand_drawn: bool | None = None,
+    header_row: bool = True, uml_box: str = "none", hand_drawn: bool | None = None,
 ) -> ComplexShape:
-    """A table's record: all its columns, then all its rows with their cells."""
+    """A table's record: all its columns, then all its rows with their cells. `uml_box` says
+    which kind of UML box it stands for, which changes nothing drawn."""
     parts = [Part(role="column", size=size) for size in column_sizes]
     parts += [Part(role="row", size=size, cells=row) for size, row in zip(row_sizes, cells, strict=True)]
-    return _record("table", {"header_row": header_row}, parts, hand_drawn=hand_drawn)
+    return _record("table", {"header_row": header_row, "uml_box": uml_box}, parts, hand_drawn=hand_drawn)
 
 
 class EntityField(NamedTuple):
@@ -2063,12 +2651,13 @@ def lifeline_shape(
 
 
 def labelled_part(
-    role: str, id: str, text: TextContent, style: PartStyle | None = None, points: int = 0, index: int = 0
+    role: str, id: str, text: TextContent, style: PartStyle | None = None, points: int = 0, index: int = 0,
+    size: int | None = None,
 ) -> Part:
-    """A section, step, layer or band: its words, its paint, and the points it owns, the
-    next `points` free numbers for the part at `index`."""
+    """A section, step, layer or band: its words, its paint, the points it owns, the next
+    `points` free numbers for the part at `index`, and a ring section's share when it has one."""
     owned = [FIRST_PART_POINT + points * index + offset for offset in range(points)] if points else None
-    return Part(role=role, id=id, text=text, style=style, point_ids=owned)
+    return Part(role=role, id=id, text=text, style=style, point_ids=owned, size=size)
 
 
 def ring_shape(sections: list[Part], ring_width: float | str = 40, *, hand_drawn: bool | None = None) -> ComplexShape:
@@ -2108,6 +2697,60 @@ def gauge_shape(
     return _record("gauge", settings, [*bands, Part(role="needle", id=needle_id)], hand_drawn=hand_drawn)
 
 
+def audience_shape(groups: list[Part], *, show_total: bool = True, hand_drawn: bool | None = None) -> ComplexShape:
+    """An audience's record: its groups from the left end of the arch to the right, each
+    made by `seat_group`."""
+    return _record("audience", {"show_total": show_total}, groups, hand_drawn=hand_drawn)
+
+
+def seat_group(id: str, seats: int, style: PartStyle | None = None) -> Part:
+    """One group of an audience: a number of seats and their paint."""
+    return Part(role="group", id=id, size=seats, style=style)
+
+
+class GanttTask(NamedTuple):
+    """One task of a Gantt chart: a bar of `days` days, or a milestone when `days` is None.
+    It starts on `start`, a day written YYYY-MM-DD, or when the task whose id is `after`
+    ends, or with neither when the task above it ends."""
+
+    id: str
+    name: TextContent
+    days: int | None
+    start: str | None = None
+    after: str | None = None
+    marks: tuple[str, ...] = ()
+    style: PartStyle | None = None
+
+
+def gantt_section(id: str, name: TextContent, tasks: int, style: PartStyle | None = None) -> Part:
+    """One section of a Gantt chart: its name, how many of the tasks are its own, and
+    the paint of those tasks."""
+    return Part(role="section", id=id, text=name, size=tasks, style=style)
+
+
+def gantt_shape(
+    sections: list[Part], tasks: list[GanttTask], *, skip_weekends: bool = False, hand_drawn: bool | None = None
+) -> ComplexShape:
+    """A Gantt chart's record: its sections, then its tasks from the top row down. Each task
+    owns the next two free points, the start and the end of its bar."""
+    parts = list(sections)
+    for index, task in enumerate(tasks):
+        marks = (*(["milestone"] if task.days is None else []), *task.marks)
+        parts.append(
+            Part(
+                role="task", id=task.id, text=task.name, size=task.days, start=task.start,
+                after=[task.after] if task.after else None, marks=list(marks) or None, style=task.style,
+                point_ids=[FIRST_PART_POINT + 2 * index, FIRST_PART_POINT + 2 * index + 1],
+            )
+        )
+    return _record("gantt", {"skip_weekends": skip_weekends}, parts, hand_drawn=hand_drawn)
+
+
+def end_label(text: TextContent, distance: float = 4.0, normal_offset: float = -2.0) -> ConnectorEndLabel:
+    """A label beside a connector's end, placed where the app places a new one."""
+    return ConnectorEndLabel(content=text, distance=distance, normal_offset=normal_offset)
+
+
 def connection(
     *,
     id: str,
@@ -2123,6 +2766,8 @@ def connection(
     label: ConnectorLabel | None = None,
     is_locked: bool = False,
     right_angle: bool = False,
+    start_label: ConnectorEndLabel | None = None,
+    end_label: ConnectorEndLabel | None = None,
 ) -> Connection:
     """A connector in the app's standard gray, with an arrow at its end; a right-angle
     connector when `right_angle`, else a direct line."""
@@ -2134,6 +2779,7 @@ def connection(
         ),
         is_locked=is_locked,
         routing="right_angle" if right_angle else None,
+        start_label=start_label, end_label=end_label,
     )
 
 

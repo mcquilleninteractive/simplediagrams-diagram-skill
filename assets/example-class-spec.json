@@ -7,20 +7,20 @@
    "grid": {"origin_x": 200, "origin_y": 200, "column_pitch": 280, "row_pitch": 200},
    "nodes": [
     {"key": "ordering", "shape": "container", "label": "Ordering", "members": ["customer", "order", "line", "status"]},
-    {"key": "customer", "shape": "table", "align": "leading", "col": 0, "row": 0,
+    {"key": "customer", "shape": "table", "uml_box": "class", "align": "leading", "col": 0, "row": 0,
      "cells": [["Customer"], ["id: UUID\nname: Text"], ["orders(): Order[]"]]},
-    {"key": "order", "shape": "table", "align": "leading", "col": 1, "row": 0,
+    {"key": "order", "shape": "table", "uml_box": "class", "align": "leading", "col": 1, "row": 0,
      "cells": [["Order"], ["id: UUID\ntotal: Money"], ["place()\ncancel()"]]},
-    {"key": "line", "shape": "table", "align": "leading", "col": 2, "row": 0,
+    {"key": "line", "shape": "table", "uml_box": "class", "align": "leading", "col": 2, "row": 0,
      "cells": [["OrderLine"], ["quantity: Int\nprice: Money"]]},
-    {"key": "status", "shape": "table", "align": "leading", "col": 1, "row": 1,
+    {"key": "status", "shape": "table", "uml_box": "enumeration", "align": "leading", "col": 1, "row": 1,
      "cells": [["«enumeration»\nOrderStatus"], ["OPEN\nPAID\nSHIPPED"]]},
-    {"key": "payable", "shape": "table", "align": "leading", "col": 1, "row": -1.2,
+    {"key": "payable", "shape": "table", "uml_box": "interface", "align": "leading", "col": 1, "row": -1.2,
      "cells": [["«interface»\nPayable"], ["pay(amount: Money)"]]},
     {"key": "tip", "shape": "callout", "label": "Totals include tax", "col": 2, "row": -1.2, "tail_to": "order"}
    ],
    "edges": [
-    {"source": "customer", "target": "order", "end_ending": "none", "label": "places"},
+    {"source": "customer", "target": "order", "end_ending": "none", "label": "places", "source_label": "1", "target_label": "0..*"},
     {"source": "order", "target": "line", "start_ending": "diamond", "end_ending": "none"},
     {"source": "order", "target": "payable", "pattern": "dashed", "end_ending": "solidArrow"},
     {"source": "order", "target": "status", "pattern": "dashed", "end_ending": "arrow"}

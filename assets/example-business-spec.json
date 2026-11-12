@@ -13,7 +13,8 @@
       {"label": "Visitors", "fill": "#D8ECFF"}, "Leads", "Trials", "Sales"
     ]},
     {"key": "revenue", "shape": "ring", "col": 1, "row": 1, "ring_width": "full", "sections": [
-      {"label": "Direct", "fill": "#FFF1A8"}, {"label": "Partners", "fill": "#D8ECFF"}, {"label": "Online", "fill": "#DDF5E3"}
+      {"label": "Direct", "share": 45, "fill": "#FFF1A8"}, {"label": "Partners", "share": 30, "fill": "#D8ECFF"},
+      {"label": "Online", "share": 25, "fill": "#DDF5E3"}
     ]},
     {"key": "review", "shape": "cycle", "col": 2, "row": 1, "steps": ["Plan", "Do", "Check", "Act"]},
     {"key": "load", "shape": "gauge", "label": "Team load", "col": 1, "row": 2, "value": 72, "bands": [

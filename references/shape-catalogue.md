@@ -1,6 +1,6 @@
 # Search the packaged shapes
 
-The skill knows the shapes packaged with SimpleDiagrams 5.2.0: 534 shapes in
+The skill knows the shapes packaged with SimpleDiagrams 5.4.0: 535 shapes in
 eight libraries, including the 89 shapes of BPMN and the 8 of UML. They are
 listed in `assets/built-in-shapes.json`, with names, descriptions, keywords,
 natural sizes and exact placement references. Search it through the CLI instead
@@ -56,5 +56,5 @@ Complex Shapes and Database sections. A search with a word such as `pool`, `clas
 `database`, `lifeline`, `funnel`, `donut`, `chevron`, `cycle` or `gauge` adds a line
 naming the kind to use (`complex_shapes` in `--json` output).
 
-The Notes and Cards section is six looks of one plain `note`, chosen by its
+The Notes section is nine looks of one plain `note`, chosen by its
 `note_style`, so its tiles are not in the list either.

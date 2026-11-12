@@ -37,7 +37,7 @@ from sd_spec import (
 SPEC_ID = "11111111-2222-4333-8444-555555555555"
 EXAMPLES = (
     "example-bpmn-spec.json", "example-sequence-spec.json", "example-class-spec.json",
-    "example-business-spec.json", "example-database-spec.json",
+    "example-business-spec.json", "example-database-spec.json", "example-plan-spec.json",
 )
 
 
@@ -100,10 +100,12 @@ def _sequence(edges: list[dict], *extra_nodes: dict, **lifeline: object) -> wire
         {"key": "y", "shape": "cycle", "steps": ["S", "T", "U"], "col": 2, "row": 0},
         {"key": "g", "shape": "gauge", "bands": ["S"], "col": 2, "row": 0},
         {"key": "e", "shape": "entity_table", "label": "E", "fields": [{"name": "id"}], "col": 2, "row": 0},
+        {"key": "u", "shape": "audience", "groups": [3, 2], "col": 2, "row": 0},
+        {"key": "n", "shape": "gantt", "plan": [{"tasks": [{"label": "T", "start": "2026-11-09", "days": 3}]}], "col": 2, "row": 0},
     ],
 )
 def test_each_complex_shape_is_an_ordinary_part_of_the_one_format(node: dict) -> None:
-    """Every document is the package SimpleDiagrams 5.2 writes, so a complex shape needs
+    """Every document is the package SimpleDiagrams 5.4 writes, so a complex shape needs
     no other format or version."""
     document = _compile([_box("a", 0, 0), node])
     assert document.schema_version == wire.SCHEMA_VERSION
@@ -124,7 +126,7 @@ def test_the_complex_profile_round_trips_unchanged() -> None:
 
 
 def test_every_setting_is_written_even_at_its_default() -> None:
-    """Format 19 requires each setting a type declares, so a default left out would refuse
+    """Format 21 requires each setting a type declares, so a default left out would refuse
     the document; `hand_drawn` alone is written only as false."""
     document = _compile([
         {"key": "c", "shape": "container", "label": "C", "members": ["a"]},
@@ -137,7 +139,7 @@ def test_every_setting_is_written_even_at_its_default() -> None:
         for element in document.pages[0].elements if element.complex_shape
     }
     assert records["container"]["settings"] == {"layout": "free", "title_style": "band"}
-    assert records["table"]["settings"] == {"header_row": True}
+    assert records["table"]["settings"] == {"header_row": True, "uml_box": "none"}
     assert records["lifeline"]["settings"] == {"head_style": "box", "ends_in_destroy_mark": False}
     for record in records.values():
         assert record["version"] == 1 and "hand_drawn" not in record
@@ -690,11 +692,11 @@ def test_a_lane_title_longer_than_its_lane_is_reported() -> None:
 
 
 def test_a_complex_document_is_written_and_read_back(tmp_path: Path) -> None:
-    """The package on disk carries manifest 19 and the records, and reads back as written."""
+    """The package on disk carries manifest 21 and the records, and reads back as written."""
     document = compile_spec(load_spec(ROOT / "assets" / "example-sequence-spec.json"))
     written = write_package(document, tmp_path / "Sequence.simplediagram")
     manifest = json.loads((written / "manifest.json").read_text())
-    assert manifest["format_version"] == 19
+    assert manifest["format_version"] == 21
     again = wire.Document.model_validate_json((written / "document.json").read_text())
     assert wire.dump(again) == wire.dump(document)
 
@@ -709,7 +711,7 @@ def test_the_build_writes_a_complex_example(tmp_path: Path) -> None:
     )
     assert result.returncode == 0, result.stdout + result.stderr
     assert not [line for line in result.stdout.splitlines() if line.startswith(("warning", "error"))]
-    assert json.loads((target / "manifest.json").read_text())["format_version"] == 19
+    assert json.loads((target / "manifest.json").read_text())["format_version"] == 21
 
 
 def test_a_search_for_a_complex_shape_names_the_kind() -> None:
@@ -722,6 +724,8 @@ def test_a_search_for_a_complex_shape_names_the_kind() -> None:
     assert [hint["shape"] for hint in complex_shape_hints("sales funnel")] == ["pyramid"]
     assert [hint["shape"] for hint in complex_shape_hints("donut")] == ["ring"]
     assert [hint["shape"] for hint in complex_shape_hints("funnels")] == ["pyramid"]
+    assert [hint["shape"] for hint in complex_shape_hints("project schedule")] == ["gantt"]
+    assert [hint["shape"] for hint in complex_shape_hints("parliament seats")] == ["audience"]
     assert complex_shape_hints("currency") == []
 
 

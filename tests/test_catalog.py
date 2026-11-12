@@ -54,7 +54,7 @@ def test_the_list_holds_only_the_shapes_packaged_with_the_app() -> None:
     """Every library is one SimpleDiagrams ships, named by the app's own identifiers, and
     nothing in the list points at the website, so no shape can need a download."""
     bundled = _bundled()
-    assert bundled["source_app_version"] == "5.2.0"
+    assert bundled["source_app_version"] == "5.4.0"
     assert [library["short_name"] for library in bundled["libraries"]] == [
         "basic", "basicClean", "3DBasicHatch", "wordBubbles", "biz", "uiFlow", "bpmn", "uml",
     ]
@@ -62,7 +62,7 @@ def test_the_list_holds_only_the_shapes_packaged_with_the_app() -> None:
         assert library["library_id"] == LIBRARY_PREFIX + library["short_name"]
     text = json.dumps(bundled)
     assert "published" not in text and "http" not in text
-    assert len(Catalog.load().shapes) == 534
+    assert len(Catalog.load().shapes) == 535
 
 
 def test_every_selector_names_one_shape() -> None:

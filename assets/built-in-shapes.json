@@ -1,7 +1,7 @@
 {
  "catalog": "com.simplediagrams.skill.built-in-shapes",
  "catalog_version": 1,
- "source_app_version": "5.2.0",
+ "source_app_version": "5.4.0",
  "note": "Shapes that SimpleDiagrams resolves by reference. A symbol_reference uses library_id, item_id and the library's asset_version exactly as listed.",
  "libraries": [
   {
@@ -4036,6 +4036,22 @@
       "segment"
      ],
      "first_release": "5.0.16"
+    },
+    {
+     "item_id": "trophy",
+     "display_name": "Trophy",
+     "default_width": 75.25,
+     "default_height": 79.5,
+     "slug": "trophy",
+     "description": "A trophy cup for a win, an award or a champion, such as the winner of a tournament.",
+     "keywords": [
+      "trophy",
+      "award",
+      "prize",
+      "winner",
+      "cup",
+      "champion"
+     ]
     }
    ]
   },

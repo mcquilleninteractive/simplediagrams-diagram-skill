@@ -1,8 +1,9 @@
 """Documents shared by format tests and private compatibility checks.
 
 `full_profile_document` uses every optional feature of plain shapes and connectors
-the authoring profile allows, and `complex_profile_document` every type of complex shape,
-connector ends along a lifeline and on a part, and label regions starting outside their shape.
+the authoring profile allows, lists, a collapsed note and labels beside a connector's ends
+among them, and `complex_profile_document` every type of complex shape, connector ends along
+a lifeline and on a part, and label regions starting outside their shape.
 They exist so these documents can be shown to SimpleDiagrams' own reader
 whenever the format or the models change; see VERSIONS.md.
 """
@@ -90,6 +91,37 @@ def full_profile_document() -> wire.Document:
             style=wire.ElementStyle(fill_hex="#00000000", stroke_hex="#343A40", line_width=2.0),
             connection_points=[wire.ConnectionPointAnchor(id=9, x=0.25, y=0.75)],
         ),
+        # Lists: numbered items, then a bulleted one a level in, in a collapsed note.
+        _element(
+            7, "note", 100.0, 500.0, note_style="documentation", collapsed=True,
+            text=wire.text_content(
+                "Before shipping\nCheck\nPack\nBox",
+                base_alignment="leading",
+                paragraph_runs=[
+                    wire.ParagraphRun(
+                        range=wire.TextRange(location=16, length=11), alignment="leading",
+                        list=wire.ListMarker(kind="number", level=1),
+                    ),
+                    wire.ParagraphRun(
+                        range=wire.TextRange(location=27, length=3), alignment="leading",
+                        list=wire.ListMarker(kind="bullet", level=2),
+                    ),
+                ],
+            ),
+        ),
+        # A list item whose words are not plain ASCII: its run is counted in UTF-16 units.
+        _element(
+            8, "note", 400.0, 500.0, note_style="umlNote",
+            text=wire.text_content(
+                "Liste\ncafé \U0001F600\nfin",
+                paragraph_runs=[
+                    wire.ParagraphRun(
+                        range=wire.TextRange(location=6, length=8), alignment="leading",
+                        list=wire.ListMarker(kind="bullet", level=3),
+                    )
+                ],
+            ),
+        ),
     ]
     connections = [
         wire.connection(
@@ -105,6 +137,8 @@ def full_profile_document() -> wire.Document:
             start_ending="zeroOrMany", end_ending="oneAndOnlyOne", stroke_texture="PencilFill",
             label=wire.ConnectorLabel(content=wire.text_content("has"), position=0.25, normal_offset=-12.0),
             is_locked=True,
+            start_label=wire.end_label(wire.text_content("1")),
+            end_label=wire.end_label(wire.text_content("0..*\nitems"), distance=12.0, normal_offset=6.0),
         ),
         wire.connection(
             id=_uuid(21),
@@ -148,7 +182,7 @@ def full_profile_document() -> wire.Document:
         ],
         drawable_order=[
             wire.DrawableReference(kind="connection", id=_uuid(20)),
-            *(wire.DrawableReference(kind="element", id=_uuid(number)) for number in range(1, 7)),
+            *(wire.DrawableReference(kind="element", id=_uuid(number)) for number in range(1, 9)),
             wire.DrawableReference(kind="connection", id=_uuid(21)),
         ],
         guides=[
@@ -222,7 +256,7 @@ def complex_profile_document() -> wire.Document:
             8, 100.0, 450.0, 200.0, 80.0,
             wire.table_shape(
                 [1.0, 2.0], [30.0, 70.0], [[cell("a"), cell("b")], [cell("c", base_alignment="leading"), cell("")]],
-                header_row=False, hand_drawn=False,
+                header_row=False, uml_box="class", hand_drawn=False,
             ),
         ),
         _complex(
@@ -260,7 +294,7 @@ def complex_profile_document() -> wire.Document:
             41, 400.0, 900.0, 200.0, 200.0,
             wire.ring_shape(
                 [
-                    wire.labelled_part("section", _uuid(510), cell("A"), painted, points=1, index=0),
+                    wire.labelled_part("section", _uuid(510), cell("A"), painted, points=1, index=0, size=30),
                     wire.labelled_part("section", _uuid(511), cell("B"), points=1, index=1),
                 ],
                 "full",
@@ -270,6 +304,24 @@ def complex_profile_document() -> wire.Document:
         _complex(43, 100.0, 1150.0, 240.0, 200.0, wire.pyramid_shape(_labelled("layer", 530, ["P", "Q"], 2), form="funnel")),
         _complex(44, 400.0, 1150.0, 240.0, 240.0, wire.cycle_shape(_labelled("step", 540, ["P", "Q", "R"], 1), ring_width=60, direction="anticlockwise", arrow_style="chevron", hand_drawn=False)),
         _complex(45, 700.0, 1150.0, 200.0, 140.0, wire.gauge_shape(_labelled("band", 550, ["Low", "High"]), _uuid(552), minimum=-5.0, maximum=5.0, value=1.5, auto_rotate_labels=False), "Load"),
+        _complex(
+            46, 100.0, 1450.0, 240.0, 140.0,
+            wire.audience_shape([wire.seat_group(_uuid(560), 50, painted), wire.seat_group(_uuid(561), 30)], show_total=False),
+        ),
+        _complex(
+            47, 400.0, 1450.0, 480.0, 220.0,
+            wire.gantt_shape(
+                [wire.gantt_section(_uuid(570), cell("Plan"), 2, painted), wire.gantt_section(_uuid(571), cell(""), 2)],
+                [
+                    wire.GanttTask(_uuid(572), cell("Research"), 5, start="2026-11-09"),
+                    wire.GanttTask(_uuid(573), cell("Sketches"), 5, marks=("done",)),
+                    wire.GanttTask(_uuid(574), cell("Prototype"), 10, after=_uuid(572), marks=("crit",), style=painted),
+                    wire.GanttTask(_uuid(575), cell("Launch"), None),
+                ],
+                skip_weekends=True,
+            ),
+            "Project plan",
+        ),
     ]
     line = lambda number, distance: wire.Attachment(
         element_id=_uuid(number), attach_line_id=wire.LIFELINE_ATTACH_LINE, distance=distance
@@ -300,6 +352,13 @@ def complex_profile_document() -> wire.Document:
             # A field's own point, and a section's: numbers the shapes place themselves.
             start_attachment=wire.Attachment(element_id=_uuid(40), connection_point_id=9),
             end_attachment=wire.Attachment(element_id=_uuid(41), connection_point_id=8),
+        ),
+        wire.connection(
+            id=_uuid(24),
+            points=[wire.ConnectorPoint(x=220.0, y=1580.0, kind="straight"), wire.ConnectorPoint(x=500.0, y=1500.0, kind="straight")],
+            # The middle of an audience's base line, and the end of a task's bar.
+            start_attachment=wire.Attachment(element_id=_uuid(46), connection_point_id=3),
+            end_attachment=wire.Attachment(element_id=_uuid(47), connection_point_id=9),
         ),
     ]
     page = wire.page(

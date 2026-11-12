@@ -55,7 +55,7 @@ COMPLEX_SHAPE_HINTS: tuple[tuple[str, str, frozenset[str]], ...] = (
     ),
     (
         "ring",
-        'a donut or pie chart cut into sections (`"ring_width": "full"` for a pie)',
+        'a donut or pie chart cut into sections, each with its share (`"ring_width": "full"` for a pie)',
         frozenset({"ring", "rings", "donut", "donuts", "doughnut", "pie", "pies", "chart", "section", "sections", "segment", "segments"}),
     ),
     (
@@ -77,6 +77,16 @@ COMPLEX_SHAPE_HINTS: tuple[tuple[str, str, frozenset[str]], ...] = (
         "gauge",
         "a half dial with coloured bands and a needle pointing at a value",
         frozenset({"gauge", "gauges", "dial", "meter", "speedometer", "needle", "kpi"}),
+    ),
+    (
+        "gantt",
+        "a chart of tasks over time: bars in sections along a date axis, with milestones",
+        frozenset({"gantt", "schedule", "schedules", "milestone", "milestones", "deadline", "deadlines"}),
+    ),
+    (
+        "audience",
+        "an arch of seats in coloured groups, such as the seats of an assembly or the votes of a board",
+        frozenset({"audience", "seats", "seating", "parliament", "assembly", "hemicycle", "votes", "council"}),
     ),
     (
         "callout",
