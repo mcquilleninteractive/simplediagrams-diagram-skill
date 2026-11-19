@@ -2787,6 +2787,10 @@ class _PageCompiler:
         )
 
         connections: list[wire.Connection] = []
+        # How many end labels already sit at each attachment point, by which end of its
+        # line the label is at: lines sharing a point run the same way there, so a second
+        # label takes the line's other side instead of covering the first.
+        labels_at: dict[tuple[str, str, int], int] = {}
         for edge_index, edge in enumerate(edges):
             message = self.messages.get(edge_index)
             right_angle = False
@@ -2824,8 +2828,8 @@ class _PageCompiler:
                     end_ending=edge.end_ending,
                     label=self._edge_label(edge.label, beside_loop=message is not None and edge.source == edge.target),
                     right_angle=right_angle,
-                    start_label=self._end_label(edge.source_label),
-                    end_label=self._end_label(edge.target_label),
+                    start_label=self._end_label(edge.source_label, "start", start_attachment, labels_at),
+                    end_label=self._end_label(edge.target_label, "end", end_attachment, labels_at),
                 )
             )
         for number, (key, at, label) in enumerate(self.dividers):
@@ -2860,11 +2864,21 @@ class _PageCompiler:
         )
 
     @staticmethod
-    def _end_label(text: str) -> wire.ConnectorEndLabel | None:
-        """A label beside a connector's end, in the words and at the place the app gives a new one."""
+    def _end_label(
+        text: str, end: str, attachment: wire.Attachment | None, labels_at: dict[tuple[str, str, int], int]
+    ) -> wire.ConnectorEndLabel | None:
+        """A label beside a connector's end, in the words and at the place the app gives a new
+        one. Labels of lines that share an attachment point alternate between the line's two
+        sides, since the app's starting place is the same for each of them."""
         if not text:
             return None
-        return wire.end_label(wire.text_content(text, base_style=wire.character_style(font_size=13.0, weight="regular")))
+        content = wire.text_content(text, base_style=wire.character_style(font_size=13.0, weight="regular"))
+        if attachment is None:
+            return wire.end_label(content)
+        place = (end, attachment.element_id, attachment.connection_point_id)
+        earlier = labels_at.get(place, 0)
+        labels_at[place] = earlier + 1
+        return wire.end_label(content) if earlier % 2 == 0 else wire.end_label(content, normal_offset=2.0)
 
     # -- Elements -----------------------------------------------------------------------
 

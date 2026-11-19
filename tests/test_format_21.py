@@ -210,6 +210,26 @@ def test_end_labels_are_written_where_the_app_places_new_ones() -> None:
     assert "label" not in connection["content"]
 
 
+def test_end_labels_of_lines_sharing_a_point_take_opposite_sides() -> None:
+    """Two owners' lines arrive at one point of the thing they own, each with its share
+    beside that end. At the app's one starting place the second would cover the first, so
+    it goes to the line's other side; a label alone at its point stays where the app puts it."""
+    document = _compile(
+        {"key": "a", "shape": "rectangle", "label": "Trust", "x": 0, "y": 0},
+        {"key": "b", "shape": "rectangle", "label": "Founder", "x": 600, "y": 0},
+        {"key": "c", "shape": "rectangle", "label": "Holdings", "x": 300, "y": 300},
+        {"key": "d", "shape": "rectangle", "label": "Subsidiary", "x": 300, "y": 600},
+        edges=[
+            {"source": "a", "target": "c", "target_label": "60%", "source_side": "bottom", "target_side": "top"},
+            {"source": "b", "target": "c", "target_label": "40%", "source_side": "bottom", "target_side": "top"},
+            {"source": "c", "target": "d", "target_label": "100%", "source_side": "bottom", "target_side": "top"},
+        ],
+    )
+    first, second, alone = (wire.dump(connection) for connection in document.pages[0].connections)
+    assert first["content"]["end_attachment"] == second["content"]["end_attachment"]
+    assert [c["end_label"]["normal_offset"] for c in (first, second, alone)] == [-2.0, 2.0, -2.0]
+
+
 def test_an_end_label_holds_at_most_200_characters() -> None:
     """The app refuses a document whose end label is longer, so the spec stops it first."""
     with pytest.raises(ValidationError):
